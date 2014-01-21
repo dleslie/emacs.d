@@ -6,21 +6,26 @@ A collection of my emacs settings, tuned for Emacs 24.2 and higher.
 Setup
 =====
 
-1. Link this repository to ~/.emacs.d
-2. Add the following to ~/.emacs
+* Link this repository to ~/.emacs.d
+* Add the following to ~/.emacs
+
 ```elisp
 (defun post-init-hook ()
   (load "~/.emacs.d/post-init.el"))
 
 (add-hook 'after-init-hook 'post-init-hook)
 ```
-3. Jedi Mode requires additional configuration, but is so worth it:
+
+* Jedi Mode requires additional configuration, but is so worth it:
+
 ```
 pip install jedi
 ```
-4. C++ auto-complete support requires clang and is bound to C-return.
+
+* C++ auto-complete support requires clang and is bound to C-return.
 JIT auto-complete with clang is a tad too slow to be bearable on my netbook.
-5. Scheme is currently configured to use my chicken-scheme mode, and so requires Chicken Scheme 4.8.0 or higher installed. If you use another Scheme then I highly recommend Geiser.
+
+* Scheme is currently configured to use my chicken-scheme mode, and so requires Chicken Scheme 4.8.0 or higher installed. If you use another Scheme then I highly recommend Geiser.
 
 Additional Package Requirements
 ===============================
