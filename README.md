@@ -9,7 +9,7 @@ Setup
 * Link this repository to ~/.emacs.d
 * Add the following to ~/.emacs
 
-```elisp
+```
 (defun post-init-hook ()
   (load "~/.emacs.d/post-init.el"))
 
@@ -26,6 +26,28 @@ pip install jedi
 JIT auto-complete with clang is a tad too slow to be bearable on my netbook.
 
 * Scheme is currently configured to use my chicken-scheme mode, and so requires Chicken Scheme 4.8.0 or higher installed. If you use another Scheme then I highly recommend Geiser.
+
+Clang Completion Notes
+======================
+
+You may need to perform some additional configuration to get clang to auto-complete appropriately. To do so, modify the following variable in post-init.el:
+
+```lisp
+(setq ac-clang-flags '("-I/usr/local/include"
+                 "-I/usr/include/c++/4.7/"
+                 "-I/usr/include/x86_64-linux-gnu/c++/4.7/"
+                 "-I/usr/include"
+                 "-I/usr/include/x86_64-linux-gnu"
+                 "-I/usr/include/clang/3.2/include"
+                 "-std=c++11"
+                 "-pthread"
+                 "-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_1"
+                 "-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2"
+                 "-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4"
+                 "-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8"))
+```
+
+Generally, if clang fails to complete then there's something wrong with your code or a missing ac-clang-flags entry, you can check the \*clang-error\* buffer for more information.
 
 Additional Package Requirements
 ===============================
