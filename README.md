@@ -16,6 +16,17 @@ Setup
 (add-hook 'after-init-hook 'post-init-hook)
 ```
 
+3. Jedi Mode requires additional configuration, but is so worth it:
+
+```
+pip install jedi
+```
+
+4. C++ auto-complete support requires clang and is bound to C-return.
+JIT auto-complete with clang is a tad too slow to be bearable on my netbook.
+
+5. Scheme is currently configured to use my chicken-scheme mode, and so requires Chicken Scheme 4.8.0 or higher installed. If you use another Scheme then I highly recommend Geiser.
+
 Additional Package Requirements
 ===============================
 
