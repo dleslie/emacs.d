@@ -7,9 +7,11 @@
 (message "Configuring package archives")
 
 (setq package-archives 
-      '(("gnu" . "http://elpa.gnu.org/packages/")
+      '(
+        ("melpa" . "http://melpa.milkbox.net/packages/")
+        ;; ("gnu" . "http://elpa.gnu.org/packages/")
         ("marmalade" . "http://marmalade-repo.org/packages/")
-        ("melpa" . "http://melpa.milkbox.net/packages/")))
+	))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Extra Modes
@@ -110,37 +112,55 @@
 
 (ac-config-default)
 
-(add-to-list 'ac-sources 'ac-source-gtags)
+(setq ac-etags-requires 1)
+(eval-after-load "etags" '(progn (ac-etags-setup)))
+(add-to-list 'ac-sources 'ac-source-etags)
 
-(setq ac-quick-help-delay 0.5)
+;(add-to-list 'ac-sources 'ac-source-gtags)
+
+(setq ac-quick-help-delay 0.15)
+(setq ac-delay 0.25)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; AC-Clang
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(message "Configuring ac-clang")
+
 (require 'auto-complete-clang)
 
 (setq ac-clang-flags '("-I/usr/local/include" 
-		       "-I/usr/include/c++/4.7/" 
-		       "-I/usr/include/x86_64-linux-gnu/c++/4.7/"
 		       "-I/usr/include"
-		       "-I/usr/include/x86_64-linux-gnu"
 		       "-I/usr/include/clang/3.2/include"
+		       "-I/usr/include/clang/3.4/include"
+		       "-I/usr/lib/llvm-3.2/lib/clang/3.2/include/"
+		       "-I/usr/lib/llvm-3.4/lib/clang/3.4/include/"
+		       "-I/usr/include/c++/4.4/" 
+		       "-I/usr/include/c++/4.7/" 
+		       "-I/usr/include/c++/4.8/" 
+		       "-I/usr/include/x86_64-linux-gnu"
+		       "-I/usr/include/x86_64-linux-gnu/c++/4.7/"
+		       "-I/usr/include/x86_64-linux-gnu/c++/4.8/"
+		       "-I/usr/lib/gcc/x86_64-linux-gnu/4.7/include/"
+		       "-I/usr/lib/gcc/x86_64-linux-gnu/4.8/include/"
 		       "-std=c++11"
 		       "-pthread"
 		       "-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_1"
 		       "-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2"
 		       "-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4"
-		       "-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8"))
+		       "-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8"
+		       "-Wno-write-strings" 
+		       "-Wno-implicit-function-declaration" 
+		       "-Wno-deprecated"))
+
+;; Project includes
+(setq my-c++-engine-flags '("-I/home/dleslie/Workspace/c++_engine/src/"
+			    "-I/home/dleslie/Workspace/c++_engine/build/debug/include"))
+(setq ac-clang-flags (append ac-clang-flags my-c++-engine-flags))
 
 (defun ac-clang-at-will ()
   (interactive)
   (auto-complete (cons 'ac-source-clang 'ac-sources)))
-
-;; (add-hook 'c-mode-hook 'ac-clang-hook)
-;; (add-hook 'c++-mode-hook 'ac-clang-hook)
-;; (add-hook 'objc-mode-hook 'ac-clang-hook)
-(define-key ac-mode-map  [(control return)] 'ac-clang-at-will)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Rainbow Mode
@@ -189,6 +209,8 @@
 ;; C++
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(message "Extending C++11 fontlocking")
+
 ;; Fixes missing C++11 fontlocking in cc-mode
 (defun c++-font-lock-fix ()
   (font-lock-add-keywords 
@@ -213,7 +235,7 @@
 ;; Compilation
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(message "Configuring Compilation  Mode")
+(message "Configuring Compilation Mode")
 
 (defun compilation-custom-hook ()
   (visual-line-mode 1))
@@ -261,7 +283,7 @@
 ;; Python
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(message "Configuring Python  Mode")
+(message "Configuring Python Mode")
 
 (setq jedi:setup-keys t)                      ; optional
 (setq jedi:complete-on-dot t)                 ; optional
@@ -269,26 +291,27 @@
 ;; (setq jedi:server-command (quote ("python3" "/home/dleslie/.emacs.d/elpa/jedi-20130714.1415/jediepcserver.py")))
 ;; (setq python-shell-interpreter "python3")
 (setq py-python-command "/usr/bin/python")
-(setq jedi:server-command (quote ("python" "/home/dleslie/.emacs.d/elpa/jedi-20130714.1228/jediepcserver.py")))
+(setq jedi:server-command (quote ("python" "/home/dleslie/.emacs.d/elpa/jedi-20140131.1756/jediepcserver.py")))
 (setq python-shell-interpreter "python")
 (setq python-indent-offset 4)
 
 (add-hook 'python-mode-hook 'jedi:setup)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Keys
+;; HELM
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(message "Configuring custom keys")
+;(message "Configuring helm-mode")
 
-(global-set-key "\C-w" 'clipboard-kill-region)
-(global-set-key "\M-w" 'clipboard-kill-ring-save)
-(global-set-key "\C-y" 'clipboard-yank)
-(global-set-key (kbd "C-;") 'comment-or-uncomment-region)
-(global-set-key (kbd "TAB") 'indent-according-to-mode)
+;(require 'helm-mode)
 
-(global-set-key [f11] 'speedbar)
-(global-set-key [f12] 'menu-bar-mode)
+;(require 'helm-config)
+;; (helm-mode 1)
+
+;(require 'ac-helm)
+;(require 'helm-gist)
+;(require 'helm-themes)
+;(require 'helm-git)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Scheme
@@ -314,8 +337,6 @@
 
 (message "Configuring Miscellaneous")
 
-(setq ac-auto-show-menu 0.8)
-(setq ac-candidate-limit 50)
 (setq auto-fill-mode t)
 (setq c-basic-offset 2)
 (setq c-set-offset 2)
@@ -326,7 +347,6 @@
 (setq fill-column 80)
 (setq indent-tabs-mode nil)
 (setq line-number-mode t)
-(setq make-backup-files 0) 
 (setq redisplay-dont-pause t)
 (setq scroll-bar-mode nil)
 (setq scroll-margin 0)
@@ -338,9 +358,33 @@
 (setq truncate-lines t)
 (setq visual-line-mode t)
 (setq word-wrap t)
+(setq make-backup-files nil)
 
 (require 'nyan-mode)
 (setq nyan-wavy-trail t)
 (nyan-mode t)
 
 (message "Post Init Complete.")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Keys
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(message "Configuring custom keys")
+
+(global-set-key "\C-w" 'clipboard-kill-region)
+(global-set-key "\M-w" 'clipboard-kill-ring-save)
+(global-set-key "\C-y" 'clipboard-yank)
+(global-set-key (kbd "C-;") 'comment-or-uncomment-region)
+(global-set-key (kbd "TAB") 'indent-according-to-mode)
+
+(global-set-key [f11] 'speedbar)
+(global-set-key [f12] 'menu-bar-mode)
+
+(global-set-key (kbd "C-c h") 'helm-mini)
+(global-set-key (kbd "C-c g") 'helm-git-grep)
+
+(define-key ac-mode-map  [(control return)] 'ac-clang-at-will)
+; (global-set-key [(control shift return)] 'ac-complete-with-helm)
+; (define-key ac-complete-mode-map [(control shift return)] 'ac-complete-with-helm)
+
