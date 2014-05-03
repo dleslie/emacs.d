@@ -9,7 +9,7 @@
 (setq package-archives 
       '(
         ("melpa" . "http://melpa.milkbox.net/packages/")
-        ;; ("gnu" . "http://elpa.gnu.org/packages/")
+        ("gnu" . "http://elpa.gnu.org/packages/")
         ("marmalade" . "http://marmalade-repo.org/packages/")
 	))
 
@@ -24,63 +24,20 @@
 (require 'ditz-mode)
 (require 'gist)
 (require 'seclusion-mode)
-;; (require 'cmake-mode)
+(require 'main-line)
+(setq main-line-separator-style 'arrow)
 
-;; (add-to-list 'auto-mode-alist '("\\.cmake\\'" . cmake-mode))
-;; (add-to-list 'auto-mode-alist '("CMakeLists\\.txt\\'" . cmake-mode))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Irony
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; (require 'nyan-mode)
+;; (setq nyan-wavy-trail t)
+;; (nyan-mode t)
 
-;; (add-to-list 'load-path (expand-file-name "~/.emacs.d/irony-mode/elisp"))
+(require 'ggtags)
 
-;; (require 'irony)
-;; (irony-enable 'ac)
+(defun custom-prog-hook ()
+  (ggtags-mode 1))
 
-;; (defun irony-mode-hooks ()
-;;   (irony-mode 1))
-
-;; (add-hook 'c++-mode-hook 'irony-mode-hooks)
-;; (add-hook 'c-mode-hook 'irony-mode-hooks) 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; CEDET
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; (message "Configuring CEDET")
-
-;; (semantic-mode t)
-
-;; (require 'semantic/ia)
-;; (require 'semantic/bovine)
-
-;; (global-semantic-decoration-mode t)
-;; (global-semantic-stickyfunc-mode 0)
-;; (global-semantic-highlight-edits-mode 0)
-;; (global-semantic-highlight-func-mode t)
-;; (global-semantic-idle-completions-mode t)
-;; (global-semantic-idle-summary-mode 0)
-;; (global-semantic-show-parser-state-mode t)
-;; (global-semantic-show-unmatched-syntax-mode 0)
-
-;; (global-srecode-minor-mode t)
-
-;; (semantic-add-system-include "/usr/local/include/" 'c-mode)
-;; (semantic-add-system-include "/usr/include/c++/4.7/" 'c-mode)
-;; (semantic-add-system-include "/usr/local/include/" 'c++-mode)
-;; (semantic-add-system-include "/usr/include/c++/4.7/" 'c++-mode)
-
-;; (defun cedet-local-config () 
-;;   (local-set-key [(control return)] 'semantic-ia-complete-symbol)
-;;   (local-set-key "\C-c?" 'semantic-ia-complete-symbol-menu)
-;;   (local-set-key "\C-c>" 'semantic-complete-analyze-inline)
-;;   (local-set-key "\C-cp" 'semantic-analyze-proto-impl-toggle))
-
-;; (add-hook 'emacs-lisp-mode-hook 'cedet-local-config)
-;; (add-hook 'c-mode-common-hook 'cedet-local-config)
-;; (add-hook 'lisp-mode-hook 'cedet-local-config)
-;; (add-hook 'java-mode-hook 'cedet-local-config)
+(add-hook 'prog-mode-hook 'custom-prog-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Auto-complete
@@ -110,16 +67,17 @@
                        xml-mode sgml-mode 
                        lua-mode)))
 
-(ac-config-default)
-
-(setq ac-etags-requires 1)
-(eval-after-load "etags" '(progn (ac-etags-setup)))
+(require 'auto-complete-etags)
 (add-to-list 'ac-sources 'ac-source-etags)
+(add-to-list 'ac-sources 'ac-source-gtags)
 
-;(add-to-list 'ac-sources 'ac-source-gtags)
+(setq ac-etags-use-document t)
 
 (setq ac-quick-help-delay 0.15)
 (setq ac-delay 0.25)
+(setq ac-auto-start 1)
+
+(ac-config-default)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; AC-Clang
@@ -172,16 +130,17 @@
 (require 'rainbow-delimiters)
 
 (custom-set-faces
- '(rainbow-delimiters-depth-1-face ((t (:foreground "dark violet"))))
- '(rainbow-delimiters-depth-2-face ((t (:foreground "royal blue"))))
- '(rainbow-delimiters-depth-3-face ((t (:foreground "dark turquoise"))))
- '(rainbow-delimiters-depth-4-face ((t (:foreground "dark violet"))))
- '(rainbow-delimiters-depth-5-face ((t (:foreground "royal blue"))))
- '(rainbow-delimiters-depth-6-face ((t (:foreground "dark turquoise"))))
- '(rainbow-delimiters-depth-7-face ((t (:foreground "dark violet"))))
- '(rainbow-delimiters-depth-8-face ((t (:foreground "royal blue"))))
- '(rainbow-delimiters-depth-9-face ((t (:foreground "dark turquoise"))))
- '(rainbow-delimiters-unmatched-face ((t (:background "red" :foreground "white")))))
+ '(rainbow-delimiters-depth-1-face ((t (:inherit font-lock-function-name-face))))
+ '(rainbow-delimiters-depth-2-face ((t (:inherit font-lock-variable-name-face))))
+ '(rainbow-delimiters-depth-3-face ((t (:inherit font-lock-keyword-face))))
+ '(rainbow-delimiters-depth-4-face ((t (:inherit font-lock-comment-face))))
+ '(rainbow-delimiters-depth-5-face ((t (:inherit font-lock-type-face))))
+ '(rainbow-delimiters-depth-6-face ((t (:inherit font-lock-constant-face))))
+ '(rainbow-delimiters-depth-7-face ((t (:inherit font-lock-builtin-face))))
+ '(rainbow-delimiters-depth-8-face ((t (:inherit font-lock-string-face))))
+ '(rainbow-delimiters-depth-9-face ((t (:inherit font-lock-doc-face))))
+ '(rainbow-delimiters-unmatched-face ((((class color) (min-colors 89)) (:foreground "#ffffff" :background "#a40000" :bold t))))
+)
 
 (global-rainbow-delimiters-mode)
 
@@ -231,6 +190,19 @@
 
 (add-hook 'c++-mode-hook 'c++-font-lock-fix)
 
+(defun custom-c-hook ()
+  (interactive)
+  "Function to be called when entering into c-mode."
+  (auto-complete-mode t)
+  (make-local-variable 'ac-auto-start)
+  (setq ac-auto-start 2)
+  (make-local-variable 'ac-sources)
+  (add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers)
+  (add-to-list 'ac-sources 'ac-source-dictionary)
+  (add-to-list 'ac-sources 'ac-source-etags))
+
+(add-hook 'c-mode-common-hook 'custom-c-hook)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Compilation
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -266,8 +238,9 @@
       '(("Daily review" ?d "* %T %^g \n:CATEGORY: Review\n%?%[~/Workspace/org/template_daily_review.org]\n" "~/Workspace/org/remember.org" "Daily Review")
         ("Idea" ?i "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Idea\n" "~/Workspace/org/remember.org" "Ideas")
         ("Journal" ?j "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Journal\n" "~/Workspace/org/remember.org" "Journal")
-        ("Letter" ?l "* %^{topic} %T %^g\n:CATEGORY: Letter\n%i%?\n" "~/Crypt/letters.org" "Letter")
-        ("Work Log" ?w "* %^{topic} %T %^g\n:CATEGORY: Log\n%i%?\n" "~/Workspace/org/remember.org" "Work Log")))
+        ("Letter" ?l "* %^{topic} %T %^g\n:CATEGORY: Letter\n%i%?\n" "~/Workspace/org/remember.org" "Letter")
+        ("Work Log" ?w "* %^{topic} %T %^g\n:CATEGORY: Log\n%i%?\n" "~/Workspace/org/remember.org" "Work Log")
+	("Article" ?a "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Article\n" "~/Workspace/org/remember.org" "Article")))
 
 (setq org-todo-keywords
       '((sequence "TODO" "DOIN" "BLCK" "STAL" "|" "WONT" "DONE")))
@@ -278,6 +251,12 @@
         ("BLCK" . (:foreground "red" :weight bold))
         ("STAL" . (:foreground "yellow" :weight bold))
         ))
+
+(defun custom-org-hook ()
+  (visual-line-mode 1)
+  (flyspell-mode 1))
+
+(add-hook 'org-mode-hook 'custom-org-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Python
@@ -291,27 +270,14 @@
 ;; (setq jedi:server-command (quote ("python3" "/home/dleslie/.emacs.d/elpa/jedi-20130714.1415/jediepcserver.py")))
 ;; (setq python-shell-interpreter "python3")
 (setq py-python-command "/usr/bin/python")
-(setq jedi:server-command (quote ("python" "/home/dleslie/.emacs.d/elpa/jedi-20140131.1756/jediepcserver.py")))
+(setq jedi:server-command (quote ("python" "/home/dleslie/.emacs.d/elpa/jedi-20140321.1323/jediepcserver.py")))
 (setq python-shell-interpreter "python")
 (setq python-indent-offset 4)
 
-(add-hook 'python-mode-hook 'jedi:setup)
+(defun python-custom-hook ()
+  (jedi:setup))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; HELM
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;(message "Configuring helm-mode")
-
-;(require 'helm-mode)
-
-;(require 'helm-config)
-;; (helm-mode 1)
-
-;(require 'ac-helm)
-;(require 'helm-gist)
-;(require 'helm-themes)
-;(require 'helm-git)
+(add-hook 'python-mode-hook 'python-custom-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Scheme
@@ -329,7 +295,10 @@
 	    ac-source-chicken-symbols-prefixed
 	 )))
 
-(add-hook 'scheme-mode-hook 'scheme-ac-hook)
+(defun custom-scheme-hook ()
+  (scheme-ac-hook))
+
+(add-hook 'scheme-mode-hook 'custom-scheme-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc Custom
@@ -353,18 +322,13 @@
 (setq scroll-step 1)
 (setq show-paren-mode t)
 (setq standard-indent 2)
-(setq tab-stop-list (number-sequence 4 200 4))
+(setq tab-stop-list (number-sequence 2 200 2))
 (setq tab-width 4)
 (setq truncate-lines t)
 (setq visual-line-mode t)
 (setq word-wrap t)
 (setq make-backup-files nil)
-
-(require 'nyan-mode)
-(setq nyan-wavy-trail t)
-(nyan-mode t)
-
-(message "Post Init Complete.")
+(setq ac-etags-use-document t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keys
@@ -385,6 +349,6 @@
 (global-set-key (kbd "C-c g") 'helm-git-grep)
 
 (define-key ac-mode-map  [(control return)] 'ac-clang-at-will)
-; (global-set-key [(control shift return)] 'ac-complete-with-helm)
-; (define-key ac-complete-mode-map [(control shift return)] 'ac-complete-with-helm)
+
+(message "Post Init Complete.")
 
