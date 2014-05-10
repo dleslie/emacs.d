@@ -27,6 +27,7 @@
 (require 'main-line)
 (setq main-line-separator-style 'arrow)
 
+(require 'minimap)
 
 ;; (require 'nyan-mode)
 ;; (setq nyan-wavy-trail t)
@@ -342,6 +343,7 @@
 (global-set-key (kbd "C-;") 'comment-or-uncomment-region)
 (global-set-key (kbd "TAB") 'indent-according-to-mode)
 
+(global-set-key [f10] 'minimap-toggle)
 (global-set-key [f11] 'speedbar)
 (global-set-key [f12] 'menu-bar-mode)
 
