@@ -286,20 +286,8 @@
 
 (message "Configuring Scheme")
 
-(require 'multi-mode)
 (require 'scheme-c-mode)
 (require 'chicken-scheme)
-
-(defun scheme-ac-hook () 
-  (append ac-sources
-	  '(ac-source-chicken-symbols
-	    ac-source-chicken-symbols-prefixed
-	 )))
-
-(defun custom-scheme-hook ()
-  (scheme-ac-hook))
-
-(add-hook 'scheme-mode-hook 'custom-scheme-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc Custom
