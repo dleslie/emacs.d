@@ -154,7 +154,7 @@
 (message "Configuring paredit")
 
 (require 'parenface)
-(require 'paredit-everywhere)
+;; (require 'paredit-everywhere)
 
 (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
 
@@ -163,7 +163,7 @@
 (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
 (add-hook 'lisp-interaction-mode-hook 'enable-paredit-mode)
 
-(add-hook 'prog-mode-hook 'paredit-everywhere-mode)
+;; (add-hook 'prog-mode-hook 'paredit-everywhere-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C++
@@ -267,9 +267,6 @@
 
 (setq jedi:setup-keys t)                      ; optional
 (setq jedi:complete-on-dot t)                 ; optional
-;; (setq py-python-command "/usr/bin/python3")
-;; (setq jedi:server-command (quote ("python3" "/home/dleslie/.emacs.d/elpa/jedi-20130714.1415/jediepcserver.py")))
-;; (setq python-shell-interpreter "python3")
 (setq py-python-command "/usr/bin/python")
 (setq jedi:server-command (quote ("python" "/home/dleslie/.emacs.d/elpa/jedi-20140321.1323/jediepcserver.py")))
 (setq python-shell-interpreter "python")
@@ -310,6 +307,7 @@
 (setq scroll-margin 0)
 (setq scroll-step 1)
 (setq show-paren-mode t)
+(setq show-paren-style 'expression)
 (setq standard-indent 2)
 (setq tab-stop-list (number-sequence 2 200 2))
 (setq tab-width 4)
@@ -318,6 +316,8 @@
 (setq word-wrap t)
 (setq make-backup-files nil)
 (setq ac-etags-use-document t)
+(delete-selection-mode 1)
+(setq auto-save-default nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keys
@@ -334,9 +334,6 @@
 (global-set-key [f10] 'minimap-toggle)
 (global-set-key [f11] 'speedbar)
 (global-set-key [f12] 'menu-bar-mode)
-
-(global-set-key (kbd "C-c h") 'helm-mini)
-(global-set-key (kbd "C-c g") 'helm-git-grep)
 
 (define-key ac-mode-map  [(control return)] 'ac-clang-at-will)
 
