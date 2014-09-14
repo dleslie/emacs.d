@@ -21,21 +21,28 @@
 
 (add-to-list 'load-path "~/.emacs.d/")
 
-(require 'ditz-mode)
 (require 'gist)
-(require 'seclusion-mode)
-(require 'main-line)
-(setq main-line-separator-style 'arrow)
+;; (require 'seclusion-mode)
+;; (require 'main-line)
+;; (setq main-line-separator-style 'arrow)
 
-(require 'minimap)
+;; (require 'minimap)
 
-;; (require 'nyan-mode)
-;; (setq nyan-wavy-trail t)
-;; (nyan-mode t)
+(require 'nyan-mode)
+(setq nyan-wavy-trail t)
+(nyan-mode t)
+
+(require 'eldoc)
+(eldoc-mode t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ggtags
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'ggtags)
 
 (defun custom-prog-hook ()
+  (setq-local eldoc-documentation-function #'ggtags-eldoc-function)
   (ggtags-mode 1))
 
 (add-hook 'prog-mode-hook 'custom-prog-hook)
@@ -46,6 +53,7 @@
 
 (message "Configuring Auto-Complete")
 (require 'auto-complete-config)
+(ac-config-default)
 
 (add-to-list 'ac-dictionary-directories (expand-file-name "~/.emacs.d/ac-dict"))
 (setq ac-comphist-file (expand-file-name "~/.emacs.d/ac-comphist.dat"))
@@ -69,16 +77,17 @@
                        lua-mode)))
 
 (require 'auto-complete-etags)
+
 (add-to-list 'ac-sources 'ac-source-etags)
 (add-to-list 'ac-sources 'ac-source-gtags)
+(add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers)
+(add-to-list 'ac-sources 'ac-source-dictionary)
 
 (setq ac-etags-use-document t)
 
 (setq ac-quick-help-delay 0.15)
 (setq ac-delay 0.25)
-(setq ac-auto-start 1)
-
-(ac-config-default)
+(setq ac-auto-start 2)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; AC-Clang
@@ -130,40 +139,17 @@
 (require 'rainbow-mode)
 (require 'rainbow-delimiters)
 
-(custom-set-faces
- '(rainbow-delimiters-depth-1-face ((t (:inherit font-lock-function-name-face))))
- '(rainbow-delimiters-depth-2-face ((t (:inherit font-lock-variable-name-face))))
- '(rainbow-delimiters-depth-3-face ((t (:inherit font-lock-keyword-face))))
- '(rainbow-delimiters-depth-4-face ((t (:inherit font-lock-comment-face))))
- '(rainbow-delimiters-depth-5-face ((t (:inherit font-lock-type-face))))
- '(rainbow-delimiters-depth-6-face ((t (:inherit font-lock-constant-face))))
- '(rainbow-delimiters-depth-7-face ((t (:inherit font-lock-builtin-face))))
- '(rainbow-delimiters-depth-8-face ((t (:inherit font-lock-string-face))))
- '(rainbow-delimiters-depth-9-face ((t (:inherit font-lock-doc-face))))
- '(rainbow-delimiters-unmatched-face ((((class color) (min-colors 89)) (:foreground "#ffffff" :background "#a40000" :bold t))))
-)
-
 (global-rainbow-delimiters-mode)
 
 (add-hook 'after-find-file 'rainbow-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Paredit
+;; Parens
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(message "Configuring paredit")
-
-(require 'parenface)
-;; (require 'paredit-everywhere)
-
-(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
-
-(add-hook 'scheme-mode-hook 'enable-paredit-mode)
-(add-hook 'lisp-mode-hook 'enable-paredit-mode)
-(add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
-(add-hook 'lisp-interaction-mode-hook 'enable-paredit-mode)
-
-;; (add-hook 'prog-mode-hook 'paredit-everywhere-mode)
+(require 'smartparens-config)
+(show-smartparens-global-mode +1)
+(smartparens-global-mode 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C++
@@ -180,7 +166,7 @@
      ("\\<\\(alignof\\|alignas\\|constexpr\\|decltype\\|noexcept\\|nullptr\\|static_assert\\|thread_local\\|override\\|final\\)\\>" . font-lock-keyword-face)
      ("\\<\\(char[0-9]+_t\\)\\>" . font-lock-keyword-face)
      ;; PREPROCESSOR_CONSTANT
-     ("\\<[A-Z]+[A-Z_]+\\>" . font-lock-constant-face)
+     ("\\<[A-Z]+\\([A-Z_]+\\|[0-9]+\\)\\>" . font-lock-constant-face)
      ;; hexadecimal numbers
      ("\\<0[xX][0-9A-Fa-f]+\\>" . font-lock-constant-face)
      ;; integer/float/scientific numbers
@@ -190,19 +176,6 @@
      )))
 
 (add-hook 'c++-mode-hook 'c++-font-lock-fix)
-
-(defun custom-c-hook ()
-  (interactive)
-  "Function to be called when entering into c-mode."
-  (auto-complete-mode t)
-  (make-local-variable 'ac-auto-start)
-  (setq ac-auto-start 2)
-  (make-local-variable 'ac-sources)
-  (add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers)
-  (add-to-list 'ac-sources 'ac-source-dictionary)
-  (add-to-list 'ac-sources 'ac-source-etags))
-
-(add-hook 'c-mode-common-hook 'custom-c-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Compilation
@@ -285,6 +258,26 @@
 
 (require 'scheme-c-mode)
 (require 'chicken-scheme)
+
+;; (autoload 'scheme-smart-complete "scheme-complete" nil t)
+;; (eval-after-load 'scheme
+;;   '(define-key scheme-mode-map "\t" 'scheme-complete-or-indent))
+
+(autoload 'scheme-get-current-symbol-info "scheme-complete" nil t)
+(add-hook 'scheme-mode-hook
+  (lambda ()
+    (make-local-variable 'eldoc-documentation-function)
+    (setq eldoc-documentation-function 'scheme-get-current-symbol-info)
+    ;; (make-local-variable 'lisp-indent-function)
+    ;; (setq lisp-indent-function 'scheme-smart-indent-function)
+    (eldoc-mode)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Indent
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(require 'dtrt-indent)
+(dtrt-indent-mode 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc Custom
