@@ -1,5 +1,49 @@
 (message "Post Init Started")
 
+(defvar system-include-paths
+  '("/usr/local/include" 
+    "/usr/include"
+    "/usr/include/c++/4.4/" 
+    "/usr/include/c++/4.7/" 
+    "/usr/include/c++/4.8/" 
+    "/usr/include/c++/4.9/" 
+    "/usr/include/x86_64-linux-gnu"
+    "/usr/include/x86_64-linux-gnu/c++/4.7/"
+    "/usr/include/x86_64-linux-gnu/c++/4.8/"
+    "/usr/include/x86_64-linux-gnu/c++/4.9/"
+    "/usr/lib/gcc/x86_64-linux-gnu/4.7/include/"
+    "/usr/lib/gcc/x86_64-linux-gnu/4.8/include/"
+    "/usr/lib/gcc/x86_64-linux-gnu/4.9/include/"))
+
+(defvar project-include-paths
+  '("/home/dleslie/Workspace/c++_engine/src/"
+    "/home/dleslie/Workspace/c++_engine/build/debug/include"))
+
+(defvar prefixed-include-paths
+  (mapcar #'(lambda (s) (concat "-I" s)) (append project-include-paths system-include-paths)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Semantic
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(require 'semantic)
+
+(global-semanticdb-minor-mode 1)
+(global-semantic-idle-summary-mode 1)
+(global-semantic-idle-scheduler-mode 1)
+(semantic-mode 1)
+
+(mapc #'(lambda (s) (semantic-add-system-include s))
+      (append system-include-paths project-include-paths))
+
+(require 'cc-mode)
+(require 'function-args)
+(fa-config-default)
+(define-key c-mode-map  [(control tab)] 'moo-complete)
+(define-key c++-mode-map  [(control tab)] 'moo-complete)
+(define-key c-mode-map (kbd "M-o")  'fa-show)
+(define-key c++-mode-map (kbd "M-o")  'fa-show)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -22,30 +66,48 @@
 (add-to-list 'load-path "~/.emacs.d/")
 
 (require 'gist)
-;; (require 'seclusion-mode)
-;; (require 'main-line)
-;; (setq main-line-separator-style 'arrow)
-
-;; (require 'minimap)
 
 (require 'nyan-mode)
 (setq nyan-wavy-trail t)
 (nyan-mode t)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Company
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; (require 'company)
+;; (defun custom-company-mode-hook ()
+;;  (company-mode 1))
+
+;; (add-hook 'prog-mode-hook 'custom-company-mode-hook)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; eldoc
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(message "Configuring eldoc")
+
 (require 'eldoc)
-(eldoc-mode t)
+(defun custom-eldoc-prog-hook ()
+  (eldoc-mode 1))
+
+(add-hook 'lisp-mode-hook 'custom-eldoc-prog-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ggtags
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(message "Configuring ggtags")
+
 (require 'ggtags)
 
-(defun custom-prog-hook ()
-  (setq-local eldoc-documentation-function #'ggtags-eldoc-function)
-  (ggtags-mode 1))
+(defun custom-ggtags-prog-hook ()
+  (ggtags-mode 1)
+  (setq-local eldoc-documentation-function #'ggtags-eldoc-function))
 
-(add-hook 'prog-mode-hook 'custom-prog-hook)
+(add-hook 'c++-mode-hook 'custom-ggtags-prog-hook)
+
+(add-hook 'c-mode-hook 'custom-ggtags-prog-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Auto-complete
@@ -87,7 +149,7 @@
 
 (setq ac-quick-help-delay 0.15)
 (setq ac-delay 0.25)
-(setq ac-auto-start 2)
+(setq ac-auto-start 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; AC-Clang
@@ -97,34 +159,17 @@
 
 (require 'auto-complete-clang)
 
-(setq ac-clang-flags '("-I/usr/local/include" 
-		       "-I/usr/include"
-		       "-I/usr/include/clang/3.2/include"
-		       "-I/usr/include/clang/3.4/include"
-		       "-I/usr/lib/llvm-3.2/lib/clang/3.2/include/"
-		       "-I/usr/lib/llvm-3.4/lib/clang/3.4/include/"
-		       "-I/usr/include/c++/4.4/" 
-		       "-I/usr/include/c++/4.7/" 
-		       "-I/usr/include/c++/4.8/" 
-		       "-I/usr/include/x86_64-linux-gnu"
-		       "-I/usr/include/x86_64-linux-gnu/c++/4.7/"
-		       "-I/usr/include/x86_64-linux-gnu/c++/4.8/"
-		       "-I/usr/lib/gcc/x86_64-linux-gnu/4.7/include/"
-		       "-I/usr/lib/gcc/x86_64-linux-gnu/4.8/include/"
-		       "-std=c++11"
-		       "-pthread"
-		       "-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_1"
-		       "-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2"
-		       "-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4"
-		       "-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8"
-		       "-Wno-write-strings" 
-		       "-Wno-implicit-function-declaration" 
-		       "-Wno-deprecated"))
-
-;; Project includes
-(setq my-c++-engine-flags '("-I/home/dleslie/Workspace/c++_engine/src/"
-			    "-I/home/dleslie/Workspace/c++_engine/build/debug/include"))
-(setq ac-clang-flags (append ac-clang-flags my-c++-engine-flags))
+(setq ac-clang-flags 
+      (append prefixed-include-paths
+	      '("-std=c++11"
+		"-pthread"
+		"-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_1"
+		"-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2"
+		"-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4"
+		"-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8"
+		"-Wno-write-strings" 
+		"-Wno-implicit-function-declaration" 
+		"-Wno-deprecated")))
 
 (defun ac-clang-at-will ()
   (interactive)
@@ -147,9 +192,32 @@
 ;; Parens
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require 'smartparens-config)
-(show-smartparens-global-mode +1)
-(smartparens-global-mode 1)
+(require 'paredit)
+(defun paredit-prog-mode-hook ()
+  (paredit-mode t))
+(add-hook 'scheme-mode-hook 'paredit-prog-mode-hook)
+(add-hook 'lisp-mode-hook 'paredit-prog-mode-hook)
+(add-hook 'emacs-lisp-mode-hook 'paredit-prog-mode-hook)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Compilation
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(message "Configuring Compilation Mode")
+
+(defun compilation-custom-hook ()
+  (visual-line-mode 1))
+
+(add-hook 'compilation-mode-hook 'compilation-custom-hook)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Scheme
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(message "Configuring Scheme")
+
+(require 'scheme-c-mode)
+(require 'chicken-scheme)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C++
@@ -177,16 +245,12 @@
 
 (add-hook 'c++-mode-hook 'c++-font-lock-fix)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Compilation
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun my-custom-c-mode-hook ()
+  (setq-local eldoc-documentation-function #'ggtags-eldoc-function))
 
-(message "Configuring Compilation Mode")
+(add-hook 'c-mode-hook 'my-custom-c-mode-hook)
 
-(defun compilation-custom-hook ()
-  (visual-line-mode 1))
-
-(add-hook 'compilation-mode-hook 'compilation-custom-hook)
+(add-hook 'c++-mode-hook 'my-custom-c-mode-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Remember
@@ -251,35 +315,6 @@
 (add-hook 'python-mode-hook 'python-custom-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Scheme
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(message "Configuring Scheme")
-
-(require 'scheme-c-mode)
-(require 'chicken-scheme)
-
-;; (autoload 'scheme-smart-complete "scheme-complete" nil t)
-;; (eval-after-load 'scheme
-;;   '(define-key scheme-mode-map "\t" 'scheme-complete-or-indent))
-
-(autoload 'scheme-get-current-symbol-info "scheme-complete" nil t)
-(add-hook 'scheme-mode-hook
-  (lambda ()
-    (make-local-variable 'eldoc-documentation-function)
-    (setq eldoc-documentation-function 'scheme-get-current-symbol-info)
-    ;; (make-local-variable 'lisp-indent-function)
-    ;; (setq lisp-indent-function 'scheme-smart-indent-function)
-    (eldoc-mode)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Indent
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(require 'dtrt-indent)
-(dtrt-indent-mode 1)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc Custom
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -308,7 +343,6 @@
 (setq visual-line-mode t)
 (setq word-wrap t)
 (setq make-backup-files nil)
-(setq ac-etags-use-document t)
 (delete-selection-mode 1)
 (setq auto-save-default nil)
 
