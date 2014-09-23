@@ -31,6 +31,7 @@
 (global-semanticdb-minor-mode 1)
 (global-semantic-idle-summary-mode 1)
 (global-semantic-idle-scheduler-mode 1)
+
 (semantic-mode 1)
 
 (mapc #'(lambda (s) (semantic-add-system-include s))
@@ -72,16 +73,6 @@
 (nyan-mode t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Company
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; (require 'company)
-;; (defun custom-company-mode-hook ()
-;;  (company-mode 1))
-
-;; (add-hook 'prog-mode-hook 'custom-company-mode-hook)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; eldoc
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -91,7 +82,7 @@
 (defun custom-eldoc-prog-hook ()
   (eldoc-mode 1))
 
-(add-hook 'lisp-mode-hook 'custom-eldoc-prog-hook)
+(add-hook 'emacs-lisp-mode-hook 'custom-eldoc-prog-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ggtags
@@ -102,11 +93,9 @@
 (require 'ggtags)
 
 (defun custom-ggtags-prog-hook ()
-  (ggtags-mode 1)
-  (setq-local eldoc-documentation-function #'ggtags-eldoc-function))
+  (ggtags-mode 1))
 
 (add-hook 'c++-mode-hook 'custom-ggtags-prog-hook)
-
 (add-hook 'c-mode-hook 'custom-ggtags-prog-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -115,41 +104,92 @@
 
 (message "Configuring Auto-Complete")
 (require 'auto-complete-config)
+(require 'auto-complete-etags)
+
 (ac-config-default)
 
 (add-to-list 'ac-dictionary-directories (expand-file-name "~/.emacs.d/ac-dict"))
 (setq ac-comphist-file (expand-file-name "~/.emacs.d/ac-comphist.dat"))
-(setq ac-modes (quote (emacs-lisp-mode 
-                       lisp-interaction-mode 
-                       c-mode cc-mode c++-mode
-                       java-mode clojure-mode scala-mode 
-                       scheme-mode 
-                       ocaml-mode tuareg-mode 
-                       perl-mode cperl-mode 
-                       python-mode 
-                       ruby-mode 
-                       ecmascript-mode javascript-mode js-mode js2-mode 
-                       php-mode 
-                       css-mode 
-                       makefile-mode 
-                       sh-mode 
-                       fortran-mode f90-mode 
-                       ada-mode 
-                       xml-mode sgml-mode 
-                       lua-mode)))
-
-(require 'auto-complete-etags)
-
-(add-to-list 'ac-sources 'ac-source-etags)
-(add-to-list 'ac-sources 'ac-source-gtags)
-(add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers)
-(add-to-list 'ac-sources 'ac-source-dictionary)
+(setq ac-modes 
+      '(emacs-lisp-mode 
+	lisp-interaction-mode 
+	c-mode cc-mode c++-mode
+	java-mode clojure-mode scala-mode 
+	scheme-mode 
+	ocaml-mode tuareg-mode 
+	perl-mode cperl-mode 
+	python-mode 
+	ruby-mode 
+	ecmascript-mode javascript-mode js-mode js2-mode 
+	php-mode 
+	css-mode 
+	makefile-mode 
+	sh-mode 
+	fortran-mode f90-mode 
+	ada-mode 
+	xml-mode sgml-mode 
+	lua-mode))
 
 (setq ac-etags-use-document t)
-
 (setq ac-quick-help-delay 0.15)
 (setq ac-delay 0.25)
 (setq ac-auto-start 1)
+
+(setq ac-sources 
+      '(ac-source-functions 
+	ac-source-features 
+	ac-source-variables 
+	ac-source-yasnippet 
+	ac-source-abbrev 
+	ac-source-entity))
+
+(defun ac-no-semantic-setup ()
+  (make-local-variable 'ac-sources)
+  (add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers)
+  (add-to-list 'ac-sources 'ac-source-dictionary)
+  (add-to-list 'ac-sources 'ac-source-symbols))
+
+(defun ac-semantic-setup ()
+  (make-local-variable 'ac-sources)
+  (add-to-list 'ac-sources 'ac-source-semantic))
+
+(mapc #'(lambda (m) (add-hook m 'ac-no-semantic-setup))
+      '(scheme-mode-hook
+	ocaml-mode-hook	tuareg-mode-hook
+	python-mode-hook
+	ruby-mode-hook
+	php-mode-hook
+	css-mode-hook
+	perl-mode-hook cperl-mode-hook
+	ecmascript-mode-hook javascript-mode-hook js-mode-hook js2-mode-hook
+	makefile-mode-hook sh-mode-hook
+	fortran-mode-hook f90-mode-hook
+	ada-mode-hook
+	xml-mode-hook sgml-mode-hook
+	lua-mode-hook))
+
+(mapc #'(lambda (m) (add-hook m 'ac-semantic-setup))
+      '(emacs-lisp-mode-hook
+	lisp-interaction-mode-hook
+	c-mode-hook 
+	c++-mode-hook
+	java-mode-hook))
+
+(defun ac-css-setup ()
+  (make-local-variable 'ac-sources)
+  (add-to-list 'ac-sources 'ac-source-css-property))
+
+(defun ac-haskell-setup ()
+  (make-local-variable 'ac-sources)
+  (add-to-list 'ac-sources 'ac-source-ghc-mod))
+
+(defun ac-elisp-setup ()
+  (make-local-variable 'ac-sources)
+  (add-to-list 'ac-sources 'ac-source-emacs-lisp-features))
+
+(add-hook 'haskell-mode-hook 'ac-haskell-setup)
+(add-hook 'css-mode-hook 'ac-css-setup)
+(add-hook 'emacs-lisp-mode-hook 'ac-elisp-setup)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; AC-Clang
@@ -173,7 +213,7 @@
 
 (defun ac-clang-at-will ()
   (interactive)
-  (auto-complete (cons 'ac-source-clang 'ac-sources)))
+  (auto-complete '(ac-source-clang)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Rainbow Mode
@@ -195,9 +235,12 @@
 (require 'paredit)
 (defun paredit-prog-mode-hook ()
   (paredit-mode t))
-(add-hook 'scheme-mode-hook 'paredit-prog-mode-hook)
-(add-hook 'lisp-mode-hook 'paredit-prog-mode-hook)
-(add-hook 'emacs-lisp-mode-hook 'paredit-prog-mode-hook)
+
+(mapc #'(lambda (m) (add-hook m 'paredit-prog-mode-hook))
+      '(scheme-mode-hook 
+	lisp-mode-hook 
+	emacs-lisp-mode-hook 
+	lisp-interaction-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Compilation
@@ -244,13 +287,6 @@
      )))
 
 (add-hook 'c++-mode-hook 'c++-font-lock-fix)
-
-(defun my-custom-c-mode-hook ()
-  (setq-local eldoc-documentation-function #'ggtags-eldoc-function))
-
-(add-hook 'c-mode-hook 'my-custom-c-mode-hook)
-
-(add-hook 'c++-mode-hook 'my-custom-c-mode-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Remember

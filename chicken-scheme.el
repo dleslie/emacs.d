@@ -273,7 +273,7 @@ Argument SYMBOL-NAME The symbol to recover documentation for."
     (candidate-face . ac-chicken-scheme-candidate-face)
     (selection-face . ac-chicken-scheme-selection-face)
     (symbol . "f")
-    (requires . 2)
+    (requires . 1)
     (document . ac-chicken-doc)
     (cache)))
 
@@ -282,7 +282,7 @@ Argument SYMBOL-NAME The symbol to recover documentation for."
     (candidate-face . ac-chicken-scheme-candidate-face)
     (selection-face . ac-chicken-scheme-selection-face)
     (symbol . "f")
-    (requires . 2)
+    (requires . 1)
     (document . ac-chicken-doc)
     (prefix . ,(concat "[^ \t\r\n" chicken-prefix "]*[" chicken-prefix "]\\(.*\\)"))
     (cache)))
