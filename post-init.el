@@ -99,123 +99,6 @@
 (add-hook 'c-mode-hook 'custom-ggtags-prog-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Auto-complete
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(message "Configuring Auto-Complete")
-(require 'auto-complete-config)
-(require 'auto-complete-etags)
-
-(ac-config-default)
-
-(add-to-list 'ac-dictionary-directories (expand-file-name "~/.emacs.d/ac-dict"))
-(setq ac-comphist-file (expand-file-name "~/.emacs.d/ac-comphist.dat"))
-(setq ac-modes 
-      '(emacs-lisp-mode 
-	lisp-interaction-mode 
-	c-mode cc-mode c++-mode
-	java-mode clojure-mode scala-mode 
-	scheme-mode 
-	ocaml-mode tuareg-mode 
-	perl-mode cperl-mode 
-	python-mode 
-	ruby-mode 
-	ecmascript-mode javascript-mode js-mode js2-mode 
-	php-mode 
-	css-mode 
-	makefile-mode 
-	sh-mode 
-	fortran-mode f90-mode 
-	ada-mode 
-	xml-mode sgml-mode 
-	lua-mode))
-
-(setq ac-etags-use-document t)
-(setq ac-quick-help-delay 0.15)
-(setq ac-delay 0.25)
-(setq ac-auto-start 1)
-
-(setq ac-sources 
-      '(ac-source-functions 
-	ac-source-features 
-	ac-source-variables 
-	ac-source-yasnippet 
-	ac-source-abbrev 
-	ac-source-entity))
-
-(defun ac-no-semantic-setup ()
-  (make-local-variable 'ac-sources)
-  (add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers)
-  (add-to-list 'ac-sources 'ac-source-dictionary)
-  (add-to-list 'ac-sources 'ac-source-symbols))
-
-(defun ac-semantic-setup ()
-  (make-local-variable 'ac-sources)
-  (add-to-list 'ac-sources 'ac-source-semantic))
-
-(mapc #'(lambda (m) (add-hook m 'ac-no-semantic-setup))
-      '(scheme-mode-hook
-	ocaml-mode-hook	tuareg-mode-hook
-	python-mode-hook
-	ruby-mode-hook
-	php-mode-hook
-	css-mode-hook
-	perl-mode-hook cperl-mode-hook
-	ecmascript-mode-hook javascript-mode-hook js-mode-hook js2-mode-hook
-	makefile-mode-hook sh-mode-hook
-	fortran-mode-hook f90-mode-hook
-	ada-mode-hook
-	xml-mode-hook sgml-mode-hook
-	lua-mode-hook))
-
-(mapc #'(lambda (m) (add-hook m 'ac-semantic-setup))
-      '(emacs-lisp-mode-hook
-	lisp-interaction-mode-hook
-	c-mode-hook 
-	c++-mode-hook
-	java-mode-hook))
-
-(defun ac-css-setup ()
-  (make-local-variable 'ac-sources)
-  (add-to-list 'ac-sources 'ac-source-css-property))
-
-(defun ac-haskell-setup ()
-  (make-local-variable 'ac-sources)
-  (add-to-list 'ac-sources 'ac-source-ghc-mod))
-
-(defun ac-elisp-setup ()
-  (make-local-variable 'ac-sources)
-  (add-to-list 'ac-sources 'ac-source-emacs-lisp-features))
-
-(add-hook 'haskell-mode-hook 'ac-haskell-setup)
-(add-hook 'css-mode-hook 'ac-css-setup)
-(add-hook 'emacs-lisp-mode-hook 'ac-elisp-setup)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; AC-Clang
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(message "Configuring ac-clang")
-
-(require 'auto-complete-clang)
-
-(setq ac-clang-flags 
-      (append prefixed-include-paths
-	      '("-std=c++11"
-		"-pthread"
-		"-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_1"
-		"-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2"
-		"-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4"
-		"-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8"
-		"-Wno-write-strings" 
-		"-Wno-implicit-function-declaration" 
-		"-Wno-deprecated")))
-
-(defun ac-clang-at-will ()
-  (interactive)
-  (auto-complete '(ac-source-clang)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Rainbow Mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -254,6 +137,20 @@
 (add-hook 'compilation-mode-hook 'compilation-custom-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; SLIME
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(message "Configuring SLIME")
+
+(setq slime-lisp-implementations
+      '((sbcl ("/usr/bin/sbcl" "--core" "/usr/lib/sbcl/sbcl.core")
+              :coding-system utf-8-unix
+              :env ("SBCL_HOME=/usr/lib/sbcl"))))
+
+(require 'slime-autoloads)
+(slime-setup '(slime-fancy slime-banner))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Scheme
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -261,6 +158,25 @@
 
 (require 'scheme-c-mode)
 (require 'chicken-scheme)
+
+;; (add-to-list 'load-path "/var/lib/chicken/7/")
+;; (autoload 'chicken-slime "chicken-slime" "SWANK backend for Chicken" t)
+
+;; (defun my-scheme-mode-hook ()
+;;   (slime-mode t))
+
+;; (add-hook 'scheme-mode-hook 'my-scheme-mode-hook)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; LISP
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(message "Configuring LISP")
+
+(defun my-lisp-mode-hook ()
+  (slime-mode t))
+
+(add-hook 'lisp-mode-hook 'my-lisp-mode-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C++
@@ -351,6 +267,126 @@
 (add-hook 'python-mode-hook 'python-custom-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Auto-complete
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(message "Configuring Auto-Complete")
+(require 'auto-complete-config)
+(require 'auto-complete-etags)
+(require 'auto-complete-clang)
+
+(ac-config-default)
+
+(setq ac-clang-flags 
+      (append prefixed-include-paths
+	      '("-std=c++11"
+		"-pthread"
+		"-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_1"
+		"-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2"
+		"-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4"
+		"-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8"
+		"-Wno-write-strings" 
+		"-Wno-implicit-function-declaration" 
+		"-Wno-deprecated")))
+
+(add-to-list 'ac-dictionary-directories (expand-file-name "~/.emacs.d/ac-dict"))
+(setq ac-comphist-file (expand-file-name "~/.emacs.d/ac-comphist.dat"))
+(setq ac-modes 
+      '(emacs-lisp-mode
+	lisp-mode
+	lisp-interaction-mode 
+	c-mode cc-mode c++-mode
+	java-mode clojure-mode scala-mode 
+	scheme-mode 
+	ocaml-mode tuareg-mode 
+	perl-mode cperl-mode 
+	python-mode 
+	ruby-mode 
+	ecmascript-mode javascript-mode js-mode js2-mode 
+	php-mode 
+	css-mode 
+	makefile-mode 
+	sh-mode 
+	fortran-mode f90-mode 
+	ada-mode 
+	xml-mode sgml-mode 
+	lua-mode
+	slime-repl-mode))
+
+(setq ac-etags-use-document t)
+(setq ac-quick-help-delay 0.15)
+(setq ac-delay 0.25)
+(setq ac-auto-start 1)
+
+(setq ac-sources 
+      '(ac-source-yasnippet 
+	ac-source-abbrev))
+
+(defun ac-no-semantic-setup ()
+  (make-local-variable 'ac-sources)
+  (add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers)
+  (add-to-list 'ac-sources 'ac-source-dictionary))
+
+(defun ac-semantic-setup ()
+  (make-local-variable 'ac-sources)
+  (add-to-list 'ac-sources 'ac-source-semantic))
+
+(mapc #'(lambda (m) (add-hook m 'ac-no-semantic-setup))
+      '(scheme-mode-hook
+	ocaml-mode-hook	tuareg-mode-hook
+	python-mode-hook
+	ruby-mode-hook
+	php-mode-hook
+	css-mode-hook
+	perl-mode-hook cperl-mode-hook
+	ecmascript-mode-hook javascript-mode-hook js-mode-hook js2-mode-hook
+	makefile-mode-hook sh-mode-hook
+	fortran-mode-hook f90-mode-hook
+	ada-mode-hook
+	xml-mode-hook sgml-mode-hook
+	lua-mode-hook))
+
+(mapc #'(lambda (m) (add-hook m 'ac-semantic-setup))
+      '(emacs-lisp-mode-hook
+	lisp-mode-hook
+	lisp-interaction-mode-hook
+	c-mode-hook 
+	c++-mode-hook
+	java-mode-hook))
+
+(defun ac-css-setup ()
+  (make-local-variable 'ac-sources)
+  (add-to-list 'ac-sources 'ac-source-css-property))
+
+(defun ac-haskell-setup ()
+  (make-local-variable 'ac-sources)
+  (add-to-list 'ac-sources 'ac-source-ghc-mod))
+
+(defun ac-elisp-setup ()
+  (make-local-variable 'ac-sources)
+  (mapc #'(lambda (m) (add-to-list 'ac-sources m))
+	'(ac-source-functions ac-source-symbols ac-source-features ac-source-variables)))
+
+(defun ac-scheme-setup ()
+  (make-local-variable 'ac-sources)
+  (mapc #'(lambda (m) (add-to-list 'ac-sources m))
+	'(ac-source-scheme-symbols ac-source-chicken-symbols ac-source-chicken-symbols-prefixed)))
+
+(defun ac-cc-mode-setup ()
+  (make-local-variable 'ac-sources)
+  (mapc #'(lambda (m) (add-to-list 'ac-sources m))
+	'(ac-source-clang)))
+
+(add-hook 'haskell-mode-hook 'ac-haskell-setup)
+(add-hook 'css-mode-hook 'ac-css-setup)
+(add-hook 'emacs-lisp-mode-hook 'ac-elisp-setup)
+(add-hook 'scheme-mode-hook 'ac-scheme-setup)
+
+(require 'ac-slime)
+(add-hook 'slime-mode-hook 'set-up-slime-ac)
+(add-hook 'slime-repl-mode-hook 'set-up-slime-ac)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc Custom
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -381,6 +417,10 @@
 (setq make-backup-files nil)
 (delete-selection-mode 1)
 (setq auto-save-default nil)
+(setq tool-bar-mode nil)
+(setq tool-bar-style (quote image))
+(setq debug-on-error nil)
+(setq debug-on-signal nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keys
@@ -391,14 +431,15 @@
 (global-set-key "\C-w" 'clipboard-kill-region)
 (global-set-key "\M-w" 'clipboard-kill-ring-save)
 (global-set-key "\C-y" 'clipboard-yank)
+
 (global-set-key (kbd "C-;") 'comment-or-uncomment-region)
 (global-set-key (kbd "TAB") 'indent-according-to-mode)
 
-(global-set-key [f10] 'minimap-toggle)
+(global-set-key [f10] 'tool-bar-mode)
 (global-set-key [f11] 'speedbar)
 (global-set-key [f12] 'menu-bar-mode)
 
-(define-key ac-mode-map  [(control return)] 'ac-clang-at-will)
+(define-key ac-mode-map  [(control return)] 'auto-complete)
 
 (message "Post Init Complete.")
 
