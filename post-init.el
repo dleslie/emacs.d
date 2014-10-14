@@ -15,35 +15,56 @@
     "/usr/lib/gcc/x86_64-linux-gnu/4.8/include/"
     "/usr/lib/gcc/x86_64-linux-gnu/4.9/include/"))
 
-(defvar project-include-paths
-  '("/home/dleslie/Workspace/c++_engine/src/"
-    "/home/dleslie/Workspace/c++_engine/build/debug/include"))
-
 (defvar prefixed-include-paths
-  (mapcar #'(lambda (s) (concat "-I" s)) (append project-include-paths system-include-paths)))
+  (mapcar #'(lambda (s) (concat "-I" s)) system-include-paths))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Menu
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(require 'imenu)
+
+(defun try-to-add-imenu ()
+  (condition-case nil (imenu-add-to-menubar "TAGS") (error nil)))
+(add-hook 'font-lock-mode-hook 'try-to-add-imenu)
+
+(require 'doremi)
+(require 'help+)
+(require 'help-fns+)
+(require 'help-mode+)
+
+(require 'menu-bar+)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Semantic
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'semantic)
+(require 'semantic/bovine/gcc)
+(require 'semantic/ia)
+(require 'semantic/imenu)
 
 (global-semanticdb-minor-mode 1)
 (global-semantic-idle-summary-mode 1)
 (global-semantic-idle-scheduler-mode 1)
 
-(semantic-mode 1)
-
 (mapc #'(lambda (s) (semantic-add-system-include s))
-      (append system-include-paths project-include-paths))
+      system-include-paths)
+
+(when (cedet-gnu-global-version-check t)
+  (semanticdb-enable-gnu-global-databases 'c-mode)
+  (semanticdb-enable-gnu-global-databases 'c++-mode))
 
 (require 'cc-mode)
 (require 'function-args)
 (fa-config-default)
+
 (define-key c-mode-map  [(control tab)] 'moo-complete)
 (define-key c++-mode-map  [(control tab)] 'moo-complete)
 (define-key c-mode-map (kbd "M-o")  'fa-show)
 (define-key c++-mode-map (kbd "M-o")  'fa-show)
+
+(semantic-mode 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Packages
@@ -159,13 +180,16 @@
 (require 'scheme-c-mode)
 (require 'chicken-scheme)
 
-;; (add-to-list 'load-path "/var/lib/chicken/7/")
-;; (autoload 'chicken-slime "chicken-slime" "SWANK backend for Chicken" t)
+(add-hook 'scheme-mode-hook 'setup-chicken-scheme)
+(define-key scheme-mode-map (kbd "C-?") 'chicken-show-help)
 
-;; (defun my-scheme-mode-hook ()
-;;   (slime-mode t))
+(add-to-list 'load-path "/var/lib/chicken/7/")
+(autoload 'chicken-slime "chicken-slime" "SWANK backend for Chicken" t)
 
-;; (add-hook 'scheme-mode-hook 'my-scheme-mode-hook)
+(defun my-scheme-mode-hook ()
+  (slime-mode t))
+
+(add-hook 'scheme-mode-hook 'my-scheme-mode-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LISP
@@ -212,10 +236,10 @@
 
 (require 'org-remember)
 
-(setq org-directory "~/Workspace/org/")
-(setq org-default-notes-file "~/Workspace/org/notes.org")
-(setq org-agenda-files '("~/Workspace/org/todo.org" "~/Workspace/org/agenda.org" "~/Workspace/org/remember.org"))
-(setq org-agenda-diary-file "~/Workspace/org/remember.org")
+(setq org-directory "~/Dropbox/org/")
+(setq org-default-notes-file "~/Dropbox/org/notes.org")
+(setq org-agenda-files '("~/Dropbox/org/todo.org" "~/Dropbox/org/agenda.org" "~/Dropbox/org/remember.org"))
+(setq org-agenda-diary-file "~/Dropbox/org/remember.org")
 
 (define-key global-map "\C-cr" 'org-remember)
 (define-key global-map "\C-ct" 'org-todo-list)
@@ -225,12 +249,12 @@
 (setq remember-handler-functions '(org-remember-handler))
 (add-hook 'remember-mode-hook 'org-remember-apply-template)
 (setq org-remember-templates
-      '(("Daily review" ?d "* %T %^g \n:CATEGORY: Review\n%?%[~/Workspace/org/template_daily_review.org]\n" "~/Workspace/org/remember.org" "Daily Review")
-        ("Idea" ?i "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Idea\n" "~/Workspace/org/remember.org" "Ideas")
-        ("Journal" ?j "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Journal\n" "~/Workspace/org/remember.org" "Journal")
-        ("Letter" ?l "* %^{topic} %T %^g\n:CATEGORY: Letter\n%i%?\n" "~/Workspace/org/remember.org" "Letter")
-        ("Work Log" ?w "* %^{topic} %T %^g\n:CATEGORY: Log\n%i%?\n" "~/Workspace/org/remember.org" "Work Log")
-	("Article" ?a "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Article\n" "~/Workspace/org/remember.org" "Article")))
+      '(("Daily review" ?d "* %T %^g \n:CATEGORY: Review\n%?%[~/Dropbox/org/template_daily_review.org]\n" "~/Dropbox/org/remember.org" "Daily Review")
+        ("Idea" ?i "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Idea\n" "~/Dropbox/org/remember.org" "Ideas")
+        ("Journal" ?j "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Journal\n" "~/Dropbox/org/remember.org" "Journal")
+        ("Letter" ?l "* %^{topic} %T %^g\n:CATEGORY: Letter\n%i%?\n" "~/Dropbox/org/remember.org" "Letter")
+        ("Work Log" ?w "* %^{topic} %T %^g\n:CATEGORY: Log\n%i%?\n" "~/Dropbox/org/remember.org" "Work Log")
+	("Article" ?a "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Article\n" "~/Dropbox/org/remember.org" "Article")))
 
 (setq org-todo-keywords
       '((sequence "TODO" "DOIN" "BLCK" "STAL" "|" "WONT" "DONE")))
@@ -272,32 +296,19 @@
 
 (message "Configuring Auto-Complete")
 (require 'auto-complete-config)
-(require 'auto-complete-etags)
-(require 'auto-complete-clang)
 
 (ac-config-default)
-
-(setq ac-clang-flags 
-      (append prefixed-include-paths
-	      '("-std=c++11"
-		"-pthread"
-		"-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_1"
-		"-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2"
-		"-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4"
-		"-D__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8"
-		"-Wno-write-strings" 
-		"-Wno-implicit-function-declaration" 
-		"-Wno-deprecated")))
 
 (add-to-list 'ac-dictionary-directories (expand-file-name "~/.emacs.d/ac-dict"))
 (setq ac-comphist-file (expand-file-name "~/.emacs.d/ac-comphist.dat"))
 (setq ac-modes 
-      '(emacs-lisp-mode
+      '(java-mode clojure-mode scala-mode 
+	emacs-lisp-mode
 	lisp-mode
 	lisp-interaction-mode 
 	c-mode cc-mode c++-mode
-	java-mode clojure-mode scala-mode 
-	scheme-mode 
+	scheme-mode
+	slime-repl-mode
 	ocaml-mode tuareg-mode 
 	perl-mode cperl-mode 
 	python-mode 
@@ -313,10 +324,9 @@
 	lua-mode
 	slime-repl-mode))
 
-(setq ac-etags-use-document t)
-(setq ac-quick-help-delay 0.15)
-(setq ac-delay 0.25)
-(setq ac-auto-start 1)
+(setq ac-quick-help-delay 0.5)
+(setq ac-delay 2.0)
+(setq ac-auto-start 0.25)
 
 (setq ac-sources 
       '(ac-source-yasnippet 
@@ -324,8 +334,7 @@
 
 (defun ac-no-semantic-setup ()
   (make-local-variable 'ac-sources)
-  (add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers)
-  (add-to-list 'ac-sources 'ac-source-dictionary))
+  (add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers))
 
 (defun ac-semantic-setup ()
   (make-local-variable 'ac-sources)
@@ -344,15 +353,16 @@
 	fortran-mode-hook f90-mode-hook
 	ada-mode-hook
 	xml-mode-hook sgml-mode-hook
-	lua-mode-hook))
+	lua-mode-hook
+	c-mode-hook 
+	c++-mode-hook
+	java-mode-hook))
 
 (mapc #'(lambda (m) (add-hook m 'ac-semantic-setup))
       '(emacs-lisp-mode-hook
 	lisp-mode-hook
 	lisp-interaction-mode-hook
-	c-mode-hook 
-	c++-mode-hook
-	java-mode-hook))
+	c-mode-common-hook))
 
 (defun ac-css-setup ()
   (make-local-variable 'ac-sources)
@@ -370,21 +380,24 @@
 (defun ac-scheme-setup ()
   (make-local-variable 'ac-sources)
   (mapc #'(lambda (m) (add-to-list 'ac-sources m))
-	'(ac-source-scheme-symbols ac-source-chicken-symbols ac-source-chicken-symbols-prefixed)))
+	'(ac-source-chicken-symbols ac-source-chicken-symbols-prefixed)))
 
-(defun ac-cc-mode-setup ()
+(defun ac-c-common-mode-setup ()
   (make-local-variable 'ac-sources)
-  (mapc #'(lambda (m) (add-to-list 'ac-sources m))
-	'(ac-source-clang)))
+  (add-to-list 'ac-sources 'ac-source-gtags))
+
+(defun ac-slime-setup ()
+  (make-local-variable 'ac-sources))
 
 (add-hook 'haskell-mode-hook 'ac-haskell-setup)
 (add-hook 'css-mode-hook 'ac-css-setup)
 (add-hook 'emacs-lisp-mode-hook 'ac-elisp-setup)
 (add-hook 'scheme-mode-hook 'ac-scheme-setup)
+(add-hook 'c-mode-common-ook 'ac-c-common-mode-setup)
 
 (require 'ac-slime)
-(add-hook 'slime-mode-hook 'set-up-slime-ac)
-(add-hook 'slime-repl-mode-hook 'set-up-slime-ac)
+(add-hook 'slime-mode-hook 'ac-slime-setup)
+(add-hook 'slime-repl-mode-hook 'ac-slime-setup)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc Custom
@@ -392,16 +405,21 @@
 
 (message "Configuring Miscellaneous")
 
+(delete-selection-mode 1)
 (setq auto-fill-mode t)
+(setq auto-save-default nil)
 (setq c-basic-offset 2)
 (setq c-set-offset 2)
 (setq c-set-style "BSD")
 (setq column-number-mode t)
+(setq debug-on-error nil)
+(setq debug-on-signal nil)
 (setq display-battery-mode t)
 (setq display-time-mode t)
 (setq fill-column 80)
 (setq indent-tabs-mode nil)
 (setq line-number-mode t)
+(setq make-backup-files nil)
 (setq redisplay-dont-pause t)
 (setq scroll-bar-mode nil)
 (setq scroll-margin 0)
@@ -411,16 +429,11 @@
 (setq standard-indent 2)
 (setq tab-stop-list (number-sequence 2 200 2))
 (setq tab-width 4)
+(setq tool-bar-mode nil)
+(setq tool-bar-style (quote image))
 (setq truncate-lines t)
 (setq visual-line-mode t)
 (setq word-wrap t)
-(setq make-backup-files nil)
-(delete-selection-mode 1)
-(setq auto-save-default nil)
-(setq tool-bar-mode nil)
-(setq tool-bar-style (quote image))
-(setq debug-on-error nil)
-(setq debug-on-signal nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keys
