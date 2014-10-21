@@ -405,6 +405,16 @@
 
 (message "Configuring Miscellaneous")
 
+(defun override-theme (arg)
+  "Disables all enabled themes and then loads the provided theme."
+  (interactive
+   (list
+    (intern (completing-read "Load custom theme: "
+			     (mapcar 'symbol-name (custom-available-themes))))))
+  (while custom-enabled-themes
+    (disable-theme (car custom-enabled-themes)))
+  (load-theme arg t))
+
 (delete-selection-mode 1)
 (setq auto-fill-mode t)
 (setq auto-save-default nil)
