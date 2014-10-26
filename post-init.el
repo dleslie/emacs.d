@@ -163,13 +163,17 @@
 
 (message "Configuring SLIME")
 
+(load (expand-file-name "~/quicklisp/slime-helper.el"))
+(setq inferior-lisp-program "/usr/bin/sbcl")
+
 (setq slime-lisp-implementations
       '((sbcl ("/usr/bin/sbcl" "--core" "/usr/lib/sbcl/sbcl.core")
               :coding-system utf-8-unix
               :env ("SBCL_HOME=/usr/lib/sbcl"))))
 
 (require 'slime-autoloads)
-(slime-setup '(slime-fancy slime-banner))
+(setq slime-contribs '(slime-fancy slime-autodoc slime-banner))
+(slime-setup)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Scheme
@@ -330,7 +334,8 @@
 
 (setq ac-sources 
       '(ac-source-yasnippet 
-	ac-source-abbrev))
+	ac-source-abbrev
+	ac-source-imenu))
 
 (defun ac-no-semantic-setup ()
   (make-local-variable 'ac-sources)
@@ -374,26 +379,38 @@
 
 (defun ac-elisp-setup ()
   (make-local-variable 'ac-sources)
-  (mapc #'(lambda (m) (add-to-list 'ac-sources m))
-	'(ac-source-functions ac-source-symbols ac-source-features ac-source-variables)))
+  (add-to-list 'ac-sources ac-source-functions)
+  (add-to-list 'ac-sources ac-source-symbols)
+  (add-to-list 'ac-sources ac-source-features)
+  (add-to-list 'ac-sources ac-source-variables))
 
 (defun ac-scheme-setup ()
   (make-local-variable 'ac-sources)
-  (mapc #'(lambda (m) (add-to-list 'ac-sources m))
-	'(ac-source-chicken-symbols ac-source-chicken-symbols-prefixed)))
+  (add-to-list 'ac-sources ac-source-r7rs-symbols)
+  (add-to-list 'ac-sources ac-source-r5rs-symbols)
+  (add-to-list 'ac-sources ac-source-chicken-symbols)
+  (add-to-list 'ac-sources ac-source-chicken-symbols-prefixed)
+  (add-to-list 'ac-sources ac-source-slime))
 
 (defun ac-c-common-mode-setup ()
   (make-local-variable 'ac-sources)
   (add-to-list 'ac-sources 'ac-source-gtags))
 
+(defun ac-lisp-setup ()
+  (make-local-variable 'ac-sources)
+  (add-to-list 'ac-sources 'ac-source-slime))
+
 (defun ac-slime-setup ()
-  (make-local-variable 'ac-sources))
+  (make-local-variable 'ac-sources)
+  (add-to-list 'ac-sources 'ac-source-slime))
 
 (add-hook 'haskell-mode-hook 'ac-haskell-setup)
 (add-hook 'css-mode-hook 'ac-css-setup)
 (add-hook 'emacs-lisp-mode-hook 'ac-elisp-setup)
 (add-hook 'scheme-mode-hook 'ac-scheme-setup)
-(add-hook 'c-mode-common-ook 'ac-c-common-mode-setup)
+(add-hook 'c-mode-common-hook 'ac-c-common-mode-setup)
+(add-hook 'lisp-mode-hook 'ac-lisp-setup)
+(add-hook 'lisp-interaction-mode-hook 'ac-lisp-setup)
 
 (require 'ac-slime)
 (add-hook 'slime-mode-hook 'ac-slime-setup)
