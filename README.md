@@ -20,3 +20,19 @@ sudo gem install pry pry-doc
 ```
 
 * The first time you launch it will require an active internet connection to fetch all the necessary packages
+
+Making it Launch Quickly
+========================
+
+Run Emacs as a server:
+
+```
+emacs --daemon
+```
+
+Connect Emacs clients as desired:
+
+```
+emacsclient -c
+```
+
