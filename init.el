@@ -3,6 +3,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes (quote ("8ada1f0bcfc2d8662b74fb21bd1830eaacb5d29e3c99a5ea7fd7a417b7a9b708" "88e56f2e676c8828e08b128c74f2818cbfc77b79f8ebbae955db6098d0001473" default)))
+ '(menu-bar-mode nil)
+ '(semanticdb-find-default-throttle (quote (local project unloaded system recursive omniscience)))
+ '(tool-bar-mode nil)
  '(visible-bell t))
 
 (custom-set-faces
@@ -10,7 +14,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:background nil :family "Inconsolata" :foundry "unknown" :slant normal :weight normal :height 83 :width normal))))
+ '(default ((t (:background nil))))
  '(mode-line ((t (:background "#191919" :foreground "#BBBBBB" :box nil))))
  '(mode-line-highlight ((t (:box nil))))
  '(rainbow-delimiters-depth-1-face ((t (:inherit font-lock-function-name-face))))

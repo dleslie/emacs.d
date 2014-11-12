@@ -120,7 +120,7 @@
 (add-hook 'c-mode-hook 'custom-ggtags-prog-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Rainbow Mode
+;; Rainbow Modes
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (message "Configuring Rainbow Mode")
@@ -163,7 +163,6 @@
 
 (message "Configuring SLIME")
 
-(load (expand-file-name "~/quicklisp/slime-helper.el"))
 (setq inferior-lisp-program "/usr/bin/sbcl")
 
 (setq slime-lisp-implementations
@@ -174,6 +173,10 @@
 (require 'slime-autoloads)
 (setq slime-contribs '(slime-fancy slime-autodoc slime-banner))
 (slime-setup)
+
+(defun sbcl-slime ()
+  (interactive)
+  (slime 'sbcl))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Scheme
@@ -186,14 +189,6 @@
 
 (add-hook 'scheme-mode-hook 'setup-chicken-scheme)
 (define-key scheme-mode-map (kbd "C-?") 'chicken-show-help)
-
-(add-to-list 'load-path "/var/lib/chicken/7/")
-(autoload 'chicken-slime "chicken-slime" "SWANK backend for Chicken" t)
-
-(defun my-scheme-mode-hook ()
-  (slime-mode t))
-
-(add-hook 'scheme-mode-hook 'my-scheme-mode-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LISP
@@ -295,11 +290,53 @@
 (add-hook 'python-mode-hook 'python-custom-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Ruby
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(message "Configuring Ruby Mode")
+
+(setq enh-ruby-program "/usr/bin/ruby")
+(require 'cl)
+(require 'enh-ruby-mode)
+
+(defun launch-ruby ()
+  (interactive)
+  (unless (get-buffer "*ruby*")
+    (let ((buf (current-buffer)))
+      (inf-ruby)
+      (robe-start)
+      (set-buffer buf))))
+
+(add-hook 'ruby-mode-hook 'launch-ruby)
+(add-hook 'enh-ruby-mode-hook 'launch-ruby)
+
+(add-hook 'ruby-mode-hook 'robe-mode)
+(add-hook 'enh-ruby-mode-hook 'robe-mode)
+
+(add-hook 'robe-mode-hook 'ac-robe-setup)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Web
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(require 'web-mode) 
+(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Auto-complete
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (message "Configuring Auto-Complete")
 (require 'auto-complete-config)
+
+(require 'ac-capf)
 
 (ac-config-default)
 
@@ -316,7 +353,7 @@
 	ocaml-mode tuareg-mode 
 	perl-mode cperl-mode 
 	python-mode 
-	ruby-mode 
+	ruby-mode enh-ruby-mode
 	ecmascript-mode javascript-mode js-mode js2-mode 
 	php-mode 
 	css-mode 
@@ -326,16 +363,15 @@
 	ada-mode 
 	xml-mode sgml-mode 
 	lua-mode
-	slime-repl-mode))
+	slime-repl-mode
+	web-mode))
 
 (setq ac-quick-help-delay 0.5)
-(setq ac-delay 2.0)
+(setq ac-delay 0.5)
 (setq ac-auto-start 0.25)
+(setq ac-ignore-case nil)
 
-(setq ac-sources 
-      '(ac-source-yasnippet 
-	ac-source-abbrev
-	ac-source-imenu))
+(add-to-list 'ac-sources 'ac-capf)
 
 (defun ac-no-semantic-setup ()
   (make-local-variable 'ac-sources)
@@ -389,8 +425,7 @@
   (add-to-list 'ac-sources ac-source-r7rs-symbols)
   (add-to-list 'ac-sources ac-source-r5rs-symbols)
   (add-to-list 'ac-sources ac-source-chicken-symbols)
-  (add-to-list 'ac-sources ac-source-chicken-symbols-prefixed)
-  (add-to-list 'ac-sources ac-source-slime))
+  (add-to-list 'ac-sources ac-source-chicken-symbols-prefixed))
 
 (defun ac-c-common-mode-setup ()
   (make-local-variable 'ac-sources)
@@ -422,6 +457,12 @@
 
 (message "Configuring Miscellaneous")
 
+(require 'web-mode)
+
+(smex-initialize)
+(icy-mode 1)
+(projectile-global-mode t)
+
 (defun override-theme (arg)
   "Disables all enabled themes and then loads the provided theme."
   (interactive
@@ -430,7 +471,8 @@
 			     (mapcar 'symbol-name (custom-available-themes))))))
   (while custom-enabled-themes
     (disable-theme (car custom-enabled-themes)))
-  (load-theme arg t))
+  (load-theme arg t)
+  t)
 
 (delete-selection-mode 1)
 (setq auto-fill-mode t)
@@ -451,8 +493,6 @@
 (setq scroll-bar-mode nil)
 (setq scroll-margin 0)
 (setq scroll-step 1)
-(setq show-paren-mode t)
-(setq show-paren-style 'expression)
 (setq standard-indent 2)
 (setq tab-stop-list (number-sequence 2 200 2))
 (setq tab-width 4)
@@ -461,6 +501,10 @@
 (setq truncate-lines t)
 (setq visual-line-mode t)
 (setq word-wrap t)
+
+; Cycle this
+(show-paren-mode nil)
+(show-paren-mode t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keys
@@ -472,6 +516,8 @@
 (global-set-key "\M-w" 'clipboard-kill-ring-save)
 (global-set-key "\C-y" 'clipboard-yank)
 
+(global-set-key "\M-x" 'smex)
+
 (global-set-key (kbd "C-;") 'comment-or-uncomment-region)
 (global-set-key (kbd "TAB") 'indent-according-to-mode)
 
@@ -480,6 +526,9 @@
 (global-set-key [f12] 'menu-bar-mode)
 
 (define-key ac-mode-map  [(control return)] 'auto-complete)
+
+(require 'moe-theme)
+(override-theme 'moe-dark)
 
 (message "Post Init Complete.")
 
