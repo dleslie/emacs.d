@@ -1,5 +1,25 @@
 (message "Post Init Started")
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Semantic
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(message "Configuring Semantic and CEDET")
+
+; Semantic and CEDET have to come first because they're dinks
+
+(require 'cedet)
+(require 'srecode)
+(require 'srecode/map)
+(require 'advice)
+(require 'eieio-opt)
+
+(require 'semantic)
+(require 'semantic/bovine/gcc)
+(require 'semantic/ia)
+(require 'semantic/imenu)
+(require 'semantic/sb)
+
 (defvar system-include-paths
   '("/usr/local/include" 
     "/usr/include"
@@ -15,35 +35,7 @@
     "/usr/lib/gcc/x86_64-linux-gnu/4.8/include/"
     "/usr/lib/gcc/x86_64-linux-gnu/4.9/include/"))
 
-(defvar prefixed-include-paths
-  (mapcar #'(lambda (s) (concat "-I" s)) system-include-paths))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Menu
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(require 'imenu)
-
-(defun try-to-add-imenu ()
-  (condition-case nil (imenu-add-to-menubar "TAGS") (error nil)))
-(add-hook 'font-lock-mode-hook 'try-to-add-imenu)
-
-(require 'doremi)
-(require 'help+)
-(require 'help-fns+)
-(require 'help-mode+)
-
-(require 'menu-bar+)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Semantic
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(require 'semantic)
-(require 'semantic/bovine/gcc)
-(require 'semantic/ia)
-(require 'semantic/imenu)
-
+(global-ede-mode 1)
 (global-semanticdb-minor-mode 1)
 (global-semantic-idle-summary-mode 1)
 (global-semantic-idle-scheduler-mode 1)
@@ -51,26 +43,49 @@
 (mapc #'(lambda (s) (semantic-add-system-include s))
       system-include-paths)
 
-(when (cedet-gnu-global-version-check t)
-  (semanticdb-enable-gnu-global-databases 'c-mode)
-  (semanticdb-enable-gnu-global-databases 'c++-mode))
-
-(require 'cc-mode)
-(require 'function-args)
-(fa-config-default)
-
-(define-key c-mode-map  [(control tab)] 'moo-complete)
-(define-key c++-mode-map  [(control tab)] 'moo-complete)
-(define-key c-mode-map (kbd "M-o")  'fa-show)
-(define-key c++-mode-map (kbd "M-o")  'fa-show)
+(semanticdb-enable-gnu-global-databases 'c-mode)
+(semanticdb-enable-gnu-global-databases 'c++-mode)
 
 (semantic-mode 1)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Custom Functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(message "Defining Custom Functions")
+
+(defun override-theme (arg)
+  "Disables all enabled themes and then loads the provided theme."
+  (interactive
+   (list
+    (intern (completing-read "Load custom theme: "
+			     (mapcar 'symbol-name (custom-available-themes))))))
+  (while custom-enabled-themes
+    (disable-theme (car custom-enabled-themes)))
+  (load-theme arg t)
+  t)
+
+(defun require-package (package-name &rest remaining-packages)
+  "Loads and imports packages, installing from ELPA if necessary"
+  (unless (package-installed-p package-name)
+    (package-install package-name))
+  (require package-name)
+  
+  (cons package-name
+	(cond
+	 ((equal remaining-packages nil) nil)
+	 (t (apply 'require-package remaining-packages)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(message "Configuring package archives")
+(message "Configuring Packages")
+
+(add-to-list 'load-path "~/.emacs.d/")
+
+(require 'package)
+(package-initialize)
 
 (setq package-archives 
       '(
@@ -79,19 +94,67 @@
         ("marmalade" . "http://marmalade-repo.org/packages/")
 	))
 
+(message "Check for packages")
+
+(package-refresh-contents)
+
+(message 
+ (format "Installed %s"
+	 (require-package
+	  'ac-capf
+	  'ac-slime
+	  'auto-complete
+	  'auto-complete-exuberant-ctags
+	  'cl-lib
+	  'chicken-scheme
+	  'dired+
+	  'doremi
+	  'enh-ruby-mode
+	  'function-args
+	  'ggtags
+	  'ghc
+	  'gist
+	  'help+
+	  'help-fns+
+	  'help-mode+
+	  'inf-ruby
+	  'jedi
+	  'magit
+	  'magit-gh-pulls
+	  'magit-svn
+	  'menu-bar+
+	  'moe-theme
+	  'nyan-mode
+	  'paredit 
+	  'parenface 
+	  'popup
+	  'projectile 
+	  'python-environment 
+	  'rainbow-delimiters 
+	  'rainbow-mode 
+	  'robe
+	  'slime 
+	  'smex 
+	  'sublime-themes 
+	  'web-mode 
+	  'zenburn-theme)))
+
+; Additional that require force loading
+(require 'cl)
+(require 'imenu)
+(require 'org-remember)
+(require 'auto-complete-config)
+(require 'cc-mode)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Extra Modes
+;; Menu
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(message "Configuring extra modes")
+(message "Configuring Menu")
 
-(add-to-list 'load-path "~/.emacs.d/")
-
-(require 'gist)
-
-(require 'nyan-mode)
-(setq nyan-wavy-trail t)
-(nyan-mode t)
+(defun try-to-add-imenu ()
+  (condition-case nil (imenu-add-to-menubar "TAGS") (error nil)))
+(add-hook 'font-lock-mode-hook 'try-to-add-imenu)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; eldoc
@@ -111,8 +174,6 @@
 
 (message "Configuring ggtags")
 
-(require 'ggtags)
-
 (defun custom-ggtags-prog-hook ()
   (ggtags-mode 1))
 
@@ -123,20 +184,15 @@
 ;; Rainbow Modes
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(message "Configuring Rainbow Mode")
+(message "Configuring Rainbow Modes")
 
-(require 'rainbow-mode)
-(require 'rainbow-delimiters)
-
-(global-rainbow-delimiters-mode)
-
+(add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
 (add-hook 'after-find-file 'rainbow-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Parens
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require 'paredit)
 (defun paredit-prog-mode-hook ()
   (paredit-mode t))
 
@@ -184,11 +240,7 @@
 
 (message "Configuring Scheme")
 
-(require 'scheme-c-mode)
-(require 'chicken-scheme)
-
 (add-hook 'scheme-mode-hook 'setup-chicken-scheme)
-(define-key scheme-mode-map (kbd "C-?") 'chicken-show-help)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LISP
@@ -225,7 +277,17 @@
      ("\\<[A-Za-z_]+[A-Za-z_0-9]*_\\(t\\|ptr\\|c\\|e\\)\\>" . font-lock-type-face)
      )))
 
+(fa-config-default)
+
 (add-hook 'c++-mode-hook 'c++-font-lock-fix)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Haskell
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(autoload 'ghc-init "ghc" nil t)
+(autoload 'ghc-debug "ghc" nil t)
+(add-hook 'haskell-mode-hook (lambda () (ghc-init)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Remember
@@ -233,27 +295,21 @@
 
 (message "Configuring Org Mode")
 
-(require 'org-remember)
-
 (setq org-directory "~/Dropbox/org/")
-(setq org-default-notes-file "~/Dropbox/org/notes.org")
-(setq org-agenda-files '("~/Dropbox/org/todo.org" "~/Dropbox/org/agenda.org" "~/Dropbox/org/remember.org"))
-(setq org-agenda-diary-file "~/Dropbox/org/remember.org")
-
-(define-key global-map "\C-cr" 'org-remember)
-(define-key global-map "\C-ct" 'org-todo-list)
-(define-key global-map "\C-ca" 'org-agenda)
+(setq org-default-notes-file (concat org-directory "notes.org"))
+(setq org-agenda-files '((concat org-directory "todo.org") (concat org-directory "agenda.org") (concat org-directory "remember.org")))
+(setq org-agenda-diary-file (concat org-directory "remember.org"))
 
 (setq remember-annotation-functions '(org-remember-annotation))
 (setq remember-handler-functions '(org-remember-handler))
 (add-hook 'remember-mode-hook 'org-remember-apply-template)
 (setq org-remember-templates
-      '(("Daily review" ?d "* %T %^g \n:CATEGORY: Review\n%?%[~/Dropbox/org/template_daily_review.org]\n" "~/Dropbox/org/remember.org" "Daily Review")
-        ("Idea" ?i "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Idea\n" "~/Dropbox/org/remember.org" "Ideas")
-        ("Journal" ?j "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Journal\n" "~/Dropbox/org/remember.org" "Journal")
-        ("Letter" ?l "* %^{topic} %T %^g\n:CATEGORY: Letter\n%i%?\n" "~/Dropbox/org/remember.org" "Letter")
-        ("Work Log" ?w "* %^{topic} %T %^g\n:CATEGORY: Log\n%i%?\n" "~/Dropbox/org/remember.org" "Work Log")
-	("Article" ?a "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Article\n" "~/Dropbox/org/remember.org" "Article")))
+      '(("Daily review" ?d "* %T %^g \n:CATEGORY: Review\n%?%[~/Dropbox/org/template_daily_review.org]\n" (concat org-directory "remember.org") "Daily Review")
+        ("Idea" ?i "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Idea\n" (concat org-directory "remember.org") "Ideas")
+        ("Journal" ?j "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Journal\n" (concat org-directory "remember.org") "Journal")
+        ("Letter" ?l "* %^{topic} %T %^g\n:CATEGORY: Letter\n%i%?\n" (concat org-directory "remember.org") "Letter")
+        ("Work Log" ?w "* %^{topic} %T %^g\n:CATEGORY: Log\n%i%?\n" (concat org-directory "remember.org") "Work Log")
+	("Article" ?a "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Article\n" (concat org-directory "remember.org") "Article")))
 
 (setq org-todo-keywords
       '((sequence "TODO" "DOIN" "BLCK" "STAL" "|" "WONT" "DONE")))
@@ -296,8 +352,6 @@
 (message "Configuring Ruby Mode")
 
 (setq enh-ruby-program "/usr/bin/ruby")
-(require 'cl)
-(require 'enh-ruby-mode)
 
 (defun launch-ruby ()
   (interactive)
@@ -319,7 +373,6 @@
 ;; Web
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require 'web-mode) 
 (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
@@ -334,9 +387,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (message "Configuring Auto-Complete")
-(require 'auto-complete-config)
-
-(require 'ac-capf)
 
 (ac-config-default)
 
@@ -447,64 +497,8 @@
 (add-hook 'lisp-mode-hook 'ac-lisp-setup)
 (add-hook 'lisp-interaction-mode-hook 'ac-lisp-setup)
 
-(require 'ac-slime)
 (add-hook 'slime-mode-hook 'ac-slime-setup)
 (add-hook 'slime-repl-mode-hook 'ac-slime-setup)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Misc Custom
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(message "Configuring Miscellaneous")
-
-(require 'web-mode)
-
-(smex-initialize)
-(icy-mode 1)
-(projectile-global-mode t)
-
-(defun override-theme (arg)
-  "Disables all enabled themes and then loads the provided theme."
-  (interactive
-   (list
-    (intern (completing-read "Load custom theme: "
-			     (mapcar 'symbol-name (custom-available-themes))))))
-  (while custom-enabled-themes
-    (disable-theme (car custom-enabled-themes)))
-  (load-theme arg t)
-  t)
-
-(delete-selection-mode 1)
-(setq auto-fill-mode t)
-(setq auto-save-default nil)
-(setq c-basic-offset 2)
-(setq c-set-offset 2)
-(setq c-set-style "BSD")
-(setq column-number-mode t)
-(setq debug-on-error nil)
-(setq debug-on-signal nil)
-(setq display-battery-mode t)
-(setq display-time-mode t)
-(setq fill-column 80)
-(setq indent-tabs-mode nil)
-(setq line-number-mode t)
-(setq make-backup-files nil)
-(setq redisplay-dont-pause t)
-(setq scroll-bar-mode nil)
-(setq scroll-margin 0)
-(setq scroll-step 1)
-(setq standard-indent 2)
-(setq tab-stop-list (number-sequence 2 200 2))
-(setq tab-width 4)
-(setq tool-bar-mode nil)
-(setq tool-bar-style (quote image))
-(setq truncate-lines t)
-(setq visual-line-mode t)
-(setq word-wrap t)
-
-; Cycle this
-(show-paren-mode nil)
-(show-paren-mode t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keys
@@ -525,10 +519,33 @@
 (global-set-key [f11] 'speedbar)
 (global-set-key [f12] 'menu-bar-mode)
 
-(define-key ac-mode-map  [(control return)] 'auto-complete)
+(global-set-key "\C-cr" 'org-remember)
+(global-set-key "\C-ct" 'org-todo-list)
+(global-set-key "\C-ca" 'org-agenda)
 
-(require 'moe-theme)
+(define-key scheme-mode-map (kbd "C-?") 'chicken-show-help)
+
+(define-key c-mode-map  [(control tab)] 'moo-complete)
+(define-key c++-mode-map  [(control tab)] 'moo-complete)
+(define-key c-mode-map (kbd "M-o")  'fa-show)
+(define-key c++-mode-map (kbd "M-o")  'fa-show)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Misc Custom
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(message "Configuring Miscellaneous")
+
+(smex-initialize)
+(projectile-global-mode t)
+
+(setq nyan-wavy-trail t)
+(nyan-mode t)
+
 (override-theme 'moe-dark)
 
-(message "Post Init Complete.")
+; Cycle this, somehow it gets gubered
+(show-paren-mode nil)
+(show-paren-mode t)
 
+(message "Post Init Complete.")
