@@ -333,8 +333,10 @@
 
 (message "Configuring Python Mode")
 
-(setq jedi:setup-keys t)                      ; optional
-(setq jedi:complete-on-dot t)                 ; optional
+(jedi:install-server)
+
+(setq jedi:setup-keys t)
+(setq jedi:complete-on-dot t)
 (setq py-python-command "/usr/bin/python")
 (setq jedi:server-command (quote ("python" "/home/dleslie/.emacs.d/elpa/jedi-20140321.1323/jediepcserver.py")))
 (setq python-shell-interpreter "python")
