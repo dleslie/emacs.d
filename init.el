@@ -383,12 +383,12 @@
 (setq remember-handler-functions '(org-remember-handler))
 (add-hook 'remember-mode-hook 'org-remember-apply-template)
 (setq org-remember-templates
-      '(("Daily review" ?d "* %T %^g \n:CATEGORY: Review\n%?%[~/Dropbox/org/template_daily_review.org]\n" (concat org-directory "remember.org") "Daily Review")
-        ("Idea" ?i "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Idea\n" (concat org-directory "remember.org") "Ideas")
-        ("Journal" ?j "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Journal\n" (concat org-directory "remember.org") "Journal")
-        ("Letter" ?l "* %^{topic} %T %^g\n:CATEGORY: Letter\n%i%?\n" (concat org-directory "remember.org") "Letter")
-        ("Work Log" ?w "* %^{topic} %T %^g\n:CATEGORY: Log\n%i%?\n" (concat org-directory "remember.org") "Work Log")
-	("Article" ?a "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Article\n" (concat org-directory "remember.org") "Article")))
+      `(("Daily review" ?d "* %T %^g \n:CATEGORY: Review\n%?%[~/Dropbox/org/template_daily_review.org]\n" ,(concat org-directory "remember.org") "Daily Review")
+        ("Idea" ?i "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Idea\n" ,(concat org-directory "remember.org") "Ideas")
+        ("Journal" ?j "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Journal\n" ,(concat org-directory "remember.org") "Journal")
+        ("Letter" ?l "* %^{topic} %T %^g\n:CATEGORY: Letter\n%i%?\n" ,(concat org-directory "remember.org") "Letter")
+        ("Work Log" ?w "* %^{topic} %T %^g\n:CATEGORY: Log\n%i%?\n" ,(concat org-directory "remember.org") "Work Log")
+	("Article" ?a "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Article\n" ,(concat org-directory "remember.org") "Article")))
 
 (setq org-todo-keywords
       '((sequence "TODO" "DOIN" "BLCK" "STAL" "|" "WONT" "DONE")))
