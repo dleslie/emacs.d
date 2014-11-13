@@ -91,8 +91,7 @@
       '(
         ("melpa" . "http://melpa.milkbox.net/packages/")
         ("gnu" . "http://elpa.gnu.org/packages/")
-        ("marmalade" . "http://marmalade-repo.org/packages/")
-	))
+        ("marmalade" . "http://marmalade-repo.org/packages/")))
 
 (message "Check for packages")
 
@@ -219,15 +218,12 @@
 
 (message "Configuring SLIME")
 
-(setq inferior-lisp-program "/usr/bin/sbcl")
-
 (setq slime-lisp-implementations
       '((sbcl ("/usr/bin/sbcl" "--core" "/usr/lib/sbcl/sbcl.core")
               :coding-system utf-8-unix
               :env ("SBCL_HOME=/usr/lib/sbcl"))))
 
 (require 'slime-autoloads)
-(setq slime-contribs '(slime-fancy slime-autodoc slime-banner))
 (slime-setup)
 
 (defun sbcl-slime ()
@@ -295,11 +291,6 @@
 
 (message "Configuring Org Mode")
 
-(setq org-directory "~/Dropbox/org/")
-(setq org-default-notes-file (concat org-directory "notes.org"))
-(setq org-agenda-files '((concat org-directory "todo.org") (concat org-directory "agenda.org") (concat org-directory "remember.org")))
-(setq org-agenda-diary-file (concat org-directory "remember.org"))
-
 (setq remember-annotation-functions '(org-remember-annotation))
 (setq remember-handler-functions '(org-remember-handler))
 (add-hook 'remember-mode-hook 'org-remember-apply-template)
@@ -335,13 +326,6 @@
 
 (jedi:install-server)
 
-(setq jedi:setup-keys t)
-(setq jedi:complete-on-dot t)
-(setq py-python-command "/usr/bin/python")
-(setq jedi:server-command (quote ("python" "/home/dleslie/.emacs.d/elpa/jedi-20140321.1323/jediepcserver.py")))
-(setq python-shell-interpreter "python")
-(setq python-indent-offset 4)
-
 (defun python-custom-hook ()
   (jedi:setup))
 
@@ -352,8 +336,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (message "Configuring Ruby Mode")
-
-(setq enh-ruby-program "/usr/bin/ruby")
 
 (defun launch-ruby ()
   (interactive)
@@ -394,34 +376,30 @@
 
 (add-to-list 'ac-dictionary-directories (expand-file-name "~/.emacs.d/ac-dict"))
 (setq ac-comphist-file (expand-file-name "~/.emacs.d/ac-comphist.dat"))
+
 (setq ac-modes 
       '(java-mode clojure-mode scala-mode 
-	emacs-lisp-mode
-	lisp-mode
-	lisp-interaction-mode 
-	c-mode cc-mode c++-mode
-	scheme-mode
-	slime-repl-mode
-	ocaml-mode tuareg-mode 
-	perl-mode cperl-mode 
-	python-mode 
-	ruby-mode enh-ruby-mode
-	ecmascript-mode javascript-mode js-mode js2-mode 
-	php-mode 
-	css-mode 
-	makefile-mode 
-	sh-mode 
-	fortran-mode f90-mode 
-	ada-mode 
-	xml-mode sgml-mode 
-	lua-mode
-	slime-repl-mode
-	web-mode))
-
-(setq ac-quick-help-delay 0.5)
-(setq ac-delay 0.5)
-(setq ac-auto-start 0.25)
-(setq ac-ignore-case nil)
+        emacs-lisp-mode
+        lisp-mode
+        lisp-interaction-mode 
+        c-mode cc-mode c++-mode
+        scheme-mode
+        slime-repl-mode
+        ocaml-mode tuareg-mode 
+        perl-mode cperl-mode 
+        python-mode 
+        ruby-mode enh-ruby-mode
+        ecmascript-mode javascript-mode js-mode js2-mode 
+        php-mode 
+        css-mode 
+        makefile-mode 
+        sh-mode 
+        fortran-mode f90-mode 
+        ada-mode 
+        xml-mode sgml-mode 
+        lua-mode
+        slime-repl-mode
+        web-mode))
 
 (add-to-list 'ac-sources 'ac-capf)
 
@@ -541,13 +519,11 @@
 (smex-initialize)
 (projectile-global-mode t)
 
-(setq nyan-wavy-trail t)
 (nyan-mode t)
 
-(override-theme 'moe-dark)
-
 ; Cycle this, somehow it gets gubered
-(show-paren-mode nil)
-(show-paren-mode t)
+(when show-paren-mode
+  (show-paren-mode nil)
+  (show-paren-mode t))
 
 (message "Post Init Complete.")

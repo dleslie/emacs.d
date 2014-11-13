@@ -3,6 +3,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ac-auto-start 0.25)
+ '(ac-delay 0.5)
+ '(ac-ignore-case nil)
+ '(ac-quick-help-delay 0.5)
  '(auto-fill-mode t)
  '(auto-save-default nil)
  '(c-basic-offset 2)
@@ -15,15 +19,24 @@
  '(delete-selection-mode 1)
  '(display-battery-mode t)
  '(display-time-mode t)
+ '(enh-ruby-program "/usr/bin/ruby")
  '(fill-column 80)
  '(indent-tabs-mode nil)
+ '(inferior-lisp-program "/usr/bin/sbcl")
+ '(jedi:complete-on-dot t)
+ '(jedi:setup-keys t)
  '(line-number-mode t)
  '(make-backup-files nil)
+ '(nyan-wavy-trail t)
+ '(py-python-command "/usr/bin/python")
+ '(python-indent-offset 4)
+ '(python-shell-interpreter "python")
  '(redisplay-dont-pause t)
  '(scroll-bar-mode nil)
  '(scroll-margin 0)
  '(scroll-step 1)
  '(semanticdb-find-default-throttle (quote (local project unloaded system recursive omniscience)))
+ '(slime-contribs '(slime-fancy slime-autodoc slime-banner))
  '(standard-indent 2)
  '(tab-stop-list (number-sequence 2 200 2))
  '(tab-width 4)
@@ -52,10 +65,16 @@
  '(rainbow-delimiters-depth-9-face ((t (:inherit font-lock-doc-face))))
  '(rainbow-delimiters-unmatched-face ((((class color) (min-colors 89)) (:foreground "#ffffff" :background "#a40000" :bold t)))))
 
+(setq org-directory "~/Dropbox/org/")
+(setq org-default-notes-file (concat org-directory "notes.org"))
+(setq org-agenda-files '((concat org-directory "todo.org") (concat org-directory "agenda.org") (concat org-directory "remember.org")))
+(setq org-agenda-diary-file (concat org-directory "remember.org"))
+
 (message "Adding Post Init Hook")
 
 (defun post-init-hook ()
-  (load "~/.emacs.d/post-init.el"))
+  (load "~/.emacs.d/post-init.el")
+  (override-theme 'moe-dark))
 
 (add-hook 'after-init-hook 'post-init-hook)
 

@@ -9,14 +9,15 @@ Setup
 Everything will break if you don't do the following:
 
 * Link this repository to ~/.emacs.d
-* Install all the external tools:
+* Install all the external tools and programming languages supported:
 
 ```
-sudo apt-get install global
+sudo apt-get install global python python-pip sbcl ruby chicken-bin
 
 sudo pip install jedi epc virtualenv
 
 sudo gem install pry pry-doc
+
 ```
 
 * The first time you launch it will require an active internet connection to fetch all the necessary packages
