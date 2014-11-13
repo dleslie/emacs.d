@@ -181,6 +181,7 @@
 
 (defun require-package (package-name &rest remaining-packages)
   "Loads and imports packages, installing from ELPA if necessary"
+
   (unless (package-installed-p package-name)
     (package-install package-name))
   
@@ -472,11 +473,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TeX
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (unless (package-installed-p 'auctex)
   (package-install 'auctex))
 
 (let* ((version-list (elt (cdr (assq 'auctex package-alist)) 0))
-       (version (format "%s.%s" (car version-list) (cadr version-list)))
+       (version (package-version-join version-list))
        (path (package--dir "auctex" version)))
   (add-to-list 'load-path path)
 
