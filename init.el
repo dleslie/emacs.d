@@ -238,6 +238,7 @@
 	  'magit
 	  'magit-gh-pulls
 	  'magit-svn
+      'markdown-mode
 	  'menu-bar+
 	  'moe-theme
 	  'nyan-mode
@@ -404,6 +405,31 @@
 (autoload 'ghc-init "ghc" nil t)
 (autoload 'ghc-debug "ghc" nil t)
 (add-hook 'haskell-mode-hook (lambda () (ghc-init)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Markdown
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun custom-markdown-mode ()
+  (interactive)
+  (visual-line-mode 1)
+  (flyspell-mode 1)
+  (writegood-mode 1)
+  (markdown-mode))
+
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . custom-markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . custom-markdown-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Text
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun custom-text-mode-hook ()
+  (visual-line-mode 1)
+  (flyspell-mode 1)
+  (writegood-mode 1))
+
+(add-hook 'text-mode-hook 'custom-text-mode-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Org
