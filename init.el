@@ -26,6 +26,40 @@
     "/usr/lib/gcc/x86_64-linux-gnu/4.8/include/"
     "/usr/lib/gcc/x86_64-linux-gnu/4.9/include/"))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Keys
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(message "Configuring custom keys")
+
+(global-set-key "\C-w" 'clipboard-kill-region)
+(global-set-key "\M-w" 'clipboard-kill-ring-save)
+(global-set-key "\C-y" 'clipboard-yank)
+
+(global-set-key "\M-x" 'smex)
+
+(global-set-key (kbd "C-;") 'comment-or-uncomment-region)
+(global-set-key (kbd "TAB") 'indent-according-to-mode)
+
+(global-set-key [f10] 'tool-bar-mode)
+(global-set-key [f11] 'speedbar)
+(global-set-key [f12] 'menu-bar-mode)
+
+(global-set-key "\C-cr" 'org-remember)
+(global-set-key "\C-ct" 'org-todo-list)
+(global-set-key "\C-ca" 'org-agenda)
+
+(global-set-key "\C-cg" 'magit-status)
+
+(require 'cc-mode)
+(define-key c-mode-map  [(control tab)] 'moo-complete)
+(define-key c++-mode-map  [(control tab)] 'moo-complete)
+(define-key c-mode-map (kbd "M-o")  'fa-show)
+(define-key c++-mode-map (kbd "M-o")  'fa-show)
+
+(global-set-key [(control return)] 'auto-complete)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Custom Variables
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -588,38 +622,6 @@
 (add-hook 'js2-mode-hook 'ac-js2-setup)
 (add-hook 'slime-mode-hook 'ac-slime-setup)
 (add-hook 'slime-repl-mode-hook 'ac-slime-setup)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Keys
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(message "Configuring custom keys")
-
-(global-set-key "\C-w" 'clipboard-kill-region)
-(global-set-key "\M-w" 'clipboard-kill-ring-save)
-(global-set-key "\C-y" 'clipboard-yank)
-
-(global-set-key "\M-x" 'smex)
-
-(global-set-key (kbd "C-;") 'comment-or-uncomment-region)
-(global-set-key (kbd "TAB") 'indent-according-to-mode)
-
-(global-set-key [f10] 'tool-bar-mode)
-(global-set-key [f11] 'speedbar)
-(global-set-key [f12] 'menu-bar-mode)
-
-(global-set-key "\C-cr" 'org-remember)
-(global-set-key "\C-ct" 'org-todo-list)
-(global-set-key "\C-ca" 'org-agenda)
-
-(define-key scheme-mode-map (kbd "C-?") 'chicken-show-help)
-
-(define-key c-mode-map  [(control tab)] 'moo-complete)
-(define-key c++-mode-map  [(control tab)] 'moo-complete)
-(define-key c-mode-map (kbd "M-o")  'fa-show)
-(define-key c++-mode-map (kbd "M-o")  'fa-show)
-
-(global-set-key [(control return)] 'auto-complete)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc Custom
