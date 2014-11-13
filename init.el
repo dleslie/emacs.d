@@ -7,10 +7,6 @@
 (setq org-directory "~/Dropbox/org/")
 (setq tern-command '("~/node_modules/.bin/tern"))
 
-(setq org-default-notes-file (concat org-directory "notes.org"))
-(setq org-agenda-files '((concat org-directory "todo.org") (concat org-directory "agenda.org") (concat org-directory "remember.org")))
-(setq org-agenda-diary-file (concat org-directory "remember.org"))
-
 (defvar system-include-paths
   '("/usr/local/include" 
     "/usr/include"
@@ -187,7 +183,8 @@
   "Loads and imports packages, installing from ELPA if necessary"
   (unless (package-installed-p package-name)
     (package-install package-name))
-  (require package-name)
+  
+  (require package-name nil 'noerror)
   
   (cons package-name
 	(cond
@@ -258,6 +255,7 @@
       'tern
       'tern-auto-complete
 	  'web-mode 
+      'writegood-mode
 	  'zenburn-theme)))
 
 ; Additional that require force loading
@@ -407,11 +405,15 @@
 (autoload 'ghc-debug "ghc" nil t)
 (add-hook 'haskell-mode-hook (lambda () (ghc-init)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Remember
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Org
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (message "Configuring Org Mode")
+
+(setq org-default-notes-file (concat org-directory "notes.org"))
+(setq org-agenda-files `(,(concat org-directory "todo.org") ,(concat org-directory "agenda.org") ,(concat org-directory "remember.org")))
+(setq org-agenda-diary-file (concat org-directory "remember.org"))
 
 (setq remember-annotation-functions '(org-remember-annotation))
 (setq remember-handler-functions '(org-remember-handler))
@@ -436,13 +438,44 @@
 
 (defun custom-org-hook ()
   (visual-line-mode 1)
-  (flyspell-mode 1))
+  (flyspell-mode 1)
+  (writegood-mode 1))
 
 (add-hook 'org-mode-hook 'custom-org-hook)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; TeX
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(unless (package-installed-p 'auctex)
+  (package-install 'auctex))
+
+(let* ((version-list (elt (cdr (assq 'auctex package-alist)) 0))
+       (version (format "%s.%s" (car version-list) (cadr version-list)))
+       (path (package--dir "auctex" version)))
+  (add-to-list 'load-path path)
+
+  (autoload 'TeX-load-hack
+    (expand-file-name "tex-site.el"
+                      (file-name-directory load-file-name)))
+  (TeX-load-hack)
+
+  (load "preview.el" nil t t)
+  (setq load-path (remove-if (lambda (val) (equal path val)) load-path)))
+
+(setq TeX-auto-save t)
+(setq TeX-parse-self t)
+(setq-default TeX-master nil)
+(setq reftex-plug-into-AUCTeX t)
+
+(add-hook 'LaTeX-mode-hook 'visual-line-mode)
+(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+
+(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Python
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (message "Configuring Python Mode")
 
