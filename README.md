@@ -12,15 +12,21 @@ Everything will break if you don't do the following:
 * Install all the external tools and programming languages supported:
 
 ```
-sudo apt-get install global python python-pip sbcl ruby chicken-bin
+sudo apt-get install global python python-pip sbcl ruby chicken-bin nodejs nodejs-legacy npm
 
 sudo pip install jedi epc virtualenv
 
 sudo gem install pry pry-doc
 
+sudo npm install tern
+
 ```
 
 * The first time you launch it will require an active internet connection to fetch all the necessary packages
+
+* Feel free to configure obvious things (like where to find tern) in `init.el`
+
+* Check the "Keys" section for predefined custom keys
 
 Making it Launch Quickly
 ========================
