@@ -58,7 +58,6 @@
 
 (global-set-key (kbd "C-!") 'eshell-here)
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Semantic
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -139,6 +138,12 @@ directory to make multiple eshell windows easier."
 
     (insert (concat "ls"))
     (eshell-send-input)))
+
+(defun eshell/x ()
+  "Closes the current eshell window."
+  (insert "exit")
+  (eshell-send-input)
+  (delete-window))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Packages
