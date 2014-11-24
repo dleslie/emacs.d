@@ -56,80 +56,8 @@
 
 (global-set-key [(control return)] 'auto-complete)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Custom Variables
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(global-set-key (kbd "C-!") 'eshell-here)
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ac-auto-start 0.25)
- '(ac-delay 0.5)
- '(ac-ignore-case nil)
- '(ac-quick-help-delay 0.5)
- '(auto-fill-mode t)
- '(auto-save-default nil)
- '(c-basic-offset 2)
- '(c-set-offset 2)
- '(c-set-style "BSD")
- '(column-number-mode t)
- '(custom-safe-themes (quote ("8ada1f0bcfc2d8662b74fb21bd1830eaacb5d29e3c99a5ea7fd7a417b7a9b708" "88e56f2e676c8828e08b128c74f2818cbfc77b79f8ebbae955db6098d0001473" default)))
- '(debug-on-error nil)
- '(debug-on-signal nil)
- '(delete-selection-mode 1)
- '(display-battery-mode t)
- '(display-time-mode t)
- '(enh-ruby-program "/usr/bin/ruby")
- '(fill-column 80)
- '(indent-tabs-mode nil)
- '(inferior-lisp-program "/usr/bin/sbcl")
- '(jedi:complete-on-dot t)
- '(jedi:setup-keys t)
- '(line-number-mode t)
- '(make-backup-files nil)
- '(nyan-wavy-trail t)
- '(py-python-command "/usr/bin/python")
- '(python-indent-offset 4)
- '(python-shell-interpreter "python")
- '(redisplay-dont-pause t)
- '(scroll-bar-mode nil)
- '(scroll-margin 0)
- '(scroll-step 1)
- '(semanticdb-find-default-throttle (quote (local project unloaded system recursive omniscience)))
- '(slime-contribs '(slime-fancy slime-autodoc slime-banner))
- '(standard-indent 2)
- '(tab-stop-list (number-sequence 2 200 2))
- '(tab-width 4)
- '(tool-bar-style (quote image))
- '(truncate-lines t)
- '(visible-bell t)
- '(visual-line-mode t)
- '(word-wrap t))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Custom Faces
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:background nil))))
- '(mode-line ((t (:background "#191919" :foreground "#BBBBBB" :box nil))))
- '(mode-line-highlight ((t (:box nil))))
- '(rainbow-delimiters-depth-1-face ((t (:inherit font-lock-function-name-face))))
- '(rainbow-delimiters-depth-2-face ((t (:inherit font-lock-variable-name-face))))
- '(rainbow-delimiters-depth-3-face ((t (:inherit font-lock-keyword-face))))
- '(rainbow-delimiters-depth-4-face ((t (:inherit font-lock-comment-face))))
- '(rainbow-delimiters-depth-5-face ((t (:inherit font-lock-type-face))))
- '(rainbow-delimiters-depth-6-face ((t (:inherit font-lock-constant-face))))
- '(rainbow-delimiters-depth-7-face ((t (:inherit font-lock-builtin-face))))
- '(rainbow-delimiters-depth-8-face ((t (:inherit font-lock-string-face))))
- '(rainbow-delimiters-depth-9-face ((t (:inherit font-lock-doc-face))))
- '(rainbow-delimiters-unmatched-face ((((class color) (min-colors 89)) (:foreground "#ffffff" :background "#a40000" :bold t)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Semantic
@@ -192,6 +120,26 @@
 	 ((equal remaining-packages nil) nil)
 	 (t (apply 'require-package remaining-packages)))))
 
+;; From:
+;; http://www.howardism.org/Technical/Emacs/eshell-fun.html
+(defun eshell-here ()
+  "Opens up a new shell in the directory associated with the
+current buffer's file. The eshell is renamed to match that
+directory to make multiple eshell windows easier."
+  (interactive)
+  (let* ((parent (if (buffer-file-name)
+                     (file-name-directory (buffer-file-name))
+                   default-directory))
+         (height (/ (window-total-height) 3))
+         (name   (car (last (split-string parent "/" t)))))
+    (split-window-vertically (- height))
+    (other-window 1)
+    (eshell "new")
+    (rename-buffer (concat "*eshell: " name "*"))
+
+    (insert (concat "ls"))
+    (eshell-send-input)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -218,6 +166,8 @@
 	 (require-package
 	  'ac-capf
       'ac-js2
+      'ac-geiser
+      'ac-inf-ruby
 	  'ac-slime
 	  'auto-complete
 	  'auto-complete-exuberant-ctags
@@ -228,6 +178,7 @@
 	  'enh-ruby-mode
 	  'function-args
 	  'ggtags
+      'geiser
 	  'ghc
 	  'gist
 	  'help+
@@ -308,6 +259,8 @@
 (message "Configuring Rainbow Modes")
 
 (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
+(add-hook 'prog-mode-hook 'show-paren-mode)
+
 (add-hook 'after-find-file 'rainbow-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -319,9 +272,9 @@
 
 (mapc #'(lambda (m) (add-hook m 'paredit-prog-mode-hook))
       '(scheme-mode-hook 
-	lisp-mode-hook 
-	emacs-lisp-mode-hook 
-	lisp-interaction-mode))
+        lisp-mode-hook 
+        emacs-lisp-mode-hook 
+        lisp-interaction-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Compilation
@@ -358,7 +311,11 @@
 
 (message "Configuring Scheme")
 
-(add-hook 'scheme-mode-hook 'setup-chicken-scheme)
+(defun custom-scheme-hook ()
+  (interactive)
+  (setup-chicken-scheme))
+
+(add-hook 'scheme-mode-hook 'custom-scheme-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LISP
@@ -584,12 +541,12 @@
         lisp-mode
         lisp-interaction-mode 
         c-mode cc-mode c++-mode
-        scheme-mode
+        scheme-mode geiser-repl-mode
         slime-repl-mode
         ocaml-mode tuareg-mode 
         perl-mode cperl-mode 
         python-mode 
-        ruby-mode enh-ruby-mode
+        ruby-mode enh-ruby-mode inf-ruby-mode
         ecmascript-mode javascript-mode js-mode js2-mode 
         php-mode 
         css-mode 
@@ -683,6 +640,10 @@
 (add-hook 'js2-mode-hook 'ac-js2-setup)
 (add-hook 'slime-mode-hook 'ac-slime-setup)
 (add-hook 'slime-repl-mode-hook 'ac-slime-setup)
+(add-hook 'inf-ruby-mode-hook 'ac-inf-ruby-enable)
+
+(add-hook 'geiser-mode-hook 'ac-geiser-setup)
+(add-hook 'geiser-repl-mode-hook 'ac-geiser-setup)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc Custom
@@ -695,12 +656,83 @@
 
 (nyan-mode t)
 
-; Cycle this, somehow it gets gubered
-(when show-paren-mode
-  (show-paren-mode nil)
-  (show-paren-mode t))
-
 (override-theme 'moe-dark)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Custom Variables
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ac-auto-start 0.25)
+ '(ac-delay 0.5)
+ '(ac-ignore-case nil)
+ '(ac-quick-help-delay 0.5)
+ '(auto-fill-mode t)
+ '(auto-save-default nil)
+ '(c-basic-offset 2)
+ '(c-set-offset 2)
+ '(c-set-style "BSD")
+ '(column-number-mode t)
+ '(custom-safe-themes (quote ("8ada1f0bcfc2d8662b74fb21bd1830eaacb5d29e3c99a5ea7fd7a417b7a9b708" "88e56f2e676c8828e08b128c74f2818cbfc77b79f8ebbae955db6098d0001473" default)))
+ '(debug-on-error nil)
+ '(debug-on-signal nil)
+ '(delete-selection-mode 1)
+ '(display-battery-mode t)
+ '(display-time-mode t)
+ '(enh-ruby-program "/usr/bin/ruby")
+ '(fill-column 80)
+ '(indent-tabs-mode nil)
+ '(inferior-lisp-program "/usr/bin/sbcl" t)
+ '(jedi:complete-on-dot t)
+ '(jedi:setup-keys t)
+ '(make-backup-files nil)
+ '(nyan-wavy-trail t)
+ '(py-python-command "/usr/bin/python")
+ '(python-indent-offset 4)
+ '(python-shell-interpreter "python")
+ '(redisplay-dont-pause t t)
+ '(scroll-bar-mode nil)
+ '(scroll-margin 0)
+ '(scroll-step 1)
+ '(semanticdb-find-default-throttle (quote (local project unloaded system recursive omniscience)))
+ '(show-paren-mode t)
+ '(slime-contribs (quote (slime-fancy slime-autodoc slime-banner)) t)
+ '(standard-indent 2)
+ '(tab-stop-list (number-sequence 2 200 2))
+ '(tab-width 4)
+ '(tool-bar-mode nil)
+ '(tool-bar-style (quote image))
+ '(truncate-lines t)
+ '(visible-bell t)
+ '(visual-line-mode t t)
+ '(word-wrap t))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Custom Faces
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:background nil))))
+ '(mode-line ((t (:background "#191919" :foreground "#BBBBBB" :box nil))))
+ '(mode-line-highlight ((t (:box nil))))
+ '(rainbow-delimiters-depth-1-face ((t (:inherit font-lock-function-name-face))))
+ '(rainbow-delimiters-depth-2-face ((t (:inherit font-lock-variable-name-face))))
+ '(rainbow-delimiters-depth-3-face ((t (:inherit font-lock-keyword-face))))
+ '(rainbow-delimiters-depth-4-face ((t (:inherit font-lock-comment-face))))
+ '(rainbow-delimiters-depth-5-face ((t (:inherit font-lock-type-face))))
+ '(rainbow-delimiters-depth-6-face ((t (:inherit font-lock-constant-face))))
+ '(rainbow-delimiters-depth-7-face ((t (:inherit font-lock-builtin-face))))
+ '(rainbow-delimiters-depth-8-face ((t (:inherit font-lock-string-face))))
+ '(rainbow-delimiters-depth-9-face ((t (:inherit font-lock-doc-face))))
+ '(rainbow-delimiters-unmatched-face ((((class color) (min-colors 89)) (:foreground "#ffffff" :background "#a40000" :bold t)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; End
