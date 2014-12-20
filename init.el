@@ -22,6 +22,7 @@
     "/usr/lib/gcc/x86_64-linux-gnu/4.8/include/"
     "/usr/lib/gcc/x86_64-linux-gnu/4.9/include/"))
 
+(load "~/Workspace/geiser/elisp/geiser.el")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keys
@@ -48,14 +49,6 @@
 
 (global-set-key "\C-cg" 'magit-status)
 
-(require 'cc-mode)
-(define-key c-mode-map  [(control tab)] 'moo-complete)
-(define-key c++-mode-map  [(control tab)] 'moo-complete)
-(define-key c-mode-map (kbd "M-o")  'fa-show)
-(define-key c++-mode-map (kbd "M-o")  'fa-show)
-
-(global-set-key [(control return)] 'auto-complete)
-
 (global-set-key (kbd "C-!") 'eshell-here)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -80,6 +73,7 @@
 (global-semanticdb-minor-mode 1)
 (global-semantic-idle-summary-mode 1)
 (global-semantic-idle-scheduler-mode 1)
+(global-semantic-highlight-edits-mode 1)
 
 (mapc #'(lambda (s) (semantic-add-system-include s))
       system-include-paths)
@@ -100,7 +94,7 @@
   (interactive
    (list
     (intern (completing-read "Load custom theme: "
-			     (mapcar 'symbol-name (custom-available-themes))))))
+                             (mapcar 'symbol-name (custom-available-themes))))))
   (while custom-enabled-themes
     (disable-theme (car custom-enabled-themes)))
   (load-theme arg t)
@@ -115,9 +109,9 @@
   (require package-name nil 'noerror)
   
   (cons package-name
-	(cond
-	 ((equal remaining-packages nil) nil)
-	 (t (apply 'require-package remaining-packages)))))
+        (cond
+         ((equal remaining-packages nil) nil)
+         (t (apply 'require-package remaining-packages)))))
 
 ;; From:
 ;; http://www.howardism.org/Technical/Emacs/eshell-fun.html
@@ -141,6 +135,7 @@ directory to make multiple eshell windows easier."
 
 (defun eshell/x ()
   "Closes the current eshell window."
+  (interactive)
   (insert "exit")
   (eshell-send-input)
   (delete-window))
@@ -168,55 +163,55 @@ directory to make multiple eshell windows easier."
 
 (message 
  (format "Installed %s"
-	 (require-package
-	  'ac-capf
-      'ac-js2
-      'ac-geiser
-      'ac-inf-ruby
-	  'ac-slime
-	  'auto-complete
-	  'auto-complete-exuberant-ctags
-	  'cl-lib
-	  'chicken-scheme
-	  'dired+
-	  'doremi
-	  'enh-ruby-mode
-	  'function-args
-	  'ggtags
-      'geiser
-	  'ghc
-	  'gist
-	  'help+
-	  'help-fns+
-	  'help-mode+
-	  'inf-ruby
-	  'jedi
-      'js2-mode
-	  'magit
-	  'magit-gh-pulls
-	  'magit-svn
-      'markdown-mode
-	  'menu-bar+
-	  'moe-theme
-	  'nyan-mode
-	  'paredit 
-	  'parenface 
-	  'popup
-	  'projectile 
-	  'python-environment 
-	  'rainbow-delimiters 
-	  'rainbow-mode 
-	  'robe
-	  'slime 
-	  'smex 
-	  'sublime-themes 
-      'tern
-      'tern-auto-complete
-	  'web-mode 
-      'writegood-mode
-	  'zenburn-theme)))
+         (require-package
+          'ac-capf
+          'ac-js2
+          'ac-geiser
+          'ac-inf-ruby
+          'ac-slime
+          'auto-complete
+          'auto-complete-exuberant-ctags
+          'cl-lib
+          'chicken-scheme
+          'dired+
+          'doremi
+          'enh-ruby-mode
+          'function-args
+          'ggtags
+          ;;'geiser
+          'ghc
+          'gist
+          'help+
+          'help-fns+
+          'help-mode+
+          'inf-ruby
+          'jedi
+          'js2-mode
+          'magit
+          'magit-gh-pulls
+          'magit-svn
+          'markdown-mode
+          'menu-bar+
+          'moe-theme
+          'nyan-mode
+          'paredit 
+          'parenface 
+          'popup
+          'projectile 
+          'python-environment 
+          'rainbow-delimiters 
+          'rainbow-mode 
+          'robe
+          'slime 
+          'smex 
+          'sublime-themes 
+          'tern
+          'tern-auto-complete
+          'web-mode 
+          'writegood-mode
+          'zenburn-theme)))
 
-; Additional that require force loading
+;; Additional that require force loading
 (require 'cl)
 (require 'imenu)
 (require 'org-remember)
@@ -334,7 +329,7 @@ directory to make multiple eshell windows easier."
 (add-hook 'lisp-mode-hook 'my-lisp-mode-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; C++
+;; C/C++
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (message "Extending C++11 fontlocking")
@@ -357,9 +352,11 @@ directory to make multiple eshell windows easier."
      ("\\<[A-Za-z_]+[A-Za-z_0-9]*_\\(t\\|ptr\\|c\\|e\\)\\>" . font-lock-type-face)
      )))
 
-(fa-config-default)
-
 (add-hook 'c++-mode-hook 'c++-font-lock-fix)
+(add-hook 'c-mode-common-hook 'fa-config-default)
+(add-hook 'c-mode-common-hook 'fa-auto)
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Haskell
@@ -413,7 +410,7 @@ directory to make multiple eshell windows easier."
         ("Journal" ?j "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Journal\n" ,(concat org-directory "remember.org") "Journal")
         ("Letter" ?l "* %^{topic} %T %^g\n:CATEGORY: Letter\n%i%?\n" ,(concat org-directory "remember.org") "Letter")
         ("Work Log" ?w "* %^{topic} %T %^g\n:CATEGORY: Log\n%i%?\n" ,(concat org-directory "remember.org") "Work Log")
-	("Article" ?a "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Article\n" ,(concat org-directory "remember.org") "Article")))
+        ("Article" ?a "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Article\n" ,(concat org-directory "remember.org") "Article")))
 
 (setq org-todo-keywords
       '((sequence "TODO" "DOIN" "BLCK" "STAL" "|" "WONT" "DONE")))
@@ -519,9 +516,9 @@ directory to make multiple eshell windows easier."
   (tern-mode t))
 
 (eval-after-load 'tern
-   '(progn
-      (require 'tern-auto-complete)
-      (tern-ac-setup)))
+  '(progn
+     (require 'tern-auto-complete)
+     (tern-ac-setup)))
 
 (setq tern-ac-on-dot t)
 
@@ -542,29 +539,29 @@ directory to make multiple eshell windows easier."
 
 (setq ac-modes 
       '(java-mode clojure-mode scala-mode 
-        emacs-lisp-mode
-        lisp-mode
-        lisp-interaction-mode 
-        c-mode cc-mode c++-mode
-        scheme-mode geiser-repl-mode
-        slime-repl-mode
-        ocaml-mode tuareg-mode 
-        perl-mode cperl-mode 
-        python-mode 
-        ruby-mode enh-ruby-mode inf-ruby-mode
-        ecmascript-mode javascript-mode js-mode js2-mode 
-        php-mode 
-        css-mode 
-        makefile-mode 
-        sh-mode 
-        fortran-mode f90-mode 
-        ada-mode 
-        xml-mode sgml-mode 
-        lua-mode
-        slime-repl-mode
-        web-mode))
+                  emacs-lisp-mode
+                  lisp-mode
+                  lisp-interaction-mode 
+                  c-mode cc-mode c++-mode
+                  scheme-mode geiser-repl-mode
+                  slime-repl-mode
+                  ocaml-mode tuareg-mode 
+                  perl-mode cperl-mode 
+                  python-mode 
+                  ruby-mode enh-ruby-mode inf-ruby-mode
+                  ecmascript-mode javascript-mode js-mode js2-mode 
+                  php-mode 
+                  css-mode 
+                  makefile-mode 
+                  sh-mode 
+                  fortran-mode f90-mode 
+                  ada-mode 
+                  xml-mode sgml-mode 
+                  lua-mode
+                  slime-repl-mode
+                  web-mode))
 
-(add-to-list 'ac-sources 'ac-capf)
+(add-to-list 'ac-sources 'ac-source-capf)
 
 (defun ac-no-semantic-setup ()
   (make-local-variable 'ac-sources)
@@ -594,9 +591,9 @@ directory to make multiple eshell windows easier."
 
 (mapc #'(lambda (m) (add-hook m 'ac-semantic-setup))
       '(emacs-lisp-mode-hook
-	lisp-mode-hook
-	lisp-interaction-mode-hook
-	c-mode-common-hook))
+        lisp-mode-hook
+        lisp-interaction-mode-hook
+        c-mode-common-hook))
 
 (defun ac-css-setup ()
   (make-local-variable 'ac-sources)
@@ -689,12 +686,14 @@ directory to make multiple eshell windows easier."
  '(display-battery-mode t)
  '(display-time-mode t)
  '(enh-ruby-program "/usr/bin/ruby")
+ '(fa-max-one-line-width 120)
  '(fill-column 80)
  '(indent-tabs-mode nil)
  '(inferior-lisp-program "/usr/bin/sbcl" t)
  '(jedi:complete-on-dot t)
  '(jedi:setup-keys t)
  '(make-backup-files nil)
+ '(moo-select-method (quote display-completion-list))
  '(nyan-wavy-trail t)
  '(py-python-command "/usr/bin/python")
  '(python-indent-offset 4)

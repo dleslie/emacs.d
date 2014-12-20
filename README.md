@@ -14,11 +14,11 @@ Everything will break if you don't do the following:
 ```
 sudo apt-get install global python python-pip sbcl ruby chicken-bin nodejs nodejs-legacy npm
 
-sudo pip install jedi epc virtualenv
+pip install jedi epc virtualenv
 
-sudo gem install pry pry-doc
+gem install pry pry-doc
 
-sudo npm install tern
+npm install tern
 
 ```
 
