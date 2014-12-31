@@ -4,8 +4,35 @@
 
 (message "Setting Local Configuration")
 
-(setq org-directory "~/Dropbox/org/")
-(setq tern-command '("~/node_modules/.bin/tern"))
+(setq 
+ org-directory 
+ "~/Dropbox/org/")
+
+(setq 
+ tern-command 
+ '("~/node_modules/.bin/tern"))
+
+(setq
+ user-mail-address 
+ "dan@ironoxide.ca"
+ user-full-name 
+ "Dan Leslie"
+ user-mail-login 
+ "dleslie@gmail.com"
+ user-mail-attachment-directory
+ "/home/dleslie/Downloads/Attachments"
+ mail-smtp-server
+ "smtp.gmail.com"
+ mail-smtp-port
+ 587
+ mail-folder-inbox
+ "/INBOX"
+ mail-folder-drafts
+ "/[Gmail].Drafts"
+ mail-folder-sent
+ "/[Gmail].Sent Mail"
+ mail-folder-trash
+ "/[Gmail].Trash")
 
 (defvar system-include-paths
   '("/usr/local/include" 
@@ -23,6 +50,31 @@
     "/usr/lib/gcc/x86_64-linux-gnu/4.9/include/"))
 
 (load "~/Workspace/geiser/elisp/geiser.el")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Email
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(require 'smtpmail)
+
+(setq
+ message-send-mail-function 
+ 'smtpmail-send-it
+ smtpmail-stream-type
+ 'starttls
+ smtpmail-starttls-credentials
+ '((mail-smtp-server mail-smtp-port nil nil))
+ smtpmail-auth-credentials
+ '((mail-smtp-server mail-smtp-port
+    user-mail-login nil))
+ smtpmail-default-smtp-server
+ mail-smtp-server
+ smtpmail-smtp-server
+ mail-smtp-server
+ smtpmail-smtp-service
+ mail-smtp-port
+ gnus-ignored-newsgroups
+ "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keys
@@ -43,9 +95,13 @@
 (global-set-key [f11] 'speedbar)
 (global-set-key [f12] 'menu-bar-mode)
 
-(global-set-key "\C-cr" 'org-remember)
 (global-set-key "\C-ct" 'org-todo-list)
 (global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cc" 'org-capture)
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-cb" 'org-iswitchb)
+
+(global-set-key "\C-cm" 'mu4e)
 
 (global-set-key "\C-cg" 'magit-status)
 
@@ -138,7 +194,8 @@ directory to make multiple eshell windows easier."
   (interactive)
   (insert "exit")
   (eshell-send-input)
-  (delete-window))
+  (delete-window)
+  t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Packages
@@ -146,16 +203,14 @@ directory to make multiple eshell windows easier."
 
 (message "Configuring Packages")
 
-(add-to-list 'load-path "~/.emacs.d/")
-
 (require 'package)
 (package-initialize)
 
 (setq package-archives 
-      '(
-        ("melpa" . "http://melpa.milkbox.net/packages/")
+      '(("melpa" . "http://melpa.milkbox.net/packages/")
         ("gnu" . "http://elpa.gnu.org/packages/")
-        ("marmalade" . "http://marmalade-repo.org/packages/")))
+        ("marmalade" . "http://marmalade-repo.org/packages/")
+        ("org" . "http://orgmode.org/elpa/")))
 
 (message "Check for packages")
 
@@ -194,6 +249,7 @@ directory to make multiple eshell windows easier."
           'menu-bar+
           'moe-theme
           'nyan-mode
+          'org-plus-contrib
           'paredit 
           'parenface 
           'popup
@@ -214,9 +270,10 @@ directory to make multiple eshell windows easier."
 ;; Additional that require force loading
 (require 'cl)
 (require 'imenu)
-(require 'org-remember)
 (require 'auto-complete-config)
 (require 'cc-mode)
+
+(require 'org-contacts)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Menu
@@ -356,8 +413,6 @@ directory to make multiple eshell windows easier."
 (add-hook 'c-mode-common-hook 'fa-config-default)
 (add-hook 'c-mode-common-hook 'fa-auto)
 
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Haskell
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -397,30 +452,44 @@ directory to make multiple eshell windows easier."
 
 (message "Configuring Org Mode")
 
-(setq org-default-notes-file (concat org-directory "notes.org"))
-(setq org-agenda-files `(,(concat org-directory "todo.org") ,(concat org-directory "agenda.org") ,(concat org-directory "remember.org")))
-(setq org-agenda-diary-file (concat org-directory "remember.org"))
-
-(setq remember-annotation-functions '(org-remember-annotation))
-(setq remember-handler-functions '(org-remember-handler))
-(add-hook 'remember-mode-hook 'org-remember-apply-template)
-(setq org-remember-templates
-      `(("Daily review" ?d "* %T %^g \n:CATEGORY: Review\n%?%[~/Dropbox/org/template_daily_review.org]\n" ,(concat org-directory "remember.org") "Daily Review")
-        ("Idea" ?i "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Idea\n" ,(concat org-directory "remember.org") "Ideas")
-        ("Journal" ?j "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Journal\n" ,(concat org-directory "remember.org") "Journal")
-        ("Letter" ?l "* %^{topic} %T %^g\n:CATEGORY: Letter\n%i%?\n" ,(concat org-directory "remember.org") "Letter")
-        ("Work Log" ?w "* %^{topic} %T %^g\n:CATEGORY: Log\n%i%?\n" ,(concat org-directory "remember.org") "Work Log")
-        ("Article" ?a "* %^{topic} %T %^g\n%i%?\n:CATEGORY: Article\n" ,(concat org-directory "remember.org") "Article")))
-
-(setq org-todo-keywords
-      '((sequence "TODO" "DOIN" "BLCK" "STAL" "|" "WONT" "DONE")))
-
-(setq org-todo-keyword-faces
-      '(
-        ("DOIN" . (:foreground "green" :weight bold))
-        ("BLCK" . (:foreground "red" :weight bold))
-        ("STAL" . (:foreground "yellow" :weight bold))
-        ))
+(setq
+ org-default-notes-file 
+ (concat org-directory "notes.org")
+ org-agenda-files 
+ `(,(concat org-directory "todo.org") 
+   ,(concat org-directory "agenda.org") )
+ org-agenda-diary-file 
+ (concat org-directory "diary.org")
+ org-agenda-files 
+ '("~/Dropbox/org/todo.org" "~/Dropbox/org/agenda.org")
+ org-todo-keywords
+ '((sequence "TODO(t)" "PROG(p)" "BLCK(b)" "STAL(s)" "|" "DONE(d)" "WONT(w)"))
+ org-todo-keyword-faces
+ '(("TODO" . (:foreground "white" :weight bold))
+   ("DOIN" . (:foreground "green" :weight bold))
+   ("BLCK" . (:foreground "red" :weight bold))
+   ("STAL" . (:foreground "yellow" :weight bold))
+   ("WONT" . (:foreground "grey" :weight bold))
+   ("DONE" . (:foreground "black" :weight bold)))
+ org-capture-templates
+ '(("d" "Daily review" entry (file+headline (concat org-directory "diary.org") "Daily Review") 
+    "* %T %^g\n:CATEGORY: Review\n%?%[~/Dropbox/org/template_daily_review.org]") 
+   ("i" "Idea" entry (file+headline (concat org-directory "ideas.org") "Ideas") 
+    "* %^{topic} %T %^g\n:CATEGORY: Idea\n%i%?\n") 
+   ("j" "Journal" entry (file+headline (concat org-directory "diary.org") "Journal") 
+    "* %^{topic} %T %^g\n:CATEGORY: Journal\n%i%?\n")
+   ("l" "Letter" entry (file+headline (concat org-directory "letters.org") "Letter") 
+    "* %^{topic} %T %^g\n:CATEGORY: Letter\n%i%?\n")
+   ("w" "Work Log" entry (file+headline (concat org-directory "work.org") "Work Log") 
+    "* %^{topic} %T %^g\n:CATEGORY: Log\n%i%?\n")
+   ("a" "Article" entry (file+headline (concat org-directory "articles.org") "Article")
+    "* %^{topic} %T %^g\n:CATEGORY: Article\n%i%?\n")
+   ("c" "Contacts" entry (file+headline (concat org-directory "addresses.org") "Addresses")
+    "* %(org-contacts-template-name)\n:PROPERTIES:\n:EMAIL: %(org-contacts-template-email)\n:END:\n%i%?\n"))
+ org-modules
+ '(org-bbdb org-bibtex org-docview org-gnus org-info org-jsinfo org-habit org-irc org-mew 
+   org-mhe org-rmail org-special-blocks org-vm org-wl org-w3m org-mouse org-bookmark 
+   org-drill org-eshell org-invoice org-registry org-contacts))
 
 (defun custom-org-hook ()
   (visual-line-mode 1)
@@ -433,21 +502,24 @@ directory to make multiple eshell windows easier."
 ;; TeX
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(message "Configuring TeX")
+
 (unless (package-installed-p 'auctex)
   (package-install 'auctex))
 
-(let* ((version-list (elt (cdr (assq 'auctex package-alist)) 0))
-       (version (package-version-join version-list))
-       (path (package--dir "auctex" version)))
-  (add-to-list 'load-path path)
+(let* ((path (elt (cadr (assq 'auctex package-alist)) 7)))
+  (when (not (file-exists-p path))
+    (message "Error loading AucTeX"))
+  (when (file-exists-p path)
+    (let ((path (concat path "/")))
+      (add-to-list 'load-path path)
 
-  (autoload 'TeX-load-hack
-    (expand-file-name "tex-site.el"
-                      (file-name-directory load-file-name)))
-  (TeX-load-hack)
+      (autoload 'TeX-load-hack
+	(expand-file-name "tex-site.el" path))
+      (TeX-load-hack)
 
-  (load "preview.el" nil t t)
-  (setq load-path (remove-if (lambda (val) (equal path val)) load-path)))
+      (load "preview.el" nil t t)
+      (setq load-path (remove-if (lambda (val) (equal path val)) load-path)))))
 
 (setq TeX-auto-save t)
 (setq TeX-parse-self t)
@@ -461,7 +533,7 @@ directory to make multiple eshell windows easier."
 (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Python
+ ;; Python
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (message "Configuring Python Mode")
@@ -474,7 +546,7 @@ directory to make multiple eshell windows easier."
 (add-hook 'python-mode-hook 'python-custom-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Ruby
+ ;; Ruby
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (message "Configuring Ruby Mode")
@@ -496,8 +568,9 @@ directory to make multiple eshell windows easier."
 (add-hook 'robe-mode-hook 'ac-robe-setup)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Web
+ ;; Web
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
@@ -644,9 +717,6 @@ directory to make multiple eshell windows easier."
 (add-hook 'slime-repl-mode-hook 'ac-slime-setup)
 (add-hook 'inf-ruby-mode-hook 'ac-inf-ruby-enable)
 
-(add-hook 'geiser-mode-hook 'ac-geiser-setup)
-(add-hook 'geiser-repl-mode-hook 'ac-geiser-setup)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc Custom
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -658,7 +728,85 @@ directory to make multiple eshell windows easier."
 
 (nyan-mode t)
 
-(override-theme 'moe-dark)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; mu4e
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(if (not (file-exists-p "/usr/local/share/emacs/site-lisp/mu4e"))
+  (message "WARNING: Not loading mu4e")
+  (progn
+    (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
+
+    (require 'mu4e)
+
+    (setq 
+     mu4e-maildir 
+     "~/Maildir"
+
+     mu4e-drafts-folder
+     mail-folder-drafts
+
+     mu4e-sent-folder
+     mail-folder-sent
+
+     mu4e-trash-folder
+     mail-folder-trash
+
+     mu4e-sent-messages-behavior
+     'sent
+
+     mu4e-maildir-shortcuts
+     `((,mail-folder-inbox . ?i)
+       (,mail-folder-sent  . ?s)
+       (,mail-folder-trash . ?t))
+
+     mu4e-get-mail-command
+     "offlineimap"
+
+     mu4e-compose-signature
+     (concat "-" user-full-name "\n")
+
+     message-kill-buffer-on-exit
+     t
+
+     mu4e-attachment-dir
+     user-mail-attachment-directory
+
+     mu4e-compose-reply-to-address
+     user-mail-address
+
+     mu4e-headers-include-related
+     t
+
+     mu4e-headers-results-limit
+     -1
+
+     mu4e-sent-messages-behavior
+     (quote sent)
+
+     mu4e-update-interval
+     350
+
+     mu4e-user-mail-address-list
+     `(,user-mail-login ,user-mail-address)
+
+     mu4e-view-show-addresses
+     t
+
+     mu4e-view-show-images
+     t
+
+     mu4e-org-contacts-file
+     (concat org-directory "addresses.org"))
+
+    (when (package-installed-p 'eww)
+      (require 'mu4e-contrib)
+      (setq mu4e-html2text-command 'mu4e-shr2text))
+
+    (add-to-list 'mu4e-headers-actions
+                 '("org-contact-add" . mu4e-action-add-org-contact) t)
+    (add-to-list 'mu4e-view-actions
+                 '("org-contact-add" . mu4e-action-add-org-contact) t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Custom Variables
@@ -743,3 +891,4 @@ directory to make multiple eshell windows easier."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (message "Init Complete.")
+
