@@ -49,7 +49,9 @@
     "/usr/lib/gcc/x86_64-linux-gnu/4.8/include/"
     "/usr/lib/gcc/x86_64-linux-gnu/4.9/include/"))
 
-(load "~/Workspace/geiser/elisp/geiser.el")
+(let ((geiser-file "~/Workspace/geiser/elisp/geiser.el"))
+  (when (file-exists-p geiser-file)
+    (load geiser-file)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Email
@@ -221,13 +223,14 @@ directory to make multiple eshell windows easier."
          (require-package
           'ac-capf
           'ac-js2
-          'ac-geiser
+          ;;'ac-geiser
           'ac-inf-ruby
           'ac-slime
           'auto-complete
           'auto-complete-exuberant-ctags
           'cl-lib
           'chicken-scheme
+          'dictionary
           'dired+
           'doremi
           'enh-ruby-mode
@@ -472,7 +475,11 @@ directory to make multiple eshell windows easier."
    ("WONT" . (:foreground "grey" :weight bold))
    ("DONE" . (:foreground "black" :weight bold)))
  org-capture-templates
- '(("d" "Daily review" entry (file+headline (concat org-directory "diary.org") "Daily Review") 
+ '(("n" "Note" entry (file+headline (concat org-directory "notes.org") "Notes")
+    "* %^{topic} %T %^g\n:CATEGORY: %^{category}\n%i%?\n")
+   ("t" "To Do" entry (file+headline (concat org-directory "todo.org") "To Do")
+    "* TODO %^{todo} %^{due} %^g\n:CATEGORY: %^{category}")
+   ("d" "Daily review" entry (file+headline (concat org-directory "diary.org") "Daily Review") 
     "* %T %^g\n:CATEGORY: Review\n%?%[~/Dropbox/org/template_daily_review.org]") 
    ("i" "Idea" entry (file+headline (concat org-directory "ideas.org") "Ideas") 
     "* %^{topic} %T %^g\n:CATEGORY: Idea\n%i%?\n") 
@@ -484,7 +491,9 @@ directory to make multiple eshell windows easier."
     "* %^{topic} %T %^g\n:CATEGORY: Log\n%i%?\n")
    ("a" "Article" entry (file+headline (concat org-directory "articles.org") "Article")
     "* %^{topic} %T %^g\n:CATEGORY: Article\n%i%?\n")
-   ("c" "Contacts" entry (file+headline (concat org-directory "addresses.org") "Addresses")
+   ("e" "Event" entry (file+headline (concat org-directory "agenda.org") "Events")
+    "* %^{title} %^g\n%^{when}\n%i%?\n")
+   ("c" "Contact" entry (file+headline (concat org-directory "addresses.org") "Addresses")
     "* %(org-contacts-template-name)\n:PROPERTIES:\n:EMAIL: %(org-contacts-template-email)\n:END:\n%i%?\n"))
  org-modules
  '(org-bbdb org-bibtex org-docview org-gnus org-info org-jsinfo org-habit org-irc org-mew 
@@ -502,35 +511,35 @@ directory to make multiple eshell windows easier."
 ;; TeX
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(message "Configuring TeX")
+;; (message "Configuring TeX")
 
-(unless (package-installed-p 'auctex)
-  (package-install 'auctex))
+;; (unless (package-installed-p 'auctex)
+;;   (package-install 'auctex))
 
-(let* ((path (elt (cadr (assq 'auctex package-alist)) 7)))
-  (when (not (file-exists-p path))
-    (message "Error loading AucTeX"))
-  (when (file-exists-p path)
-    (let ((path (concat path "/")))
-      (add-to-list 'load-path path)
+;; (let* ((path (elt (cadr (assq 'auctex package-alist)) 7)))
+;;   (when (not (file-exists-p path))
+;;     (message "Error loading AucTeX"))
+;;   (when (file-exists-p path)
+;;     (let ((path (concat path "/")))
+;;       (add-to-list 'load-path path)
 
-      (autoload 'TeX-load-hack
-	(expand-file-name "tex-site.el" path))
-      (TeX-load-hack)
+;;       (autoload 'TeX-load-hack
+;; 	(expand-file-name "tex-site.el" path))
+;;       (TeX-load-hack)
 
-      (load "preview.el" nil t t)
-      (setq load-path (remove-if (lambda (val) (equal path val)) load-path)))))
+;;       (load "preview.el" nil t t)
+;;       (setq load-path (remove-if (lambda (val) (equal path val)) load-path)))))
 
-(setq TeX-auto-save t)
-(setq TeX-parse-self t)
-(setq-default TeX-master nil)
-(setq reftex-plug-into-AUCTeX t)
+;; (setq TeX-auto-save t)
+;; (setq TeX-parse-self t)
+;; (setq-default TeX-master nil)
+;; (setq reftex-plug-into-AUCTeX t)
 
-(add-hook 'LaTeX-mode-hook 'visual-line-mode)
-(add-hook 'LaTeX-mode-hook 'flyspell-mode)
-(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+;; (add-hook 'LaTeX-mode-hook 'visual-line-mode)
+;; (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+;; (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
 
-(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+;; (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
  ;; Python
