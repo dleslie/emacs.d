@@ -4,6 +4,18 @@
 
 (message "Setting Local Configuration")
 
+(setq my-optional-init
+  '(geiser
+    chicken
+    js2
+    ruby
+    python
+    ;;tex
+    c++
+    haskell
+    lisp
+    mu4e))
+
 (setq 
  org-directory 
  "~/Dropbox/org/")
@@ -50,7 +62,7 @@
     "/usr/lib/gcc/x86_64-linux-gnu/4.9/include/"))
 
 (let ((geiser-file "~/Workspace/geiser/elisp/geiser.el"))
-  (when (file-exists-p geiser-file)
+  (when (and (member 'geiser my-optional-init) (file-exists-p geiser-file))
     (load geiser-file)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -191,14 +203,6 @@ directory to make multiple eshell windows easier."
     (insert (concat "ls"))
     (eshell-send-input)))
 
-(defun eshell/x ()
-  "Closes the current eshell window."
-  (interactive)
-  (insert "exit")
-  (eshell-send-input)
-  (delete-window)
-  t)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -218,57 +222,74 @@ directory to make multiple eshell windows easier."
 
 (package-refresh-contents)
 
-(message 
- (format "Installed %s"
-         (require-package
-          'ac-capf
-          'ac-js2
-          ;;'ac-geiser
-          'ac-inf-ruby
-          'ac-slime
-          'auto-complete
-          'auto-complete-exuberant-ctags
-          'cl-lib
-          'chicken-scheme
-          'dictionary
-          'dired+
-          'doremi
-          'enh-ruby-mode
-          'function-args
-          'ggtags
-          ;;'geiser
-          'ghc
-          'gist
-          'help+
-          'help-fns+
-          'help-mode+
-          'inf-ruby
-          'jedi
-          'js2-mode
-          'magit
-          'magit-gh-pulls
-          'magit-svn
-          'markdown-mode
-          'menu-bar+
-          'moe-theme
-          'nyan-mode
-          'org-plus-contrib
-          'paredit 
-          'parenface 
-          'popup
-          'projectile 
-          'python-environment 
-          'rainbow-delimiters 
-          'rainbow-mode 
-          'robe
-          'slime 
-          'smex 
-          'sublime-themes 
-          'tern
-          'tern-auto-complete
-          'web-mode 
-          'writegood-mode
-          'zenburn-theme)))
+(setq my-package-list
+  (list 'ac-capf
+        'auto-complete
+        'cl-lib
+        'dictionary
+        'dired+
+        'doremi
+        'gist
+        'help+
+        'help-fns+
+        'help-mode+
+        'magit
+        'magit-gh-pulls
+        'magit-svn
+        'markdown-mode
+        'menu-bar+
+        'moe-theme
+        'nyan-mode
+        'org-plus-contrib
+        'paredit 
+        'parenface 
+        'popup
+        'projectile 
+        'rainbow-delimiters 
+        'rainbow-mode 
+        'smex 
+        'sublime-themes 
+        'web-mode
+        'writegood-mode
+        'zenburn-theme))
+
+(when (member 'chicken my-optional-init)
+  (add-to-list 'my-package-list 'chicken-scheme))
+
+(when (member 'geiser my-optional-init)
+  (add-to-list 'my-package-list 'geiser)
+  (add-to-list 'my-package-list 'ac-geiser))
+
+(when (member 'js2 my-optional-init)
+  (add-to-list 'my-package-list 'js2-mode)
+  (add-to-list 'my-package-list 'ac-js2)
+  (add-to-list 'my-package-list 'tern)
+  (add-to-list 'my-package-list 'tern-auto-complete))
+
+(when (member 'ruby my-optional-init)
+  (add-to-list 'my-package-list 'ac-inf-ruby)
+  (add-to-list 'my-package-list 'enh-ruby-mode)
+  (add-to-list 'my-package-list 'inf-ruby)
+  (add-to-list 'my-package-list 'robe))
+
+(when (member 'python my-optional-init)
+  (add-to-list 'my-package-list 'jedi)
+  (add-to-list 'my-package-list 'python-environment))
+
+(when (member 'c++ my-optional-init)
+  (add-to-list 'my-package-list 'function-args)
+  (add-to-list 'my-package-list 'ggtags)
+  (add-to-list 'my-package-list 'auto-complete-exuberant-ctags))
+
+(when (member 'haskell my-optional-init)
+  (add-to-list 'my-package-list 'ghc))
+
+(when (member 'lisp my-optional-init)
+  (add-to-list 'my-package-list 'ac-slime)
+  (add-to-list 'my-package-list 'slime))
+
+(let ((loaded (eval (cons 'require-package (mapcar (lambda (x) `(quote ,x)) my-package-list)))))
+  (message (format "Installed %s" loaded)))
 
 ;; Additional that require force loading
 (require 'cl)
@@ -348,81 +369,81 @@ directory to make multiple eshell windows easier."
 (add-hook 'compilation-mode-hook 'compilation-custom-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; SLIME
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(message "Configuring SLIME")
-
-(setq slime-lisp-implementations
-      '((sbcl ("/usr/bin/sbcl" "--core" "/usr/lib/sbcl/sbcl.core")
-              :coding-system utf-8-unix
-              :env ("SBCL_HOME=/usr/lib/sbcl"))))
-
-(require 'slime-autoloads)
-(slime-setup)
-
-(defun sbcl-slime ()
-  (interactive)
-  (slime 'sbcl))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Scheme
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(message "Configuring Scheme")
+(when (member 'chicken my-optional-init)
 
-(defun custom-scheme-hook ()
-  (interactive)
-  (setup-chicken-scheme))
+  (message "Configuring Chicken Scheme")
 
-(add-hook 'scheme-mode-hook 'custom-scheme-hook)
+  (defun custom-scheme-hook ()
+    (interactive)
+    (setup-chicken-scheme))
+
+  (add-hook 'scheme-mode-hook 'custom-scheme-hook))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LISP
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(message "Configuring LISP")
+(when (member 'lisp my-optional-init)
 
-(defun my-lisp-mode-hook ()
-  (slime-mode t))
+  (message "Configuring LISP")
 
-(add-hook 'lisp-mode-hook 'my-lisp-mode-hook)
+  (setq slime-lisp-implementations
+        '((sbcl ("/usr/bin/sbcl" "--core" "/usr/lib/sbcl/sbcl.core")
+                :coding-system utf-8-unix
+                :env ("SBCL_HOME=/usr/lib/sbcl"))))
+
+  (require 'slime-autoloads)
+  (slime-setup)
+
+  (defun sbcl-slime ()
+    (interactive)
+    (slime 'sbcl))
+
+  (defun my-lisp-mode-hook ()
+    (slime-mode t))
+
+  (add-hook 'lisp-mode-hook 'my-lisp-mode-hook))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C/C++
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(message "Extending C++11 fontlocking")
+(when (member 'c++ my-optional-init)
+  (message "Extending C++11 fontlocking")
 
-;; Fixes missing C++11 fontlocking in cc-mode
-(defun c++-font-lock-fix ()
-  (font-lock-add-keywords 
-   nil 
-   '(("\\<\\(void\\|unsigned\\|signed\\|char\\|short\\|bool\\|int\\|long\\|float\\|double\\)\\>" . font-lock-keyword-face)
-     ;; add the new C++11 keywords
-     ("\\<\\(alignof\\|alignas\\|constexpr\\|decltype\\|noexcept\\|nullptr\\|static_assert\\|thread_local\\|override\\|final\\)\\>" . font-lock-keyword-face)
-     ("\\<\\(char[0-9]+_t\\)\\>" . font-lock-keyword-face)
-     ;; PREPROCESSOR_CONSTANT
-     ("\\<[A-Z]+\\([A-Z_]+\\|[0-9]+\\)\\>" . font-lock-constant-face)
-     ;; hexadecimal numbers
-     ("\\<0[xX][0-9A-Fa-f]+\\>" . font-lock-constant-face)
-     ;; integer/float/scientific numbers
-     ("\\<[\\-+]*[0-9]*\\.?[0-9]+\\([ulUL]+\\|[eE][\\-+]?[0-9]+\\)?\\>" . font-lock-constant-face)
-     ;; user-types
-     ("\\<[A-Za-z_]+[A-Za-z_0-9]*_\\(t\\|ptr\\|c\\|e\\)\\>" . font-lock-type-face)
-     )))
+  ;; Fixes missing C++11 fontlocking in cc-mode
+  (defun c++-font-lock-fix ()
+    (font-lock-add-keywords 
+     nil 
+     '(("\\<\\(void\\|unsigned\\|signed\\|char\\|short\\|bool\\|int\\|long\\|float\\|double\\)\\>" . font-lock-keyword-face)
+       ;; add the new C++11 keywords
+       ("\\<\\(alignof\\|alignas\\|constexpr\\|decltype\\|noexcept\\|nullptr\\|static_assert\\|thread_local\\|override\\|final\\)\\>" . font-lock-keyword-face)
+       ("\\<\\(char[0-9]+_t\\)\\>" . font-lock-keyword-face)
+       ;; PREPROCESSOR_CONSTANT
+       ("\\<[A-Z]+\\([A-Z_]+\\|[0-9]+\\)\\>" . font-lock-constant-face)
+       ;; hexadecimal numbers
+       ("\\<0[xX][0-9A-Fa-f]+\\>" . font-lock-constant-face)
+       ;; integer/float/scientific numbers
+       ("\\<[\\-+]*[0-9]*\\.?[0-9]+\\([ulUL]+\\|[eE][\\-+]?[0-9]+\\)?\\>" . font-lock-constant-face)
+       ;; user-types
+       ("\\<[A-Za-z_]+[A-Za-z_0-9]*_\\(t\\|ptr\\|c\\|e\\)\\>" . font-lock-type-face)
+       )))
 
-(add-hook 'c++-mode-hook 'c++-font-lock-fix)
-(add-hook 'c-mode-common-hook 'fa-config-default)
-(add-hook 'c-mode-common-hook 'fa-auto)
+  (add-hook 'c++-mode-hook 'c++-font-lock-fix)
+  (add-hook 'c-mode-common-hook 'fa-config-default)
+  (add-hook 'c-mode-common-hook 'fa-auto))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Haskell
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(autoload 'ghc-init "ghc" nil t)
-(autoload 'ghc-debug "ghc" nil t)
-(add-hook 'haskell-mode-hook (lambda () (ghc-init)))
+(when (member 'haskell my-optional-init)
+  (autoload 'ghc-init "ghc" nil t)
+  (autoload 'ghc-debug "ghc" nil t)
+  (add-hook 'haskell-mode-hook (lambda () (ghc-init))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Markdown
@@ -511,75 +532,77 @@ directory to make multiple eshell windows easier."
 ;; TeX
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; (message "Configuring TeX")
+(when (member 'tex my-optional-init)
+  (message "Configuring TeX")
 
-;; (unless (package-installed-p 'auctex)
-;;   (package-install 'auctex))
+  (unless (package-installed-p 'auctex)
+    (package-install 'auctex))
 
-;; (let* ((path (elt (cadr (assq 'auctex package-alist)) 7)))
-;;   (when (not (file-exists-p path))
-;;     (message "Error loading AucTeX"))
-;;   (when (file-exists-p path)
-;;     (let ((path (concat path "/")))
-;;       (add-to-list 'load-path path)
+  (let* ((path (elt (cadr (assq 'auctex package-alist)) 7)))
+    (when (not (file-exists-p path))
+      (message "Error loading AucTeX"))
+    (when (file-exists-p path)
+      (let ((path (concat path "/")))
+        (add-to-list 'load-path path)
 
-;;       (autoload 'TeX-load-hack
-;; 	(expand-file-name "tex-site.el" path))
-;;       (TeX-load-hack)
+        (autoload 'TeX-load-hack
+          (expand-file-name "tex-site.el" path))
+        (TeX-load-hack)
 
-;;       (load "preview.el" nil t t)
-;;       (setq load-path (remove-if (lambda (val) (equal path val)) load-path)))))
+        (load "preview.el" nil t t)
+        (setq load-path (remove-if (lambda (val) (equal path val)) load-path)))))
 
-;; (setq TeX-auto-save t)
-;; (setq TeX-parse-self t)
-;; (setq-default TeX-master nil)
-;; (setq reftex-plug-into-AUCTeX t)
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq-default TeX-master nil)
+  (setq reftex-plug-into-AUCTeX t)
 
-;; (add-hook 'LaTeX-mode-hook 'visual-line-mode)
-;; (add-hook 'LaTeX-mode-hook 'flyspell-mode)
-;; (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+  (add-hook 'LaTeX-mode-hook 'visual-line-mode)
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
 
-;; (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- ;; Python
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(message "Configuring Python Mode")
-
-(jedi:install-server)
-
-(defun python-custom-hook ()
-  (jedi:setup))
-
-(add-hook 'python-mode-hook 'python-custom-hook)
+  (add-hook 'LaTeX-mode-hook 'turn-on-reftex))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- ;; Ruby
+;; Python
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(message "Configuring Ruby Mode")
+(when (member 'python my-optional-init)
+  (message "Configuring Python Mode")
 
-(defun launch-ruby ()
-  (interactive)
-  (unless (get-buffer "*ruby*")
-    (let ((buf (current-buffer)))
-      (inf-ruby)
-      (robe-start)
-      (set-buffer buf))))
+  (jedi:install-server)
 
-(add-hook 'ruby-mode-hook 'launch-ruby)
-(add-hook 'enh-ruby-mode-hook 'launch-ruby)
+  (defun python-custom-hook ()
+    (jedi:setup))
 
-(add-hook 'ruby-mode-hook 'robe-mode)
-(add-hook 'enh-ruby-mode-hook 'robe-mode)
-
-(add-hook 'robe-mode-hook 'ac-robe-setup)
+  (add-hook 'python-mode-hook 'python-custom-hook))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- ;; Web
+;; Ruby
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(when (member 'ruby my-optional-init)
+  (message "Configuring Ruby Mode")
+
+  (defun launch-ruby ()
+    (interactive)
+    (unless (get-buffer "*ruby*")
+      (let ((buf (current-buffer)))
+        (inf-ruby)
+        (robe-start)
+        (set-buffer buf))))
+
+  (add-hook 'ruby-mode-hook 'launch-ruby)
+  (add-hook 'enh-ruby-mode-hook 'launch-ruby)
+
+  (add-hook 'ruby-mode-hook 'robe-mode)
+  (add-hook 'enh-ruby-mode-hook 'robe-mode)
+
+  (add-hook 'robe-mode-hook 'ac-robe-setup))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Web
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
@@ -594,19 +617,20 @@ directory to make multiple eshell windows easier."
 ;; Javascript
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun js2-mode-custom-hook ()
-  (tern-mode t))
+(when (member 'js2 my-optional-init)
+  (defun js2-mode-custom-hook ()
+    (tern-mode t))
 
-(eval-after-load 'tern
-  '(progn
-     (require 'tern-auto-complete)
-     (tern-ac-setup)))
+  (eval-after-load 'tern
+    '(progn
+       (require 'tern-auto-complete)
+       (tern-ac-setup)))
 
-(setq tern-ac-on-dot t)
+  (setq tern-ac-on-dot t)
 
-(add-hook 'js2-mode-hook 'js2-mode-custom-hook)
+  (add-hook 'js2-mode-hook 'js2-mode-custom-hook)
 
-(add-to-list 'auto-mode-alist '("\\.js?\\'" . js2-mode))
+  (add-to-list 'auto-mode-alist '("\\.js?\\'" . js2-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Auto-complete
@@ -741,81 +765,81 @@ directory to make multiple eshell windows easier."
 ;; mu4e
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(if (not (file-exists-p "/usr/local/share/emacs/site-lisp/mu4e"))
-  (message "WARNING: Not loading mu4e")
-  (progn
-    (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
+(when
+    (and (file-exists-p "/usr/local/share/emacs/site-lisp/mu4e")
+         (member 'mu4e my-optional-init))
+  (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
 
-    (require 'mu4e)
+  (require 'mu4e)
 
-    (setq 
-     mu4e-maildir 
-     "~/Maildir"
+  (setq 
+   mu4e-maildir 
+   "~/Maildir"
 
-     mu4e-drafts-folder
-     mail-folder-drafts
+   mu4e-drafts-folder
+   mail-folder-drafts
 
-     mu4e-sent-folder
-     mail-folder-sent
+   mu4e-sent-folder
+   mail-folder-sent
 
-     mu4e-trash-folder
-     mail-folder-trash
+   mu4e-trash-folder
+   mail-folder-trash
 
-     mu4e-sent-messages-behavior
-     'sent
+   mu4e-sent-messages-behavior
+   'sent
 
-     mu4e-maildir-shortcuts
-     `((,mail-folder-inbox . ?i)
-       (,mail-folder-sent  . ?s)
-       (,mail-folder-trash . ?t))
+   mu4e-maildir-shortcuts
+   `((,mail-folder-inbox . ?i)
+     (,mail-folder-sent  . ?s)
+     (,mail-folder-trash . ?t))
 
-     mu4e-get-mail-command
-     "offlineimap"
+   mu4e-get-mail-command
+   "offlineimap"
 
-     mu4e-compose-signature
-     (concat "-" user-full-name "\n")
+   mu4e-compose-signature
+   (concat "-" user-full-name "\n")
 
-     message-kill-buffer-on-exit
-     t
+   message-kill-buffer-on-exit
+   t
 
-     mu4e-attachment-dir
-     user-mail-attachment-directory
+   mu4e-attachment-dir
+   user-mail-attachment-directory
 
-     mu4e-compose-reply-to-address
-     user-mail-address
+   mu4e-compose-reply-to-address
+   user-mail-address
 
-     mu4e-headers-include-related
-     t
+   mu4e-headers-include-related
+   t
 
-     mu4e-headers-results-limit
-     -1
+   mu4e-headers-results-limit
+   -1
 
-     mu4e-sent-messages-behavior
-     (quote sent)
+   mu4e-sent-messages-behavior
+   (quote sent)
 
-     mu4e-update-interval
-     350
+   mu4e-update-interval
+   350
 
-     mu4e-user-mail-address-list
-     `(,user-mail-login ,user-mail-address)
+   mu4e-user-mail-address-list
+   `(,user-mail-login ,user-mail-address)
 
-     mu4e-view-show-addresses
-     t
+   mu4e-view-show-addresses
+   t
 
-     mu4e-view-show-images
-     t
+   mu4e-view-show-images
+   t
 
-     mu4e-org-contacts-file
-     (concat org-directory "addresses.org"))
+   mu4e-org-contacts-file
+   (concat org-directory "addresses.org"))
 
-    (when (package-installed-p 'eww)
-      (require 'mu4e-contrib)
-      (setq mu4e-html2text-command 'mu4e-shr2text))
+  (when (package-installed-p 'eww)
+    (require 'mu4e-contrib)
+    (setq mu4e-html2text-command 'mu4e-shr2text))
 
-    (add-to-list 'mu4e-headers-actions
-                 '("org-contact-add" . mu4e-action-add-org-contact) t)
-    (add-to-list 'mu4e-view-actions
-                 '("org-contact-add" . mu4e-action-add-org-contact) t)))
+  (add-to-list 'mu4e-headers-actions
+               '("org-contact-add" . mu4e-action-add-org-contact) t)
+  (add-to-list 'mu4e-view-actions
+               '("org-contact-add" . mu4e-action-add-org-contact) t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Custom Variables
