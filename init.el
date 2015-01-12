@@ -5,7 +5,8 @@
 (message "Setting Local Configuration")
 
 (setq my-optional-init
-  '(geiser
+  '(auto-complete
+    geiser
     chicken
     js2
     ruby
@@ -127,7 +128,7 @@
 
 (message "Configuring Semantic and CEDET")
 
-(require 'cedet)
+;; (require 'cedet)
 (require 'srecode)
 (require 'srecode/map)
 (require 'advice)
@@ -136,14 +137,8 @@
 (require 'semantic)
 (require 'semantic/bovine/gcc)
 (require 'semantic/ia)
-(require 'semantic/imenu)
+;; (require 'semantic/imenu)
 (require 'semantic/sb)
-
-(global-ede-mode 1)
-(global-semanticdb-minor-mode 1)
-(global-semantic-idle-summary-mode 1)
-(global-semantic-idle-scheduler-mode 1)
-(global-semantic-highlight-edits-mode 1)
 
 (mapc #'(lambda (s) (semantic-add-system-include s))
       system-include-paths)
@@ -151,7 +146,16 @@
 (semanticdb-enable-gnu-global-databases 'c-mode)
 (semanticdb-enable-gnu-global-databases 'c++-mode)
 
-(semantic-mode 1)
+(defun enable-semantic-mode ()
+  (interactive)
+
+  ; (ede-mode 1)
+  (semanticdb-minor-mode 1)
+  (semantic-idle-scheduler-mode 1)
+  (semantic-idle-summary-mode 1)
+  (semantic-idle-scheduler-mode 1)
+
+  (semantic-mode 1))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utility Functions
@@ -223,9 +227,7 @@ directory to make multiple eshell windows easier."
 (package-refresh-contents)
 
 (setq my-package-list
-  (list 'ac-capf
-        'auto-complete
-        'cl-lib
+  (list 'cl-lib
         'dictionary
         'dired+
         'doremi
@@ -253,23 +255,31 @@ directory to make multiple eshell windows easier."
         'writegood-mode
         'zenburn-theme))
 
+(when (member 'auto-complete my-optional-init)
+  (add-to-list 'my-package-list 'ac-capf)
+  (add-to-list 'my-package-list 'auto-complete))
+
 (when (member 'chicken my-optional-init)
   (add-to-list 'my-package-list 'chicken-scheme))
 
 (when (member 'geiser my-optional-init)
   (add-to-list 'my-package-list 'geiser)
-  (add-to-list 'my-package-list 'ac-geiser))
+  (when (member 'auto-complete my-optional-init)
+    (add-to-list 'my-package-list 'ac-geiser)))
 
 (when (member 'js2 my-optional-init)
   (add-to-list 'my-package-list 'js2-mode)
-  (add-to-list 'my-package-list 'ac-js2)
+  (when (member 'auto-complete my-optional-init)
+    (add-to-list 'my-package-list 'ac-js2))
   (add-to-list 'my-package-list 'tern)
   (add-to-list 'my-package-list 'tern-auto-complete))
 
 (when (member 'ruby my-optional-init)
-  (add-to-list 'my-package-list 'ac-inf-ruby)
+  (when (member 'auto-complete my-optional-init)
+    (add-to-list 'my-package-list 'ac-inf-ruby))
   (add-to-list 'my-package-list 'enh-ruby-mode)
   (add-to-list 'my-package-list 'inf-ruby)
+  (add-to-list 'my-package-list 'projectile-rails)
   (add-to-list 'my-package-list 'robe))
 
 (when (member 'python my-optional-init)
@@ -285,7 +295,8 @@ directory to make multiple eshell windows easier."
   (add-to-list 'my-package-list 'ghc))
 
 (when (member 'lisp my-optional-init)
-  (add-to-list 'my-package-list 'ac-slime)
+  (when (member 'auto-complete my-optional-init)
+    (add-to-list 'my-package-list 'ac-slime))
   (add-to-list 'my-package-list 'slime))
 
 (let ((loaded (eval (cons 'require-package (mapcar (lambda (x) `(quote ,x)) my-package-list)))))
@@ -294,44 +305,23 @@ directory to make multiple eshell windows easier."
 ;; Additional that require force loading
 (require 'cl)
 (require 'imenu)
-(require 'auto-complete-config)
 (require 'cc-mode)
-
 (require 'org-contacts)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Menu
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(message "Configuring Menu")
-
-(defun try-to-add-imenu ()
-  (condition-case nil (imenu-add-to-menubar "TAGS") (error nil)))
-(add-hook 'font-lock-mode-hook 'try-to-add-imenu)
+(when (member 'auto-complete my-optional-init)
+  (require 'auto-complete-config))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; eldoc
+;; elisp
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(message "Configuring eldoc")
+(message "Configuring elisp")
 
 (require 'eldoc)
-(defun custom-eldoc-prog-hook ()
+(defun custom-elisp-prog-hook ()
   (eldoc-mode 1))
 
-(add-hook 'emacs-lisp-mode-hook 'custom-eldoc-prog-hook)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ggtags
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(message "Configuring ggtags")
-
-(defun custom-ggtags-prog-hook ()
-  (ggtags-mode 1))
-
-(add-hook 'c++-mode-hook 'custom-ggtags-prog-hook)
-(add-hook 'c-mode-hook 'custom-ggtags-prog-hook)
+(add-hook 'emacs-lisp-mode-hook 'custom-elisp-prog-hook)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Rainbow Modes
@@ -367,6 +357,13 @@ directory to make multiple eshell windows easier."
   (visual-line-mode 1))
 
 (add-hook 'compilation-mode-hook 'compilation-custom-hook)
+
+(require 'ansi-color)
+(defun colorize-compilation-buffer ()
+  (toggle-read-only)
+  (ansi-color-apply-on-region (point-min) (point-max))
+  (toggle-read-only))
+(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Scheme
@@ -412,7 +409,14 @@ directory to make multiple eshell windows easier."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (when (member 'c++ my-optional-init)
-  (message "Extending C++11 fontlocking")
+  (message "Configuring C and C++")
+
+  (defun custom-cc-prog-hook ()
+    (enable-semantic-mode)
+    (ggtags-mode 1))
+
+  (add-hook 'c++-mode-hook 'custom-cc-prog-hook)
+  (add-hook 'c-mode-hook 'custom-cc-prog-hook)
 
   ;; Fixes missing C++11 fontlocking in cc-mode
   (defun c++-font-lock-fix ()
@@ -522,6 +526,7 @@ directory to make multiple eshell windows easier."
    org-drill org-eshell org-invoice org-registry org-contacts))
 
 (defun custom-org-hook ()
+  (interactive)
   (visual-line-mode 1)
   (flyspell-mode 1)
   (writegood-mode 1))
@@ -586,11 +591,21 @@ directory to make multiple eshell windows easier."
 
   (defun launch-ruby ()
     (interactive)
+
+    (projectile-rails-on)
+
     (unless (get-buffer "*ruby*")
       (let ((buf (current-buffer)))
         (inf-ruby)
         (robe-start)
         (set-buffer buf))))
+
+  (defun kill-ruby ()
+    (interactive)
+    (when (get-buffer "*ruby*")
+      (kill-buffer "*ruby*")))
+
+  (advice-add 'projectile-rails-console :before #'kill-ruby)
 
   (add-hook 'ruby-mode-hook 'launch-ruby)
   (add-hook 'enh-ruby-mode-hook 'launch-ruby)
@@ -598,7 +613,8 @@ directory to make multiple eshell windows easier."
   (add-hook 'ruby-mode-hook 'robe-mode)
   (add-hook 'enh-ruby-mode-hook 'robe-mode)
 
-  (add-hook 'robe-mode-hook 'ac-robe-setup))
+  (when (member 'auto-complete my-optional-init)
+    (add-hook 'robe-mode-hook 'ac-robe-setup)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Web
@@ -621,12 +637,12 @@ directory to make multiple eshell windows easier."
   (defun js2-mode-custom-hook ()
     (tern-mode t))
 
-  (eval-after-load 'tern
-    '(progn
-       (require 'tern-auto-complete)
-       (tern-ac-setup)))
-
-  (setq tern-ac-on-dot t)
+  (when (member 'auto-complete my-optional-init)
+    (eval-after-load 'tern
+      '(progn
+         (require 'tern-auto-complete)
+         (tern-ac-setup)))
+    (setq tern-ac-on-dot t))
 
   (add-hook 'js2-mode-hook 'js2-mode-custom-hook)
 
@@ -636,119 +652,120 @@ directory to make multiple eshell windows easier."
 ;; Auto-complete
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(message "Configuring Auto-Complete")
+(when (member 'auto-complete my-optional-init)
+  (message "Configuring Auto-Complete")
 
-(ac-config-default)
+  (ac-config-default)
 
-(add-to-list 'ac-dictionary-directories (expand-file-name "~/.emacs.d/ac-dict"))
-(setq ac-comphist-file (expand-file-name "~/.emacs.d/ac-comphist.dat"))
+  (add-to-list 'ac-dictionary-directories (expand-file-name "~/.emacs.d/ac-dict"))
+  (setq ac-comphist-file (expand-file-name "~/.emacs.d/ac-comphist.dat"))
 
-(setq ac-modes 
-      '(java-mode clojure-mode scala-mode 
-                  emacs-lisp-mode
-                  lisp-mode
-                  lisp-interaction-mode 
-                  c-mode cc-mode c++-mode
-                  scheme-mode geiser-repl-mode
-                  slime-repl-mode
-                  ocaml-mode tuareg-mode 
-                  perl-mode cperl-mode 
-                  python-mode 
-                  ruby-mode enh-ruby-mode inf-ruby-mode
-                  ecmascript-mode javascript-mode js-mode js2-mode 
-                  php-mode 
-                  css-mode 
-                  makefile-mode 
-                  sh-mode 
-                  fortran-mode f90-mode 
-                  ada-mode 
-                  xml-mode sgml-mode 
-                  lua-mode
-                  slime-repl-mode
-                  web-mode))
+  (setq ac-modes 
+        '(java-mode clojure-mode scala-mode 
+                    emacs-lisp-mode
+                    lisp-mode
+                    lisp-interaction-mode 
+                    c-mode cc-mode c++-mode
+                    scheme-mode geiser-repl-mode
+                    slime-repl-mode
+                    ocaml-mode tuareg-mode 
+                    perl-mode cperl-mode 
+                    python-mode 
+                    ruby-mode enh-ruby-mode inf-ruby-mode
+                    ecmascript-mode javascript-mode js-mode js2-mode 
+                    php-mode 
+                    css-mode 
+                    makefile-mode 
+                    sh-mode 
+                    fortran-mode f90-mode 
+                    ada-mode 
+                    xml-mode sgml-mode 
+                    lua-mode
+                    slime-repl-mode
+                    web-mode))
 
-(add-to-list 'ac-sources 'ac-source-capf)
+  (add-to-list 'ac-sources 'ac-source-capf)
 
-(defun ac-no-semantic-setup ()
-  (make-local-variable 'ac-sources)
-  (add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers))
+  (defun ac-no-semantic-setup ()
+    (make-local-variable 'ac-sources)
+    (add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers))
 
-(defun ac-semantic-setup ()
-  (make-local-variable 'ac-sources)
-  (add-to-list 'ac-sources 'ac-source-semantic))
+  (defun ac-semantic-setup ()
+    (make-local-variable 'ac-sources)
+    (add-to-list 'ac-sources 'ac-source-semantic))
 
-(mapc #'(lambda (m) (add-hook m 'ac-no-semantic-setup))
-      '(scheme-mode-hook
-        ocaml-mode-hook	tuareg-mode-hook
-        python-mode-hook
-        ruby-mode-hook
-        php-mode-hook
-        css-mode-hook
-        perl-mode-hook cperl-mode-hook
-        ecmascript-mode-hook javascript-mode-hook js-mode-hook js2-mode-hook
-        makefile-mode-hook sh-mode-hook
-        fortran-mode-hook f90-mode-hook
-        ada-mode-hook
-        xml-mode-hook sgml-mode-hook
-        lua-mode-hook
-        c-mode-hook 
-        c++-mode-hook
-        java-mode-hook))
+  (mapc #'(lambda (m) (add-hook m 'ac-no-semantic-setup))
+        '(emacs-lisp-mode-hook
+          lisp-mode-hook
+          lisp-interaction-mode-hook
+          scheme-mode-hook
+          ocaml-mode-hook	tuareg-mode-hook
+          python-mode-hook
+          ruby-mode-hook
+          php-mode-hook
+          css-mode-hook
+          perl-mode-hook cperl-mode-hook
+          ecmascript-mode-hook javascript-mode-hook js-mode-hook js2-mode-hook
+          makefile-mode-hook sh-mode-hook
+          fortran-mode-hook f90-mode-hook
+          ada-mode-hook
+          xml-mode-hook sgml-mode-hook
+          lua-mode-hook
+          c-mode-hook 
+          c++-mode-hook
+          java-mode-hook))
 
-(mapc #'(lambda (m) (add-hook m 'ac-semantic-setup))
-      '(emacs-lisp-mode-hook
-        lisp-mode-hook
-        lisp-interaction-mode-hook
-        c-mode-common-hook))
+  (mapc #'(lambda (m) (add-hook m 'ac-semantic-setup))
+        '(c-mode-common-hook))
 
-(defun ac-css-setup ()
-  (make-local-variable 'ac-sources)
-  (add-to-list 'ac-sources 'ac-source-css-property))
+  (defun ac-css-setup ()
+    (make-local-variable 'ac-sources)
+    (add-to-list 'ac-sources 'ac-source-css-property))
 
-(defun ac-haskell-setup ()
-  (make-local-variable 'ac-sources)
-  (add-to-list 'ac-sources 'ac-source-ghc-mod))
+  (defun ac-haskell-setup ()
+    (make-local-variable 'ac-sources)
+    (add-to-list 'ac-sources 'ac-source-ghc-mod))
 
-(defun ac-elisp-setup ()
-  (make-local-variable 'ac-sources)
-  (add-to-list 'ac-sources ac-source-functions)
-  (add-to-list 'ac-sources ac-source-symbols)
-  (add-to-list 'ac-sources ac-source-features)
-  (add-to-list 'ac-sources ac-source-variables))
+  (defun ac-elisp-setup ()
+    (make-local-variable 'ac-sources)
+    (add-to-list 'ac-sources ac-source-functions)
+    (add-to-list 'ac-sources ac-source-symbols)
+    (add-to-list 'ac-sources ac-source-features)
+    (add-to-list 'ac-sources ac-source-variables))
 
-(defun ac-scheme-setup ()
-  (make-local-variable 'ac-sources)
-  (add-to-list 'ac-sources ac-source-r7rs-symbols)
-  (add-to-list 'ac-sources ac-source-r5rs-symbols)
-  (add-to-list 'ac-sources ac-source-chicken-symbols)
-  (add-to-list 'ac-sources ac-source-chicken-symbols-prefixed))
+  (defun ac-scheme-setup ()
+    (make-local-variable 'ac-sources)
+    (add-to-list 'ac-sources ac-source-r7rs-symbols)
+    (add-to-list 'ac-sources ac-source-r5rs-symbols)
+    (add-to-list 'ac-sources ac-source-chicken-symbols)
+    (add-to-list 'ac-sources ac-source-chicken-symbols-prefixed))
 
-(defun ac-c-common-mode-setup ()
-  (make-local-variable 'ac-sources)
-  (add-to-list 'ac-sources 'ac-source-gtags))
+  (defun ac-c-common-mode-setup ()
+    (make-local-variable 'ac-sources)
+    (add-to-list 'ac-sources 'ac-source-gtags))
 
-(defun ac-lisp-setup ()
-  (make-local-variable 'ac-sources)
-  (add-to-list 'ac-sources 'ac-source-slime))
+  (defun ac-lisp-setup ()
+    (make-local-variable 'ac-sources)
+    (add-to-list 'ac-sources 'ac-source-slime))
 
-(defun ac-slime-setup ()
-  (make-local-variable 'ac-sources)
-  (add-to-list 'ac-sources 'ac-source-slime))
+  (defun ac-slime-setup ()
+    (make-local-variable 'ac-sources)
+    (add-to-list 'ac-sources 'ac-source-slime))
 
-(defun ac-js2-setup ()
-  (ac-js2-mode))
+  (defun ac-js2-setup ()
+    (ac-js2-mode))
 
-(add-hook 'haskell-mode-hook 'ac-haskell-setup)
-(add-hook 'css-mode-hook 'ac-css-setup)
-(add-hook 'emacs-lisp-mode-hook 'ac-elisp-setup)
-(add-hook 'scheme-mode-hook 'ac-scheme-setup)
-(add-hook 'c-mode-common-hook 'ac-c-common-mode-setup)
-(add-hook 'lisp-mode-hook 'ac-lisp-setup)
-(add-hook 'lisp-interaction-mode-hook 'ac-lisp-setup)
-(add-hook 'js2-mode-hook 'ac-js2-setup)
-(add-hook 'slime-mode-hook 'ac-slime-setup)
-(add-hook 'slime-repl-mode-hook 'ac-slime-setup)
-(add-hook 'inf-ruby-mode-hook 'ac-inf-ruby-enable)
+  (add-hook 'haskell-mode-hook 'ac-haskell-setup)
+  (add-hook 'css-mode-hook 'ac-css-setup)
+  (add-hook 'emacs-lisp-mode-hook 'ac-elisp-setup)
+  (add-hook 'scheme-mode-hook 'ac-scheme-setup)
+  (add-hook 'c-mode-common-hook 'ac-c-common-mode-setup)
+  (add-hook 'lisp-mode-hook 'ac-lisp-setup)
+  (add-hook 'lisp-interaction-mode-hook 'ac-lisp-setup)
+  (add-hook 'js2-mode-hook 'ac-js2-setup)
+  (add-hook 'slime-mode-hook 'ac-slime-setup)
+  (add-hook 'slime-repl-mode-hook 'ac-slime-setup)
+  (add-hook 'inf-ruby-mode-hook 'ac-inf-ruby-enable))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc Custom
@@ -850,10 +867,10 @@ directory to make multiple eshell windows easier."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ac-auto-start 0.25)
- '(ac-delay 0.5)
+ '(ac-auto-start 0.15)
+ '(ac-delay 0.15)
  '(ac-ignore-case nil)
- '(ac-quick-help-delay 0.5)
+ '(ac-quick-help-delay 0.15)
  '(auto-fill-mode t)
  '(auto-save-default nil)
  '(c-basic-offset 2)
@@ -905,7 +922,6 @@ directory to make multiple eshell windows easier."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:background nil))))
  '(mode-line ((t (:background "#191919" :foreground "#BBBBBB" :box nil))))
  '(mode-line-highlight ((t (:box nil))))
  '(rainbow-delimiters-depth-1-face ((t (:inherit font-lock-function-name-face))))
@@ -917,7 +933,10 @@ directory to make multiple eshell windows easier."
  '(rainbow-delimiters-depth-7-face ((t (:inherit font-lock-builtin-face))))
  '(rainbow-delimiters-depth-8-face ((t (:inherit font-lock-string-face))))
  '(rainbow-delimiters-depth-9-face ((t (:inherit font-lock-doc-face))))
- '(rainbow-delimiters-unmatched-face ((((class color) (min-colors 89)) (:foreground "#ffffff" :background "#a40000" :bold t)))))
+ '(rainbow-delimiters-unmatched-face ((((class color) (min-colors 89)) (:foreground "#ffffff" :background "#a40000" :bold t))))
+ '(writegood-duplicates-face ((t (:box (:line-width 2 :color "deep sky blue" :style released-button)))))
+ '(writegood-passive-voice-face ((t (:box (:line-width 2 :color "yellow" :style released-button)))))
+ '(writegood-weasels-face ((t (:box (:line-width 2 :color "red" :style released-button))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; End
