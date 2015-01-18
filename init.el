@@ -11,7 +11,8 @@
     js2
     ruby
     python
-    ;;tex
+    ;; jabber
+    ;; tex
     c++
     haskell
     lisp
@@ -63,7 +64,7 @@
     "/usr/lib/gcc/x86_64-linux-gnu/4.9/include/"))
 
 (let ((geiser-file "~/Workspace/geiser/elisp/geiser.el"))
-  (when (and (member 'geiser my-optional-init) (file-exists-p geiser-file))
+  (when (and (memq 'geiser my-optional-init) (file-exists-p geiser-file))
     (load geiser-file)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -255,49 +256,52 @@ directory to make multiple eshell windows easier."
         'writegood-mode
         'zenburn-theme))
 
-(when (member 'auto-complete my-optional-init)
+(when (memq 'auto-complete my-optional-init)
   (add-to-list 'my-package-list 'ac-capf)
   (add-to-list 'my-package-list 'auto-complete))
 
-(when (member 'chicken my-optional-init)
+(when (memq 'chicken my-optional-init)
   (add-to-list 'my-package-list 'chicken-scheme))
 
-(when (member 'geiser my-optional-init)
+(when (memq 'geiser my-optional-init)
   (add-to-list 'my-package-list 'geiser)
-  (when (member 'auto-complete my-optional-init)
+  (when (memq 'auto-complete my-optional-init)
     (add-to-list 'my-package-list 'ac-geiser)))
 
-(when (member 'js2 my-optional-init)
+(when (memq 'js2 my-optional-init)
   (add-to-list 'my-package-list 'js2-mode)
-  (when (member 'auto-complete my-optional-init)
+  (when (memq 'auto-complete my-optional-init)
     (add-to-list 'my-package-list 'ac-js2))
   (add-to-list 'my-package-list 'tern)
   (add-to-list 'my-package-list 'tern-auto-complete))
 
-(when (member 'ruby my-optional-init)
-  (when (member 'auto-complete my-optional-init)
+(when (memq 'ruby my-optional-init)
+  (when (memq 'auto-complete my-optional-init)
     (add-to-list 'my-package-list 'ac-inf-ruby))
   (add-to-list 'my-package-list 'enh-ruby-mode)
   (add-to-list 'my-package-list 'inf-ruby)
   (add-to-list 'my-package-list 'projectile-rails)
   (add-to-list 'my-package-list 'robe))
 
-(when (member 'python my-optional-init)
+(when (memq 'python my-optional-init)
   (add-to-list 'my-package-list 'jedi)
   (add-to-list 'my-package-list 'python-environment))
 
-(when (member 'c++ my-optional-init)
+(when (memq 'c++ my-optional-init)
   (add-to-list 'my-package-list 'function-args)
   (add-to-list 'my-package-list 'ggtags)
   (add-to-list 'my-package-list 'auto-complete-exuberant-ctags))
 
-(when (member 'haskell my-optional-init)
+(when (memq 'haskell my-optional-init)
   (add-to-list 'my-package-list 'ghc))
 
-(when (member 'lisp my-optional-init)
-  (when (member 'auto-complete my-optional-init)
+(when (memq 'lisp my-optional-init)
+  (when (memq 'auto-complete my-optional-init)
     (add-to-list 'my-package-list 'ac-slime))
   (add-to-list 'my-package-list 'slime))
+
+(when (memq 'jabber my-optional-init)
+  (add-to-list 'my-package-list 'jabber))
 
 (let ((loaded (eval (cons 'require-package (mapcar (lambda (x) `(quote ,x)) my-package-list)))))
   (message (format "Installed %s" loaded)))
@@ -308,8 +312,16 @@ directory to make multiple eshell windows easier."
 (require 'cc-mode)
 (require 'org-contacts)
 
-(when (member 'auto-complete my-optional-init)
+(when (memq 'auto-complete my-optional-init)
   (require 'auto-complete-config))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Jabber
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(when (memq 'jabber my-optional-init)
+  (message "Configuring Jabber")
+  (require 'jabber-autoloads))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; elisp
@@ -369,7 +381,7 @@ directory to make multiple eshell windows easier."
 ;; Scheme
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (member 'chicken my-optional-init)
+(when (memq 'chicken my-optional-init)
 
   (message "Configuring Chicken Scheme")
 
@@ -383,7 +395,7 @@ directory to make multiple eshell windows easier."
 ;; LISP
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (member 'lisp my-optional-init)
+(when (memq 'lisp my-optional-init)
 
   (message "Configuring LISP")
 
@@ -408,7 +420,7 @@ directory to make multiple eshell windows easier."
 ;; C/C++
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (member 'c++ my-optional-init)
+(when (memq 'c++ my-optional-init)
   (message "Configuring C and C++")
 
   (defun custom-cc-prog-hook ()
@@ -444,7 +456,7 @@ directory to make multiple eshell windows easier."
 ;; Haskell
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (member 'haskell my-optional-init)
+(when (memq 'haskell my-optional-init)
   (autoload 'ghc-init "ghc" nil t)
   (autoload 'ghc-debug "ghc" nil t)
   (add-hook 'haskell-mode-hook (lambda () (ghc-init))))
@@ -537,7 +549,7 @@ directory to make multiple eshell windows easier."
 ;; TeX
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (member 'tex my-optional-init)
+(when (memq 'tex my-optional-init)
   (message "Configuring TeX")
 
   (unless (package-installed-p 'auctex)
@@ -572,7 +584,7 @@ directory to make multiple eshell windows easier."
 ;; Python
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (member 'python my-optional-init)
+(when (memq 'python my-optional-init)
   (message "Configuring Python Mode")
 
   (jedi:install-server)
@@ -586,7 +598,7 @@ directory to make multiple eshell windows easier."
 ;; Ruby
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (member 'ruby my-optional-init)
+(when (memq 'ruby my-optional-init)
   (message "Configuring Ruby Mode")
 
   (defun launch-ruby ()
@@ -613,7 +625,7 @@ directory to make multiple eshell windows easier."
   (add-hook 'ruby-mode-hook 'robe-mode)
   (add-hook 'enh-ruby-mode-hook 'robe-mode)
 
-  (when (member 'auto-complete my-optional-init)
+  (when (memq 'auto-complete my-optional-init)
     (add-hook 'robe-mode-hook 'ac-robe-setup)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -633,11 +645,11 @@ directory to make multiple eshell windows easier."
 ;; Javascript
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (member 'js2 my-optional-init)
+(when (memq 'js2 my-optional-init)
   (defun js2-mode-custom-hook ()
     (tern-mode t))
 
-  (when (member 'auto-complete my-optional-init)
+  (when (memq 'auto-complete my-optional-init)
     (eval-after-load 'tern
       '(progn
          (require 'tern-auto-complete)
@@ -652,7 +664,7 @@ directory to make multiple eshell windows easier."
 ;; Auto-complete
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (member 'auto-complete my-optional-init)
+(when (memq 'auto-complete my-optional-init)
   (message "Configuring Auto-Complete")
 
   (ac-config-default)
@@ -784,7 +796,7 @@ directory to make multiple eshell windows easier."
 
 (when
     (and (file-exists-p "/usr/local/share/emacs/site-lisp/mu4e")
-         (member 'mu4e my-optional-init))
+         (memq 'mu4e my-optional-init))
   (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
 
   (require 'mu4e)
