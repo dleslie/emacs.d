@@ -180,8 +180,10 @@
 
   (unless (package-installed-p package-name)
     (package-install package-name))
-  
-  (require package-name nil 'noerror)
+
+  ;; Some themes auto-apply themselves when required, which is uncool
+  (unless (string-match "-theme" (symbol-name package-name))
+    (require package-name nil 'noerror))
   
   (cons package-name
         (cond
@@ -220,7 +222,7 @@ directory to make multiple eshell windows easier."
 (setq package-archives 
       '(("melpa" . "http://melpa.milkbox.net/packages/")
         ("gnu" . "http://elpa.gnu.org/packages/")
-        ("marmalade" . "http://marmalade-repo.org/packages/")
+        ;; ("marmalade" . "http://marmalade-repo.org/packages/")
         ("org" . "http://orgmode.org/elpa/")))
 
 (message "Check for packages")
@@ -251,10 +253,9 @@ directory to make multiple eshell windows easier."
         'rainbow-delimiters 
         'rainbow-mode 
         'smex 
-        'sublime-themes 
+        'tronesque-theme
         'web-mode
-        'writegood-mode
-        'zenburn-theme))
+        'writegood-mode))
 
 (when (memq 'auto-complete my-optional-init)
   (add-to-list 'my-package-list 'ac-capf)
@@ -889,8 +890,6 @@ directory to make multiple eshell windows easier."
  '(c-set-offset 2)
  '(c-set-style "BSD")
  '(column-number-mode t)
- '(custom-safe-themes (quote ("8ada1f0bcfc2d8662b74fb21bd1830eaacb5d29e3c99a5ea7fd7a417b7a9b708" "88e56f2e676c8828e08b128c74f2818cbfc77b79f8ebbae955db6098d0001473" default)))
- '(debug-on-error nil)
  '(debug-on-signal nil)
  '(delete-selection-mode 1)
  '(display-battery-mode t)
@@ -904,6 +903,7 @@ directory to make multiple eshell windows easier."
  '(jedi:setup-keys t)
  '(make-backup-files nil)
  '(moo-select-method (quote display-completion-list))
+ '(nyan-animate-nyancat t)
  '(nyan-wavy-trail t)
  '(py-python-command "/usr/bin/python")
  '(python-indent-offset 4)
@@ -912,7 +912,9 @@ directory to make multiple eshell windows easier."
  '(scroll-bar-mode nil)
  '(scroll-margin 0)
  '(scroll-step 1)
- '(semanticdb-find-default-throttle (quote (local project unloaded system recursive omniscience)))
+ '(semanticdb-find-default-throttle
+   (quote
+    (local project unloaded system recursive omniscience)))
  '(show-paren-mode t)
  '(slime-contribs (quote (slime-fancy slime-autodoc slime-banner)) t)
  '(standard-indent 2)
@@ -934,6 +936,7 @@ directory to make multiple eshell windows easier."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :stipple nil :background "#081724" :foreground "#d3f9ee" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 111 :width normal :foundry "unknown" :family "Ubuntu Mono"))))
  '(mode-line ((t (:background "#191919" :foreground "#BBBBBB" :box nil))))
  '(mode-line-highlight ((t (:box nil))))
  '(rainbow-delimiters-depth-1-face ((t (:inherit font-lock-function-name-face))))
