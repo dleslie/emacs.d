@@ -7,7 +7,7 @@
 (setq my-optional-init
   '(auto-complete
     geiser
-    chicken
+    ;; chicken
     js2
     ruby
     python
@@ -63,9 +63,8 @@
     "/usr/lib/gcc/x86_64-linux-gnu/4.8/include/"
     "/usr/lib/gcc/x86_64-linux-gnu/4.9/include/"))
 
-(let ((geiser-file "~/Workspace/geiser/elisp/geiser.el"))
-  (when (and (memq 'geiser my-optional-init) (file-exists-p geiser-file))
-    (load geiser-file)))
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(load custom-file)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Email
@@ -230,32 +229,42 @@ directory to make multiple eshell windows easier."
 (package-refresh-contents)
 
 (setq my-package-list
-  (list 'cl-lib
-        'dictionary
-        'dired+
-        'doremi
-        'gist
-        'help+
-        'help-fns+
-        'help-mode+
-        'magit
-        'magit-gh-pulls
-        'magit-svn
-        'markdown-mode
-        'menu-bar+
-        'moe-theme
-        'nyan-mode
-        'org-plus-contrib
-        'paredit 
-        'parenface 
-        'popup
-        'projectile 
-        'rainbow-delimiters 
-        'rainbow-mode 
-        'smex 
-        'tronesque-theme
-        'web-mode
-        'writegood-mode))
+      (list 'cl-lib
+            'camcorder
+            'dictionary
+            'dired+
+            'doremi
+            'gist
+            'help+
+            'help-fns+
+            'help-mode+
+            'magit
+            'magit-gh-pulls
+            'magit-svn
+            'markdown-mode
+            'menu-bar+
+            'nyan-mode
+            'org-plus-contrib
+            'paredit 
+            'parenface 
+            'popup
+            'projectile 
+            'rainbow-mode 
+            'smex 
+            'web-mode
+            'writegood-mode))
+
+(setq my-theme-list
+      (list 'moe-theme
+            'tronesque-theme
+            'anti-zenburn-theme
+            'ample-theme
+            'ample-zen-theme
+            'twilight-theme
+            'ubuntu-theme
+            'zen-and-art-theme
+            'zenburn-theme
+            'bubbleberry-theme))
 
 (when (memq 'auto-complete my-optional-init)
   (add-to-list 'my-package-list 'ac-capf)
@@ -304,7 +313,7 @@ directory to make multiple eshell windows easier."
 (when (memq 'jabber my-optional-init)
   (add-to-list 'my-package-list 'jabber))
 
-(let ((loaded (eval (cons 'require-package (mapcar (lambda (x) `(quote ,x)) my-package-list)))))
+(let ((loaded (eval (cons 'require-package (mapcar (lambda (x) `(quote ,x)) (append my-package-list my-theme-list))))))
   (message (format "Installed %s" loaded)))
 
 ;; Additional that require force loading
@@ -335,17 +344,6 @@ directory to make multiple eshell windows easier."
   (eldoc-mode 1))
 
 (add-hook 'emacs-lisp-mode-hook 'custom-elisp-prog-hook)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Rainbow Modes
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(message "Configuring Rainbow Modes")
-
-(add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
-(add-hook 'prog-mode-hook 'show-paren-mode)
-
-(add-hook 'after-find-file 'rainbow-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Parens
@@ -747,11 +745,12 @@ directory to make multiple eshell windows easier."
     (add-to-list 'ac-sources ac-source-variables))
 
   (defun ac-scheme-setup ()
-    (make-local-variable 'ac-sources)
-    (add-to-list 'ac-sources ac-source-r7rs-symbols)
-    (add-to-list 'ac-sources ac-source-r5rs-symbols)
-    (add-to-list 'ac-sources ac-source-chicken-symbols)
-    (add-to-list 'ac-sources ac-source-chicken-symbols-prefixed))
+    (when (memq 'chicken my-optional-init)
+      (make-local-variable 'ac-sources)
+      (add-to-list 'ac-sources ac-source-r7rs-symbols)
+      (add-to-list 'ac-sources ac-source-r5rs-symbols)
+      (add-to-list 'ac-sources ac-source-chicken-symbols)
+      (add-to-list 'ac-sources ac-source-chicken-symbols-prefixed)))
 
   (defun ac-c-common-mode-setup ()
     (make-local-variable 'ac-sources)
@@ -779,17 +778,6 @@ directory to make multiple eshell windows easier."
   (add-hook 'slime-mode-hook 'ac-slime-setup)
   (add-hook 'slime-repl-mode-hook 'ac-slime-setup)
   (add-hook 'inf-ruby-mode-hook 'ac-inf-ruby-enable))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Misc Custom
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(message "Configuring Miscellaneous")
-
-(smex-initialize)
-(projectile-global-mode t)
-
-(nyan-mode t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; mu4e
@@ -872,90 +860,21 @@ directory to make multiple eshell windows easier."
                '("org-contact-add" . mu4e-action-add-org-contact) t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Custom Variables
+;; Misc Custom
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ac-auto-start 0.15)
- '(ac-delay 0.15)
- '(ac-ignore-case nil)
- '(ac-quick-help-delay 0.15)
- '(auto-fill-mode t)
- '(auto-save-default nil)
- '(c-basic-offset 2)
- '(c-set-offset 2)
- '(c-set-style "BSD")
- '(column-number-mode t)
- '(debug-on-signal nil)
- '(delete-selection-mode 1)
- '(display-battery-mode t)
- '(display-time-mode t)
- '(enh-ruby-program "/usr/bin/ruby")
- '(fa-max-one-line-width 120)
- '(fill-column 80)
- '(indent-tabs-mode nil)
- '(inferior-lisp-program "/usr/bin/sbcl" t)
- '(jedi:complete-on-dot t)
- '(jedi:setup-keys t)
- '(make-backup-files nil)
- '(moo-select-method (quote display-completion-list))
- '(nyan-animate-nyancat t)
- '(nyan-wavy-trail t)
- '(py-python-command "/usr/bin/python")
- '(python-indent-offset 4)
- '(python-shell-interpreter "python")
- '(redisplay-dont-pause t t)
- '(scroll-bar-mode nil)
- '(scroll-margin 0)
- '(scroll-step 1)
- '(semanticdb-find-default-throttle
-   (quote
-    (local project unloaded system recursive omniscience)))
- '(show-paren-mode t)
- '(slime-contribs (quote (slime-fancy slime-autodoc slime-banner)) t)
- '(standard-indent 2)
- '(tab-stop-list (number-sequence 2 200 2))
- '(tab-width 4)
- '(tool-bar-mode nil)
- '(tool-bar-style (quote image))
- '(truncate-lines t)
- '(visible-bell t)
- '(visual-line-mode t t)
- '(word-wrap t))
+(message "Configuring Miscellaneous")
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Custom Faces
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(smex-initialize)
+(projectile-global-mode t)
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#081724" :foreground "#d3f9ee" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 111 :width normal :foundry "unknown" :family "Ubuntu Mono"))))
- '(mode-line ((t (:background "#191919" :foreground "#BBBBBB" :box nil))))
- '(mode-line-highlight ((t (:box nil))))
- '(rainbow-delimiters-depth-1-face ((t (:inherit font-lock-function-name-face))))
- '(rainbow-delimiters-depth-2-face ((t (:inherit font-lock-variable-name-face))))
- '(rainbow-delimiters-depth-3-face ((t (:inherit font-lock-keyword-face))))
- '(rainbow-delimiters-depth-4-face ((t (:inherit font-lock-comment-face))))
- '(rainbow-delimiters-depth-5-face ((t (:inherit font-lock-type-face))))
- '(rainbow-delimiters-depth-6-face ((t (:inherit font-lock-constant-face))))
- '(rainbow-delimiters-depth-7-face ((t (:inherit font-lock-builtin-face))))
- '(rainbow-delimiters-depth-8-face ((t (:inherit font-lock-string-face))))
- '(rainbow-delimiters-depth-9-face ((t (:inherit font-lock-doc-face))))
- '(rainbow-delimiters-unmatched-face ((((class color) (min-colors 89)) (:foreground "#ffffff" :background "#a40000" :bold t))))
- '(writegood-duplicates-face ((t (:box (:line-width 2 :color "deep sky blue" :style released-button)))))
- '(writegood-passive-voice-face ((t (:box (:line-width 2 :color "yellow" :style released-button)))))
- '(writegood-weasels-face ((t (:box (:line-width 2 :color "red" :style released-button))))))
+(nyan-mode t)
+
+(add-hook 'prog-mode-hook 'show-paren-mode)
+(add-hook 'prog-mode-hook 'rainbow-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; End
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (message "Init Complete.")
-
