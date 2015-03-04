@@ -11,7 +11,6 @@
     js2
     ruby
     python
-    ;; jabber
     ;; tex
     c++
     haskell
@@ -234,10 +233,12 @@ directory to make multiple eshell windows easier."
             'dictionary
             'dired+
             'doremi
+            'flx-ido
             'gist
             'help+
             'help-fns+
             'help-mode+
+            'ido-ubiquitous
             'magit
             'magit-gh-pulls
             'magit-svn
@@ -310,9 +311,6 @@ directory to make multiple eshell windows easier."
     (add-to-list 'my-package-list 'ac-slime))
   (add-to-list 'my-package-list 'slime))
 
-(when (memq 'jabber my-optional-init)
-  (add-to-list 'my-package-list 'jabber))
-
 (let ((loaded (eval (cons 'require-package (mapcar (lambda (x) `(quote ,x)) (append my-package-list my-theme-list))))))
   (message (format "Installed %s" loaded)))
 
@@ -326,12 +324,14 @@ directory to make multiple eshell windows easier."
   (require 'auto-complete-config))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Jabber
+;; Ido
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (memq 'jabber my-optional-init)
-  (message "Configuring Jabber")
-  (require 'jabber-autoloads))
+(ido-mode t)
+(ido-everywhere t)
+(flx-ido-mode t)
+
+(setq ido-enable-flex-matching t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; elisp
@@ -757,8 +757,7 @@ directory to make multiple eshell windows easier."
     (add-to-list 'ac-sources 'ac-source-gtags))
 
   (defun ac-lisp-setup ()
-    (make-local-variable 'ac-sources)
-    (add-to-list 'ac-sources 'ac-source-slime))
+    (make-local-variable 'ac-sources))
 
   (defun ac-slime-setup ()
     (make-local-variable 'ac-sources)
@@ -872,6 +871,8 @@ directory to make multiple eshell windows easier."
 
 (add-hook 'prog-mode-hook 'show-paren-mode)
 (add-hook 'prog-mode-hook 'rainbow-mode)
+
+(setq gc-cons-threshold 20000000)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; End
