@@ -45,7 +45,10 @@
  mail-folder-sent
  "/[Gmail].Sent Mail"
  mail-folder-trash
- "/[Gmail].Trash")
+ "/[Gmail].Trash"
+ gnus-select-method
+ '(nntp "GMane"
+        (nntp-address "news.gmane.org")))
 
 (defvar system-include-paths
   '("/usr/local/include" 
@@ -249,7 +252,8 @@ directory to make multiple eshell windows easier."
             'paredit 
             'parenface 
             'popup
-            'projectile 
+            'projectile
+            'purpose
             'rainbow-mode 
             'smex 
             'web-mode
@@ -328,7 +332,7 @@ directory to make multiple eshell windows easier."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (ido-mode t)
-(ido-everywhere t)
+; (ido-everywhere t)
 (flx-ido-mode t)
 
 (setq ido-enable-flex-matching t)
@@ -448,8 +452,8 @@ directory to make multiple eshell windows easier."
        )))
 
   (add-hook 'c++-mode-hook 'c++-font-lock-fix)
-  (add-hook 'c-mode-common-hook 'fa-config-default)
-  (add-hook 'c-mode-common-hook 'fa-auto))
+  ;(add-hook 'c-mode-common-hook 'fa-auto)
+  (add-hook 'c-mode-common-hook 'fa-config-default))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Haskell
@@ -873,6 +877,9 @@ directory to make multiple eshell windows easier."
 (add-hook 'prog-mode-hook 'rainbow-mode)
 
 (setq gc-cons-threshold 20000000)
+
+(winner-mode)
+(purpose-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; End
