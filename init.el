@@ -8,6 +8,7 @@
   '(auto-complete
     geiser
     ;; chicken
+    ;; ido
     js2
     ruby
     python
@@ -331,11 +332,12 @@ directory to make multiple eshell windows easier."
 ;; Ido
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(ido-mode t)
-; (ido-everywhere t)
-(flx-ido-mode t)
+(when (memq 'ido my-optional-init)
+  (ido-mode t)
+  (ido-everywhere t)
+  (flx-ido-mode t)
 
-(setq ido-enable-flex-matching t)
+  (setq ido-enable-flex-matching t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; elisp
@@ -879,7 +881,6 @@ directory to make multiple eshell windows easier."
 (setq gc-cons-threshold 20000000)
 
 (winner-mode)
-(purpose-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; End
