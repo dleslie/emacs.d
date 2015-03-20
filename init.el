@@ -237,12 +237,12 @@ directory to make multiple eshell windows easier."
             'dictionary
             'dired+
             'doremi
-            'flx-ido
+            ;; 'flx-ido
             'gist
             'help+
             'help-fns+
             'help-mode+
-            'ido-ubiquitous
+            ;; 'ido-ubiquitous
             'magit
             'magit-gh-pulls
             'magit-svn
@@ -788,10 +788,9 @@ directory to make multiple eshell windows easier."
 ;; mu4e
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when
-    (and (file-exists-p "/usr/local/share/emacs/site-lisp/mu4e")
-         (memq 'mu4e my-optional-init))
-  (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
+(when (memq 'mu4e my-optional-init)
+  (when (file-exists-p "/usr/local/share/emacs/site-lisp/mu4e")
+    (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e"))
 
   (require 'mu4e)
 
