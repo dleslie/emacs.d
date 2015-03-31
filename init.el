@@ -5,18 +5,20 @@
 (message "Setting Local Configuration")
 
 (setq my-optional-init
-  '(auto-complete
-    geiser
-    ;; chicken
-    ;; ido
-    js2
-    ruby
-    python
-    ;; tex
-    c++
-    haskell
-    lisp
-    mu4e))
+      '(auto-complete
+	clojure
+	geiser
+	;; chicken
+	;; ido
+	js2
+	ruby
+	python
+	;; tex
+	c++
+	haskell
+	lisp
+	mu4e
+	semantic))
 
 (setq 
  org-directory 
@@ -84,7 +86,7 @@
  '((mail-smtp-server mail-smtp-port nil nil))
  smtpmail-auth-credentials
  '((mail-smtp-server mail-smtp-port
-    user-mail-login nil))
+		     user-mail-login nil))
  smtpmail-default-smtp-server
  mail-smtp-server
  smtpmail-smtp-server
@@ -129,36 +131,32 @@
 ;; Semantic
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(message "Configuring Semantic and CEDET")
+(when (memq 'semantic my-optional-init) 
+  (message "Configuring Semantic and CEDET")
 
-;; (require 'cedet)
-(require 'srecode)
-(require 'srecode/map)
-(require 'advice)
-(require 'eieio-opt)
+  ;; (require 'srecode)
+  ;; (require 'srecode/map)
+  ;; (require 'eieio-opt)
 
-(require 'semantic)
-(require 'semantic/bovine/gcc)
-(require 'semantic/ia)
-;; (require 'semantic/imenu)
-(require 'semantic/sb)
+  (require 'semantic)
+  (require 'semantic/bovine/gcc)
+  ;; (require 'semantic/ia)
+  ;; (require 'semantic/sb)
 
-(mapc #'(lambda (s) (semantic-add-system-include s))
-      system-include-paths)
+  (mapc #'(lambda (s) (semantic-add-system-include s))
+	system-include-paths)
 
-(semanticdb-enable-gnu-global-databases 'c-mode)
-(semanticdb-enable-gnu-global-databases 'c++-mode)
+  (semanticdb-enable-gnu-global-databases 'c-mode)
+  (semanticdb-enable-gnu-global-databases 'c++-mode))
 
 (defun enable-semantic-mode ()
   (interactive)
-
-  ; (ede-mode 1)
-  (semanticdb-minor-mode 1)
-  (semantic-idle-scheduler-mode 1)
-  (semantic-idle-summary-mode 1)
-  (semantic-idle-scheduler-mode 1)
-
-  (semantic-mode 1))
+  (when (memq 'semantic my-optional-init)
+    (semanticdb-minor-mode 1)
+    (semantic-idle-scheduler-mode 1)
+    (semantic-idle-summary-mode 1)
+    (semantic-idle-scheduler-mode 1)
+    (semantic-mode 1)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Utility Functions
@@ -271,6 +269,15 @@ directory to make multiple eshell windows easier."
             'zen-and-art-theme
             'zenburn-theme
             'bubbleberry-theme))
+
+(when (memq 'clojure my-optional-init)
+  (add-to-list 'my-package-list 'cider)
+  (add-to-list 'my-package-list 'cider-profile)
+  (add-to-list 'my-package-list 'cider-spy)
+  (add-to-list 'my-package-list 'clojure-cheatsheet)
+
+  (when (memq 'auto-complete my-optional-init)
+    (add-to-list 'my-package-list 'ac-cider)))
 
 (when (memq 'auto-complete my-optional-init)
   (add-to-list 'my-package-list 'ac-capf)
@@ -454,7 +461,7 @@ directory to make multiple eshell windows easier."
        )))
 
   (add-hook 'c++-mode-hook 'c++-font-lock-fix)
-  ;(add-hook 'c-mode-common-hook 'fa-auto)
+					;(add-hook 'c-mode-common-hook 'fa-auto)
   (add-hook 'c-mode-common-hook 'fa-config-default))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -539,8 +546,8 @@ directory to make multiple eshell windows easier."
     "* %(org-contacts-template-name)\n:PROPERTIES:\n:EMAIL: %(org-contacts-template-email)\n:END:\n%i%?\n"))
  org-modules
  '(org-bbdb org-bibtex org-docview org-gnus org-info org-jsinfo org-habit org-irc org-mew 
-   org-mhe org-rmail org-special-blocks org-vm org-wl org-w3m org-mouse org-bookmark 
-   org-drill org-eshell org-invoice org-registry org-contacts))
+	    org-mhe org-rmail org-special-blocks org-vm org-wl org-w3m org-mouse org-bookmark 
+	    org-drill org-eshell org-invoice org-registry org-contacts))
 
 (defun custom-org-hook ()
   (interactive)
@@ -632,6 +639,22 @@ directory to make multiple eshell windows easier."
 
   (when (memq 'auto-complete my-optional-init)
     (add-hook 'robe-mode-hook 'ac-robe-setup)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Clojure
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(when (memq 'clojure my-optional-init)
+  (add-hook 'cider-mode-hook #'eldoc-mode)
+  (setq nrepl-log-messages t
+	cider-prefer-local-resources t
+	cider-repl-pop-to-buffer-on-connect nil
+	cider-repl-result-prefix ";; ")
+  (add-hook 'cider-mode-hook #'paredit-mode)
+  
+  (when (memq 'auto-complete my-optional-init)
+    (add-hook 'cider-mode-hook #'ac-cider-setup)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Web
