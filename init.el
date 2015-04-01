@@ -9,11 +9,9 @@
 	clojure
 	geiser
 	;; chicken
-	;; ido
 	js2
 	ruby
 	python
-	;; tex
 	c++
 	haskell
 	lisp
@@ -164,16 +162,19 @@
 
 (message "Defining Custom Functions")
 
+(defun reset-theme ()
+  (interactive)
+    (while custom-enabled-themes
+    (disable-theme (car custom-enabled-themes))))
+
 (defun override-theme (arg)
   "Disables all enabled themes and then loads the provided theme."
   (interactive
    (list
     (intern (completing-read "Load custom theme: "
                              (mapcar 'symbol-name (custom-available-themes))))))
-  (while custom-enabled-themes
-    (disable-theme (car custom-enabled-themes)))
-  (load-theme arg t)
-  t)
+  (reset-theme)
+  (load-theme arg t))
 
 (defun require-package (package-name &rest remaining-packages)
   "Loads and imports packages, installing from ELPA if necessary"
@@ -235,12 +236,10 @@ directory to make multiple eshell windows easier."
             'dictionary
             'dired+
             'doremi
-            ;; 'flx-ido
             'gist
             'help+
             'help-fns+
             'help-mode+
-            ;; 'ido-ubiquitous
             'magit
             'magit-gh-pulls
             'magit-svn
@@ -252,15 +251,13 @@ directory to make multiple eshell windows easier."
             'parenface 
             'popup
             'projectile
-            'purpose
             'rainbow-mode 
             'smex 
             'web-mode
             'writegood-mode))
 
 (setq my-theme-list
-      (list 'moe-theme
-            'tronesque-theme
+      (list 'tronesque-theme
             'anti-zenburn-theme
             'ample-theme
             'ample-zen-theme
@@ -276,8 +273,22 @@ directory to make multiple eshell windows easier."
   (add-to-list 'my-package-list 'cider-spy)
   (add-to-list 'my-package-list 'clojure-cheatsheet)
 
+  (add-hook 'cider-mode-hook 'eldoc-mode)
+  (setq nrepl-log-messages t
+	cider-prefer-local-resources t
+	cider-interactive-eval-result-prefix ";; ")
+  
+  (add-to-list 'auto-mode-alist '("\\.clj\\'" . cider-mode))
+
   (when (memq 'auto-complete my-optional-init)
-    (add-to-list 'my-package-list 'ac-cider)))
+    (add-hook 'cider-mode-hook 'ac-flyspell-workaround)
+    (add-hook 'cider-mode-hook 'ac-cider-setup)
+    (add-hook 'cider-repl-mode-hook 'ac-cider-setup)))
+
+(when (and
+       (memq 'clojure my-optional-init)
+       (memq 'auto-complete my-optional-init))
+  (add-to-list 'my-package-list 'ac-cider))
 
 (when (memq 'auto-complete my-optional-init)
   (add-to-list 'my-package-list 'ac-capf)
@@ -326,6 +337,8 @@ directory to make multiple eshell windows easier."
 (let ((loaded (eval (cons 'require-package (mapcar (lambda (x) `(quote ,x)) (append my-package-list my-theme-list))))))
   (message (format "Installed %s" loaded)))
 
+(reset-theme)
+
 ;; Additional that require force loading
 (require 'cl)
 (require 'imenu)
@@ -334,17 +347,6 @@ directory to make multiple eshell windows easier."
 
 (when (memq 'auto-complete my-optional-init)
   (require 'auto-complete-config))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Ido
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(when (memq 'ido my-optional-init)
-  (ido-mode t)
-  (ido-everywhere t)
-  (flx-ido-mode t)
-
-  (setq ido-enable-flex-matching t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; elisp
@@ -556,41 +558,6 @@ directory to make multiple eshell windows easier."
   (writegood-mode 1))
 
 (add-hook 'org-mode-hook 'custom-org-hook)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; TeX
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(when (memq 'tex my-optional-init)
-  (message "Configuring TeX")
-
-  (unless (package-installed-p 'auctex)
-    (package-install 'auctex))
-
-  (let* ((path (elt (cadr (assq 'auctex package-alist)) 7)))
-    (when (not (file-exists-p path))
-      (message "Error loading AucTeX"))
-    (when (file-exists-p path)
-      (let ((path (concat path "/")))
-        (add-to-list 'load-path path)
-
-        (autoload 'TeX-load-hack
-          (expand-file-name "tex-site.el" path))
-        (TeX-load-hack)
-
-        (load "preview.el" nil t t)
-        (setq load-path (remove-if (lambda (val) (equal path val)) load-path)))))
-
-  (setq TeX-auto-save t)
-  (setq TeX-parse-self t)
-  (setq-default TeX-master nil)
-  (setq reftex-plug-into-AUCTeX t)
-
-  (add-hook 'LaTeX-mode-hook 'visual-line-mode)
-  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
-  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
-
-  (add-hook 'LaTeX-mode-hook 'turn-on-reftex))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Python
