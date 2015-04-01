@@ -221,7 +221,8 @@ directory to make multiple eshell windows easier."
 (package-initialize)
 
 (setq package-archives 
-      '(("melpa" . "http://melpa.milkbox.net/packages/")
+      '(("melpa" . "http://melpa.org/packages/")
+        ("melpa-stable" . "http://stable.melpa.org/packages/")
         ("gnu" . "http://elpa.gnu.org/packages/")
         ;; ("marmalade" . "http://marmalade-repo.org/packages/")
         ("org" . "http://orgmode.org/elpa/")))
@@ -268,27 +269,14 @@ directory to make multiple eshell windows easier."
             'bubbleberry-theme))
 
 (when (memq 'clojure my-optional-init)
+  (add-to-list 'my-package-list 'clojure-mode)
   (add-to-list 'my-package-list 'cider)
-  (add-to-list 'my-package-list 'cider-profile)
-  (add-to-list 'my-package-list 'cider-spy)
   (add-to-list 'my-package-list 'clojure-cheatsheet)
 
-  (add-hook 'cider-mode-hook 'eldoc-mode)
-  (setq nrepl-log-messages t
-	cider-prefer-local-resources t
-	cider-interactive-eval-result-prefix ";; ")
+  (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
   
-  (add-to-list 'auto-mode-alist '("\\.clj\\'" . cider-mode))
-
   (when (memq 'auto-complete my-optional-init)
-    (add-hook 'cider-mode-hook 'ac-flyspell-workaround)
-    (add-hook 'cider-mode-hook 'ac-cider-setup)
-    (add-hook 'cider-repl-mode-hook 'ac-cider-setup)))
-
-(when (and
-       (memq 'clojure my-optional-init)
-       (memq 'auto-complete my-optional-init))
-  (add-to-list 'my-package-list 'ac-cider))
+    (add-to-list 'my-package-list 'ac-cider)))
 
 (when (memq 'auto-complete my-optional-init)
   (add-to-list 'my-package-list 'ac-capf)
@@ -348,6 +336,128 @@ directory to make multiple eshell windows easier."
 (when (memq 'auto-complete my-optional-init)
   (require 'auto-complete-config))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Auto-complete
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(when (memq 'auto-complete my-optional-init)
+  (message "Configuring Auto-Complete")
+
+  (ac-config-default)
+
+  (add-to-list 'ac-dictionary-directories (expand-file-name "~/.emacs.d/ac-dict"))
+  (setq ac-comphist-file (expand-file-name "~/.emacs.d/ac-comphist.dat"))
+
+  (setq ac-modes 
+        '(java-mode clojure-mode scala-mode
+		    cider-mode cider-repl-mode
+		    clojure-mode
+                    emacs-lisp-mode
+                    lisp-mode
+                    lisp-interaction-mode 
+                    c-mode cc-mode c++-mode
+                    scheme-mode geiser-repl-mode
+                    slime-repl-mode
+                    ocaml-mode tuareg-mode 
+                    perl-mode cperl-mode 
+                    python-mode 
+                    ruby-mode enh-ruby-mode inf-ruby-mode
+                    ecmascript-mode javascript-mode js-mode js2-mode 
+                    php-mode 
+                    css-mode 
+                    makefile-mode 
+                    sh-mode 
+                    fortran-mode f90-mode 
+                    ada-mode 
+                    xml-mode sgml-mode 
+                    lua-mode
+                    slime-repl-mode
+                    web-mode))
+
+  (add-to-list 'ac-sources 'ac-source-capf)
+
+  (defun ac-no-semantic-setup ()
+    (make-local-variable 'ac-sources)
+    (add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers))
+
+  (defun ac-semantic-setup ()
+    (make-local-variable 'ac-sources)
+    (add-to-list 'ac-sources 'ac-source-semantic))
+
+  (mapc #'(lambda (m) (add-hook m 'ac-no-semantic-setup))
+        '(emacs-lisp-mode-hook
+          lisp-mode-hook
+          lisp-interaction-mode-hook
+          scheme-mode-hook
+          ocaml-mode-hook	tuareg-mode-hook
+          python-mode-hook
+          ruby-mode-hook
+          php-mode-hook
+          css-mode-hook
+          perl-mode-hook cperl-mode-hook
+          ecmascript-mode-hook javascript-mode-hook js-mode-hook js2-mode-hook
+          makefile-mode-hook sh-mode-hook
+          fortran-mode-hook f90-mode-hook
+          ada-mode-hook
+          xml-mode-hook sgml-mode-hook
+          lua-mode-hook
+          c-mode-hook 
+          c++-mode-hook
+          java-mode-hook))
+
+  (mapc #'(lambda (m) (add-hook m 'ac-semantic-setup))
+        '(c-mode-common-hook))
+
+  (defun ac-css-setup ()
+    (make-local-variable 'ac-sources)
+    (add-to-list 'ac-sources 'ac-source-css-property))
+
+  (defun ac-haskell-setup ()
+    (make-local-variable 'ac-sources)
+    (add-to-list 'ac-sources 'ac-source-ghc-mod))
+
+  (defun ac-elisp-setup ()
+    (make-local-variable 'ac-sources)
+    (add-to-list 'ac-sources ac-source-functions)
+    (add-to-list 'ac-sources ac-source-symbols)
+    (add-to-list 'ac-sources ac-source-features)
+    (add-to-list 'ac-sources ac-source-variables))
+
+  (defun ac-scheme-setup ()
+    (when (memq 'chicken my-optional-init)
+      (make-local-variable 'ac-sources)
+      (add-to-list 'ac-sources ac-source-r7rs-symbols)
+      (add-to-list 'ac-sources ac-source-r5rs-symbols)
+      (add-to-list 'ac-sources ac-source-chicken-symbols)
+      (add-to-list 'ac-sources ac-source-chicken-symbols-prefixed)))
+
+  (defun ac-c-common-mode-setup ()
+    (make-local-variable 'ac-sources)
+    (add-to-list 'ac-sources 'ac-source-gtags))
+
+  (defun ac-lisp-setup ()
+    (make-local-variable 'ac-sources))
+
+  (defun ac-slime-setup ()
+    (make-local-variable 'ac-sources)
+    (add-to-list 'ac-sources 'ac-source-slime))
+
+  (defun ac-js2-setup ()
+    (ac-js2-mode))
+
+  (add-hook 'haskell-mode-hook 'ac-haskell-setup)
+  (add-hook 'css-mode-hook 'ac-css-setup)
+  (add-hook 'emacs-lisp-mode-hook 'ac-elisp-setup)
+  (add-hook 'scheme-mode-hook 'ac-scheme-setup)
+  (add-hook 'c-mode-common-hook 'ac-c-common-mode-setup)
+  (add-hook 'lisp-mode-hook 'ac-lisp-setup)
+  (add-hook 'lisp-interaction-mode-hook 'ac-lisp-setup)
+  (add-hook 'js2-mode-hook 'ac-js2-setup)
+  (add-hook 'slime-mode-hook 'ac-slime-setup)
+  (add-hook 'slime-repl-mode-hook 'ac-slime-setup)
+  (add-hook 'inf-ruby-mode-hook 'ac-inf-ruby-enable))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; elisp
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -369,7 +479,9 @@ directory to make multiple eshell windows easier."
 
 (mapc #'(lambda (m) (add-hook m 'paredit-prog-mode-hook))
       '(scheme-mode-hook 
-        lisp-mode-hook 
+        lisp-mode-hook
+	cider-mode-hook
+	clojure-mode-hook
         emacs-lisp-mode-hook 
         lisp-interaction-mode))
 
@@ -611,17 +723,16 @@ directory to make multiple eshell windows easier."
 ;; Clojure
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 (when (memq 'clojure my-optional-init)
-  (add-hook 'cider-mode-hook #'eldoc-mode)
-  (setq nrepl-log-messages t
-	cider-prefer-local-resources t
-	cider-repl-pop-to-buffer-on-connect nil
-	cider-repl-result-prefix ";; ")
-  (add-hook 'cider-mode-hook #'paredit-mode)
+  (add-hook 'clojure-mode-hook 'cider-mode)
+  (add-hook 'cider-mode-hook 'eldoc-mode)
   
+  (add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode))
+
   (when (memq 'auto-complete my-optional-init)
-    (add-hook 'cider-mode-hook #'ac-cider-setup)))
+    (add-hook 'cider-mode-hook 'ac-flyspell-workaround)
+    (add-hook 'cider-mode-hook 'ac-cider-setup)
+    (add-hook 'cider-repl-mode-hook 'ac-cider-setup)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Web
@@ -654,125 +765,6 @@ directory to make multiple eshell windows easier."
   (add-hook 'js2-mode-hook 'js2-mode-custom-hook)
 
   (add-to-list 'auto-mode-alist '("\\.js?\\'" . js2-mode)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Auto-complete
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(when (memq 'auto-complete my-optional-init)
-  (message "Configuring Auto-Complete")
-
-  (ac-config-default)
-
-  (add-to-list 'ac-dictionary-directories (expand-file-name "~/.emacs.d/ac-dict"))
-  (setq ac-comphist-file (expand-file-name "~/.emacs.d/ac-comphist.dat"))
-
-  (setq ac-modes 
-        '(java-mode clojure-mode scala-mode 
-                    emacs-lisp-mode
-                    lisp-mode
-                    lisp-interaction-mode 
-                    c-mode cc-mode c++-mode
-                    scheme-mode geiser-repl-mode
-                    slime-repl-mode
-                    ocaml-mode tuareg-mode 
-                    perl-mode cperl-mode 
-                    python-mode 
-                    ruby-mode enh-ruby-mode inf-ruby-mode
-                    ecmascript-mode javascript-mode js-mode js2-mode 
-                    php-mode 
-                    css-mode 
-                    makefile-mode 
-                    sh-mode 
-                    fortran-mode f90-mode 
-                    ada-mode 
-                    xml-mode sgml-mode 
-                    lua-mode
-                    slime-repl-mode
-                    web-mode))
-
-  (add-to-list 'ac-sources 'ac-source-capf)
-
-  (defun ac-no-semantic-setup ()
-    (make-local-variable 'ac-sources)
-    (add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers))
-
-  (defun ac-semantic-setup ()
-    (make-local-variable 'ac-sources)
-    (add-to-list 'ac-sources 'ac-source-semantic))
-
-  (mapc #'(lambda (m) (add-hook m 'ac-no-semantic-setup))
-        '(emacs-lisp-mode-hook
-          lisp-mode-hook
-          lisp-interaction-mode-hook
-          scheme-mode-hook
-          ocaml-mode-hook	tuareg-mode-hook
-          python-mode-hook
-          ruby-mode-hook
-          php-mode-hook
-          css-mode-hook
-          perl-mode-hook cperl-mode-hook
-          ecmascript-mode-hook javascript-mode-hook js-mode-hook js2-mode-hook
-          makefile-mode-hook sh-mode-hook
-          fortran-mode-hook f90-mode-hook
-          ada-mode-hook
-          xml-mode-hook sgml-mode-hook
-          lua-mode-hook
-          c-mode-hook 
-          c++-mode-hook
-          java-mode-hook))
-
-  (mapc #'(lambda (m) (add-hook m 'ac-semantic-setup))
-        '(c-mode-common-hook))
-
-  (defun ac-css-setup ()
-    (make-local-variable 'ac-sources)
-    (add-to-list 'ac-sources 'ac-source-css-property))
-
-  (defun ac-haskell-setup ()
-    (make-local-variable 'ac-sources)
-    (add-to-list 'ac-sources 'ac-source-ghc-mod))
-
-  (defun ac-elisp-setup ()
-    (make-local-variable 'ac-sources)
-    (add-to-list 'ac-sources ac-source-functions)
-    (add-to-list 'ac-sources ac-source-symbols)
-    (add-to-list 'ac-sources ac-source-features)
-    (add-to-list 'ac-sources ac-source-variables))
-
-  (defun ac-scheme-setup ()
-    (when (memq 'chicken my-optional-init)
-      (make-local-variable 'ac-sources)
-      (add-to-list 'ac-sources ac-source-r7rs-symbols)
-      (add-to-list 'ac-sources ac-source-r5rs-symbols)
-      (add-to-list 'ac-sources ac-source-chicken-symbols)
-      (add-to-list 'ac-sources ac-source-chicken-symbols-prefixed)))
-
-  (defun ac-c-common-mode-setup ()
-    (make-local-variable 'ac-sources)
-    (add-to-list 'ac-sources 'ac-source-gtags))
-
-  (defun ac-lisp-setup ()
-    (make-local-variable 'ac-sources))
-
-  (defun ac-slime-setup ()
-    (make-local-variable 'ac-sources)
-    (add-to-list 'ac-sources 'ac-source-slime))
-
-  (defun ac-js2-setup ()
-    (ac-js2-mode))
-
-  (add-hook 'haskell-mode-hook 'ac-haskell-setup)
-  (add-hook 'css-mode-hook 'ac-css-setup)
-  (add-hook 'emacs-lisp-mode-hook 'ac-elisp-setup)
-  (add-hook 'scheme-mode-hook 'ac-scheme-setup)
-  (add-hook 'c-mode-common-hook 'ac-c-common-mode-setup)
-  (add-hook 'lisp-mode-hook 'ac-lisp-setup)
-  (add-hook 'lisp-interaction-mode-hook 'ac-lisp-setup)
-  (add-hook 'js2-mode-hook 'ac-js2-setup)
-  (add-hook 'slime-mode-hook 'ac-slime-setup)
-  (add-hook 'slime-repl-mode-hook 'ac-slime-setup)
-  (add-hook 'inf-ruby-mode-hook 'ac-inf-ruby-enable))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; mu4e
