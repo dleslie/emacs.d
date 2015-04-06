@@ -14,6 +14,7 @@
 	python
 	c++
 	haskell
+	ocaml
 	lisp
 	mu4e
 	semantic))
@@ -315,7 +316,11 @@ directory to make multiple eshell windows easier."
   (add-to-list 'my-package-list 'auto-complete-exuberant-ctags))
 
 (when (memq 'haskell my-optional-init)
-  (add-to-list 'my-package-list 'ghc))
+  (add-to-list 'my-package-list 'ghc)
+  (add-to-list 'my-package-list 'haskell-mode))
+
+(when (memq 'ocaml my-optional-init)
+  (add-to-list 'my-package-list 'tuareg))
 
 (when (memq 'lisp my-optional-init)
   (when (memq 'auto-complete my-optional-init)
@@ -359,12 +364,13 @@ directory to make multiple eshell windows easier."
                     c-mode cc-mode c++-mode
                     scheme-mode geiser-repl-mode
                     slime-repl-mode
-                    ocaml-mode tuareg-mode 
+                    ocaml-mode tuareg-mode merlin-mode caml-mode 
                     perl-mode cperl-mode 
                     python-mode 
                     ruby-mode enh-ruby-mode inf-ruby-mode
                     ecmascript-mode javascript-mode js-mode js2-mode 
-                    php-mode 
+                    php-mode
+		    haskell-mode
                     css-mode 
                     makefile-mode 
                     sh-mode 
@@ -375,22 +381,22 @@ directory to make multiple eshell windows easier."
                     slime-repl-mode
                     web-mode))
 
-  (add-to-list 'ac-sources 'ac-source-capf)
-
   (defun ac-no-semantic-setup ()
     (make-local-variable 'ac-sources)
-    (add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers))
+    (add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers)
+    (add-to-list 'ac-sources 'ac-source-capf))
 
   (defun ac-semantic-setup ()
     (make-local-variable 'ac-sources)
-    (add-to-list 'ac-sources 'ac-source-semantic))
+    (add-to-list 'ac-sources 'ac-source-semantic)
+    (add-to-list 'ac-sources 'ac-source-capf))
 
   (mapc #'(lambda (m) (add-hook m 'ac-no-semantic-setup))
         '(emacs-lisp-mode-hook
           lisp-mode-hook
           lisp-interaction-mode-hook
           scheme-mode-hook
-          ocaml-mode-hook	tuareg-mode-hook
+          ocaml-mode-hook tuareg-mode-hook merlin-mode caml-mode
           python-mode-hook
           ruby-mode-hook
           php-mode-hook
@@ -416,7 +422,7 @@ directory to make multiple eshell windows easier."
   (defun ac-haskell-setup ()
     (make-local-variable 'ac-sources)
     (add-to-list 'ac-sources 'ac-source-ghc-mod))
-
+  
   (defun ac-elisp-setup ()
     (make-local-variable 'ac-sources)
     (add-to-list 'ac-sources ac-source-functions)
@@ -586,6 +592,21 @@ directory to make multiple eshell windows easier."
   (autoload 'ghc-init "ghc" nil t)
   (autoload 'ghc-debug "ghc" nil t)
   (add-hook 'haskell-mode-hook (lambda () (ghc-init))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Ocaml
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(when (memq 'ocaml my-optional-init)
+  (setq opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
+  (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
+  (require 'merlin)
+  
+  (setq merlin-use-auto-complete-mode t)
+  (setq merlin-command 'opam)
+
+  (add-hook 'tuareg-mode-hook 'merlin-mode)
+  (add-hook 'caml-mode-hook 'merlin-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Markdown

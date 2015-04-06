@@ -12,14 +12,23 @@ Everything will break if you don't do the following:
 * Install all the external tools and programming languages supported:
 
 ```
-sudo apt-get install global python python-pip sbcl ruby chicken-bin nodejs nodejs-legacy npm
+# Every damned language and tool
+sudo apt-get install global python python-pip sbcl ruby chicken-bin nodejs nodejs-legacy npm opam haskell-platform guile chicken-bin clojure1.4
 
+# Python
 pip install jedi epc virtualenv
 
+# Ruby
 gem install pry pry-doc
 
+# Node
 npm install tern
 
+# O'Caml
+opam install merlin
+
+# Haskell
+cabal install ghc-mod
 ```
 
 * The first time you launch it will require an active internet connection to fetch all the necessary packages
