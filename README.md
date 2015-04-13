@@ -12,7 +12,8 @@ Everything will break if you don't do the following:
 * Install all the external tools and programming languages supported:
 
 ```
-# Every damned language and tool
+# Ubuntu specific: install every damned language and tool
+# Except opam. You'll have to figure out how to install that yourself.
 sudo apt-get install global python python-pip sbcl ruby chicken-bin nodejs nodejs-legacy npm opam haskell-platform guile chicken-bin clojure1.4
 
 # Python
