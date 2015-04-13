@@ -4,21 +4,6 @@
 
 (message "Setting Local Configuration")
 
-(setq my-optional-init
-      '(auto-complete
-	clojure
-	geiser
-	;; chicken
-	js2
-	ruby
-	python
-	c++
-	haskell
-	ocaml
-	lisp
-	mu4e
-	semantic))
-
 (setq 
  org-directory 
  "~/Dropbox/org/")
@@ -67,7 +52,32 @@
     "/usr/lib/gcc/x86_64-linux-gnu/4.8/include/"
     "/usr/lib/gcc/x86_64-linux-gnu/4.9/include/"))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Init File Configuration
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(setq my-optional-init
+      '(auto-complete
+	clojure
+	geiser
+	;; chicken
+	js2
+	ruby
+	python
+	c++
+	haskell
+	ocaml
+	lisp
+	mu4e
+	semantic))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Customizable Values
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(unless (file-exists-p custom-file)
+  (shell-command (concat "touch " custom-file)))
 (load custom-file)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
