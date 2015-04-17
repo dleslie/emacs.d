@@ -259,6 +259,7 @@ directory to make multiple eshell windows easier."
             'menu-bar+
             'nyan-mode
             'org-plus-contrib
+	    'org-gcal
             'paredit 
             'parenface 
             'popup
@@ -350,7 +351,6 @@ directory to make multiple eshell windows easier."
 
 (when (memq 'auto-complete my-optional-init)
   (require 'auto-complete-config))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Auto-complete
@@ -654,11 +654,10 @@ directory to make multiple eshell windows easier."
  (concat org-directory "notes.org")
  org-agenda-files 
  `(,(concat org-directory "todo.org") 
-   ,(concat org-directory "agenda.org") )
+   ,(concat org-directory "agenda.org")
+   ,(concat org-directory "gcal.org"))
  org-agenda-diary-file 
  (concat org-directory "diary.org")
- org-agenda-files 
- '("~/Dropbox/org/todo.org" "~/Dropbox/org/agenda.org")
  org-todo-keywords
  '((sequence "TODO(t)" "PROG(p)" "BLCK(b)" "STAL(s)" "|" "DONE(d)" "WONT(w)"))
  org-todo-keyword-faces
@@ -670,25 +669,25 @@ directory to make multiple eshell windows easier."
    ("DONE" . (:foreground "black" :weight bold)))
  org-capture-templates
  '(("n" "Note" entry (file+headline (concat org-directory "notes.org") "Notes")
-    "* %^{topic} %T %^g\n:CATEGORY: %^{category}\n%i%?\n")
+    "* %^{topic} %T %^g\n   :CATEGORY: %^{category}\n%i%?\n")
    ("t" "To Do" entry (file+headline (concat org-directory "todo.org") "To Do")
-    "* TODO %^{todo} %^{due} %^g\n:CATEGORY: %^{category}")
+    "* TODO %^{todo} %^g\n   DEADLINE: %^{due}t\n   :CATEGORY: %^{category}\n")
    ("d" "Daily review" entry (file+headline (concat org-directory "diary.org") "Daily Review") 
-    "* %T %^g\n:CATEGORY: Review\n%?%[~/Dropbox/org/template_daily_review.org]") 
+    "* %T %^g\n   :CATEGORY: Review\n   %?%[~/Dropbox/org/template_daily_review.org]\n") 
    ("i" "Idea" entry (file+headline (concat org-directory "ideas.org") "Ideas") 
-    "* %^{topic} %T %^g\n:CATEGORY: Idea\n%i%?\n") 
+    "* %^{topic} %T %^g\n   :CATEGORY: Idea\n   %i%?\n") 
    ("j" "Journal" entry (file+headline (concat org-directory "diary.org") "Journal") 
-    "* %^{topic} %T %^g\n:CATEGORY: Journal\n%i%?\n")
+    "* %^{topic} %T %^g\n   :CATEGORY: Journal\n   %i%?\n")
    ("l" "Letter" entry (file+headline (concat org-directory "letters.org") "Letter") 
-    "* %^{topic} %T %^g\n:CATEGORY: Letter\n%i%?\n")
+    "* %^{topic} %T %^g\n   :CATEGORY: Letter\n   %i%?\n")
    ("w" "Work Log" entry (file+headline (concat org-directory "work.org") "Work Log") 
-    "* %^{topic} %T %^g\n:CATEGORY: Log\n%i%?\n")
+    "* %^{topic} %T %^g\n   :CATEGORY: Log\n   %i%?\n")
    ("a" "Article" entry (file+headline (concat org-directory "articles.org") "Article")
-    "* %^{topic} %T %^g\n:CATEGORY: Article\n%i%?\n")
+    "* %^{topic} %T %^g\n   :CATEGORY: Article\n   %i%?\n")
    ("e" "Event" entry (file+headline (concat org-directory "agenda.org") "Events")
-    "* %^{title} %^g\n%^{when}\n%i%?\n")
+    "* %^{title} %^g\n     SCHEDULED: %^{when}t\n   %i%?\n")
    ("c" "Contact" entry (file+headline (concat org-directory "addresses.org") "Addresses")
-    "* %(org-contacts-template-name)\n:PROPERTIES:\n:EMAIL: %(org-contacts-template-email)\n:END:\n%i%?\n"))
+    "* %(org-contacts-template-name)\n   :PROPERTIES:\n   :EMAIL: %(org-contacts-template-email)\n   :END:\n   %i%?\n"))
  org-modules
  '(org-bbdb org-bibtex org-docview org-gnus org-info org-jsinfo org-habit org-irc org-mew 
 	    org-mhe org-rmail org-special-blocks org-vm org-wl org-w3m org-mouse org-bookmark 
@@ -798,6 +797,19 @@ directory to make multiple eshell windows easier."
   (add-to-list 'auto-mode-alist '("\\.js?\\'" . js2-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; org-gcal
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun update-gcal ()
+  (org-gcal-refresh-token)
+  (org-gcal-sync))
+
+(let ((gcal-config (expand-file-name "gcal-settings.el" user-emacs-directory)))
+  (when (file-exists-p gcal-config)
+    (load gcal-config)
+    (run-with-timer 3600 3600 'update-gcal)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; mu4e
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -844,7 +856,7 @@ directory to make multiple eshell windows easier."
    user-mail-address
 
    mu4e-headers-include-related
-   t
+   nil
 
    mu4e-headers-results-limit
    -1
@@ -877,6 +889,42 @@ directory to make multiple eshell windows easier."
                '("org-contact-add" . mu4e-action-add-org-contact) t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Backups
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; http://anirudhsasikumar.net/blug/2005.01.21.html
+(define-minor-mode sensitive-minor-mode
+  "Disables backups"
+  nil
+  " Sensitive"
+  nil
+  (if (symbol-value sensitive-minor-mode)
+      (progn
+	(make-local-variable 'backup-inhibited)
+	(setq backup-inhibited t)
+	(when auto-save-default
+	  (auto-save-mode -1)))
+    (kill-local-variable 'backup-inhibited)
+    (when auto-save-default
+      (auto-save-mode 1))))
+
+(add-to-list 'auto-mode-alist
+	     '("\\.\\(vcf\\|gpg\\)$" . sensitive-minor-mode))
+
+(let ((backup-directory (expand-file-name "saves" user-emacs-directory)))
+  (when (not (file-exists-p backup-directory))
+    (make-directory backup-directory))
+  (setq backup-directory-alist `(("." . ,backup-directory))
+	backup-by-copying t
+	delete-old-versions t
+	kept-old-versions 2
+	kept-new-versions 6
+	version-control t
+	auto-save-default t
+	auto-save-timeout 60
+	auto-save-interval 360))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc Custom
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -893,6 +941,8 @@ directory to make multiple eshell windows easier."
 (setq gc-cons-threshold 20000000)
 
 (winner-mode)
+
+(setq make-backup-files nil)
 
 ;; From http://stackoverflow.com/a/20788581
 (ignore-errors
