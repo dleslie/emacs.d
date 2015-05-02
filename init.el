@@ -69,7 +69,8 @@
 	ocaml
 	lisp
 	mu4e
-	semantic))
+	semantic
+	rust))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Customizable Values
@@ -118,7 +119,7 @@
 (global-set-key "\M-x" 'smex)
 
 (global-set-key (kbd "C-;") 'comment-or-uncomment-region)
-(global-set-key (kbd "TAB") 'indent-according-to-mode)
+;; (global-set-key (kbd "TAB") 'indent-according-to-mode)
 
 (global-set-key [f10] 'tool-bar-mode)
 (global-set-key [f11] 'speedbar)
@@ -264,7 +265,7 @@ directory to make multiple eshell windows easier."
             'parenface 
             'popup
             'projectile
-            'rainbow-mode 
+            'rainbow-mode
             'smex 
             'web-mode
             'writegood-mode))
@@ -279,6 +280,9 @@ directory to make multiple eshell windows easier."
             'zen-and-art-theme
             'zenburn-theme
             'bubbleberry-theme))
+
+(when (memq 'rust my-optional-init)
+  (add-to-list 'my-package-list 'rust-mode))
 
 (when (memq 'clojure my-optional-init)
   (add-to-list 'my-package-list 'clojure-mode)
@@ -500,6 +504,8 @@ directory to make multiple eshell windows easier."
 	clojure-mode-hook
         emacs-lisp-mode-hook 
         lisp-interaction-mode))
+
+(put 'paredit-forward-delete 'delete-selection 'supersede)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Compilation
@@ -802,7 +808,13 @@ directory to make multiple eshell windows easier."
 
 (defun update-gcal ()
   (org-gcal-refresh-token)
-  (org-gcal-sync))
+  (let ((gcal-file (concat org-directory "gcal.org")))
+    (when (file-exists-p gcal-file)
+      (delete-file gcal-file)))
+  (let ((gcal-archive-file (concat org-directory "gcal.org_archive")))
+    (when (file-exists-p gcal-archive-file)
+      (delete-file gcal-archive-file)))
+  (org-gcal-fetch))
 
 (let ((gcal-config (expand-file-name "gcal-settings.el" user-emacs-directory)))
   (when (file-exists-p gcal-config)
@@ -951,6 +963,11 @@ directory to make multiple eshell windows easier."
     (when (eq major-mode 'compilation-mode)
       (ansi-color-apply-on-region compilation-filter-start (point-max))))
   (add-hook 'compilation-filter-hook 'my-colorize-compilation-buffer))
+
+(delete-selection-mode t)
+
+(ido-mode 1)
+(ido-everywhere 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; End
