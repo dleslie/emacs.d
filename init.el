@@ -52,6 +52,8 @@
     "/usr/lib/gcc/x86_64-linux-gnu/4.8/include/"
     "/usr/lib/gcc/x86_64-linux-gnu/4.9/include/"))
 
+(setq my-dev-geiser (expand-file-name "~/Workspace/code/dleslie/geiser/elisp/geiser.el"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Init File Configuration
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -302,9 +304,9 @@ directory to make multiple eshell windows easier."
   (add-to-list 'my-package-list 'chicken-scheme))
 
 (when (memq 'geiser my-optional-init)
-  (add-to-list 'my-package-list 'geiser)
-  (when (memq 'auto-complete my-optional-init)
-    (add-to-list 'my-package-list 'ac-geiser)))
+  (if (file-exists-p my-dev-geiser)
+      (load-file my-dev-geiser)
+    (add-to-list 'my-package-list 'geiser)))
 
 (when (memq 'js2 my-optional-init)
   (add-to-list 'my-package-list 'js2-mode)
@@ -395,36 +397,11 @@ directory to make multiple eshell windows easier."
                     slime-repl-mode
                     web-mode))
 
-  (defun ac-no-semantic-setup ()
-    (make-local-variable 'ac-sources)
-    (add-to-list 'ac-sources 'ac-source-words-in-same-mode-buffers)
-    (add-to-list 'ac-sources 'ac-source-capf))
+  (add-to-list 'ac-sources 'ac-source-capf)
 
   (defun ac-semantic-setup ()
     (make-local-variable 'ac-sources)
-    (add-to-list 'ac-sources 'ac-source-semantic)
-    (add-to-list 'ac-sources 'ac-source-capf))
-
-  (mapc #'(lambda (m) (add-hook m 'ac-no-semantic-setup))
-        '(emacs-lisp-mode-hook
-          lisp-mode-hook
-          lisp-interaction-mode-hook
-          scheme-mode-hook
-          ocaml-mode-hook tuareg-mode-hook merlin-mode caml-mode
-          python-mode-hook
-          ruby-mode-hook
-          php-mode-hook
-          css-mode-hook
-          perl-mode-hook cperl-mode-hook
-          ecmascript-mode-hook javascript-mode-hook js-mode-hook js2-mode-hook
-          makefile-mode-hook sh-mode-hook
-          fortran-mode-hook f90-mode-hook
-          ada-mode-hook
-          xml-mode-hook sgml-mode-hook
-          lua-mode-hook
-          c-mode-hook 
-          c++-mode-hook
-          java-mode-hook))
+    (add-to-list 'ac-sources 'ac-source-semantic))
 
   (mapc #'(lambda (m) (add-hook m 'ac-semantic-setup))
         '(c-mode-common-hook))
@@ -572,7 +549,7 @@ directory to make multiple eshell windows easier."
   (message "Configuring C and C++")
 
   (defun custom-cc-prog-hook ()
-    (enable-semantic-mode)
+    ;; (enable-semantic-mode)
     (ggtags-mode 1))
 
   (add-hook 'c++-mode-hook 'custom-cc-prog-hook)
@@ -966,8 +943,8 @@ directory to make multiple eshell windows easier."
 
 (delete-selection-mode t)
 
-(ido-mode 1)
-(ido-everywhere 1)
+(setq magit-auto-revert-mode nil)
+(setq magit-last-seen-setup-instructions "1.4.0")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; End
