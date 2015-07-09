@@ -6,7 +6,7 @@
 
 (setq 
  org-directory 
- "~/Dropbox/org/")
+ "~/ownCloud/org/")
 
 (setq 
  tern-command 
@@ -256,7 +256,6 @@ directory to make multiple eshell windows easier."
             'help-fns+
             'help-mode+
             'magit
-            'magit-gh-pulls
             'magit-svn
             'markdown-mode
             'menu-bar+
@@ -649,14 +648,14 @@ directory to make multiple eshell windows easier."
    ("BLCK" . (:foreground "red" :weight bold))
    ("STAL" . (:foreground "yellow" :weight bold))
    ("WONT" . (:foreground "grey" :weight bold))
-   ("DONE" . (:foreground "black" :weight bold)))
+   ("DONE" . (:foreground "grey" :weight bold)))
  org-capture-templates
  '(("n" "Note" entry (file+headline (concat org-directory "notes.org") "Notes")
     "* %^{topic} %T %^g\n   :CATEGORY: %^{category}\n%i%?\n")
    ("t" "To Do" entry (file+headline (concat org-directory "todo.org") "To Do")
     "* TODO %^{todo} %^g\n   DEADLINE: %^{due}t\n   :CATEGORY: %^{category}\n")
    ("d" "Daily review" entry (file+headline (concat org-directory "diary.org") "Daily Review") 
-    "* %T %^g\n   :CATEGORY: Review\n   %?%[~/Dropbox/org/template_daily_review.org]\n") 
+    "* %T %^g\n   :CATEGORY: Review\n   %?%[~/ownCloud/org/template_daily_review.org]\n") 
    ("i" "Idea" entry (file+headline (concat org-directory "ideas.org") "Ideas") 
     "* %^{topic} %T %^g\n   :CATEGORY: Idea\n   %i%?\n") 
    ("j" "Journal" entry (file+headline (concat org-directory "diary.org") "Journal") 
