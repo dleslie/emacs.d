@@ -1,4 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Local Configuration
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -637,7 +637,9 @@ directory to make multiple eshell windows easier."
  org-agenda-files 
  `(,(concat org-directory "todo.org") 
    ,(concat org-directory "agenda.org")
-   ,(concat org-directory "gcal.org"))
+   ,(concat org-directory "gcal-main.org")
+   ,(concat org-directory "gcal-appointments.org")
+   ,(concat org-directory "gcal-vacations.org"))
  org-agenda-diary-file 
  (concat org-directory "diary.org")
  org-todo-keywords
@@ -784,13 +786,16 @@ directory to make multiple eshell windows easier."
 
 (defun update-gcal ()
   (org-gcal-refresh-token)
-  (let ((gcal-file (concat org-directory "gcal.org")))
-    (when (file-exists-p gcal-file)
-      (delete-file gcal-file)))
-  (let ((gcal-archive-file (concat org-directory "gcal.org_archive")))
-    (when (file-exists-p gcal-archive-file)
-      (delete-file gcal-archive-file)))
   (org-gcal-fetch))
+
+(defun force-gcal-category ()
+  (let ((category (assoc buffer-file-name org-gcal-forced-category-file-alist)))
+    (when category
+      (goto-char (point-min))
+      (insert (format "#+CATEGORY: %s" (cdr category)))
+      (newline))))
+
+(add-hook 'before-save-hook 'force-gcal-category)
 
 (let ((gcal-config (expand-file-name "gcal-settings.el" user-emacs-directory)))
   (when (file-exists-p gcal-config)
