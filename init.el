@@ -114,30 +114,24 @@
 
 (message "Configuring custom keys")
 
-(global-set-key "\C-w" 'clipboard-kill-region)
-(global-set-key "\M-w" 'clipboard-kill-ring-save)
-(global-set-key "\C-y" 'clipboard-yank)
+;; (global-set-key "\C-w" 'clipboard-kill-region)
+;; (global-set-key "\M-w" 'clipboard-kill-ring-save)
+;; (global-set-key "\C-y" 'clipboard-yank)
 
 (global-set-key "\M-x" 'smex)
 
-(global-set-key (kbd "C-;") 'comment-or-uncomment-region)
-;; (global-set-key (kbd "TAB") 'indent-according-to-mode)
-
-(global-set-key [f10] 'tool-bar-mode)
-(global-set-key [f11] 'speedbar)
-(global-set-key [f12] 'menu-bar-mode)
-
-(global-set-key "\C-ct" 'org-todo-list)
+(global-set-key "\C-c," 'scroll-bar-mode)
+(global-set-key "\C-c." 'tool-bar-mode)
+(global-set-key "\C-c?" 'menu-bar-mode)
+(global-set-key "\C-c\\" 'comment-or-uncomment-region)
 (global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cc" 'org-capture)
-(global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-cb" 'org-iswitchb)
-
-(global-set-key "\C-cm" 'mu4e)
-
+(global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-cg" 'magit-status)
-
-(global-set-key (kbd "C-!") 'eshell-here)
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-cm" 'mu4e)
+(global-set-key "\C-cs" 'eshell-here)
+(global-set-key "\C-ct" 'org-todo-list)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Semantic
