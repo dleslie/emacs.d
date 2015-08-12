@@ -30,6 +30,13 @@ opam install merlin
 
 # Haskell
 cabal install ghc-mod
+
+# Setup Chicken for Geiser
+# 1. Install the necessary support eggs:
+chicken-install -s apropos chicken-doc
+# 2. Update the Chicken documentation database:
+cd `csi -p '(chicken-home)'`
+curl http://3e8.org/pub/chicken-doc/chicken-doc-repo.tgz | sudo tar zx
 ```
 
 * The first time you launch it will require an active internet connection to fetch all the necessary packages
