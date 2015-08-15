@@ -64,6 +64,8 @@
     "/usr/lib/gcc/x86_64-linux-gnu/4.8/include/"
     "/usr/lib/gcc/x86_64-linux-gnu/4.9/include/"))
 
+(setq my-load-debug-geiser nil)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Init File Configuration
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -320,8 +322,10 @@ directory to make multiple eshell windows easier."
 (with-optional-init 'chicken
   (add-to-list 'my-package-list 'chicken-scheme))
 
-(with-optional-init 'geiser
-  (add-to-list 'my-package-list 'geiser))
+(when (not my-load-debug-geiser)
+  (with-optional-init
+   'geiser
+   (add-to-list 'my-package-list 'geiser)))
 
 (with-optional-init 'js2
   (add-to-list 'my-package-list 'js2-mode)
@@ -518,8 +522,15 @@ directory to make multiple eshell windows easier."
  (add-hook 'compilation-filter-hook 'colorize-compilation-buffer))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Chicken
+;; Scheme
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(when
+    (and
+     my-load-debug-geiser
+     (file-exists-p "/home/dleslie/Workspace/code/dleslie/geiser/elisp/geiser.el"))
+  (load "/home/dleslie/Workspace/code/dleslie/geiser/elisp/geiser.el")
+  (require 'geiser))
 
 (with-optional-init 'chicken
   (message "Configuring Chicken Scheme")
