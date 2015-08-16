@@ -71,7 +71,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (setq my-optional-init
-      '(auto-complete
+      '(company
 	compilation
 	elisp
 	email
@@ -183,27 +183,28 @@ directory to make multiple eshell windows easier."
 ;; Email
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-optional-init 'email
-		    (require 'smtpmail)
+(with-optional-init
+ 'email
+ (require 'smtpmail)
 
-		    (setq
-		     message-send-mail-function 
-		     'smtpmail-send-it
-		     smtpmail-stream-type
-		     'starttls
-		     smtpmail-starttls-credentials
-		     '((mail-smtp-server mail-smtp-port nil nil))
-		     smtpmail-auth-credentials
-		     '((mail-smtp-server mail-smtp-port
-					 user-mail-login nil))
-		     smtpmail-default-smtp-server
-		     mail-smtp-server
-		     smtpmail-smtp-server
-		     mail-smtp-server
-		     smtpmail-smtp-service
-		     mail-smtp-port
-		     gnus-ignored-newsgroups
-		     "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]"))
+ (setq
+  message-send-mail-function 
+  'smtpmail-send-it
+  smtpmail-stream-type
+  'starttls
+  smtpmail-starttls-credentials
+  '((mail-smtp-server mail-smtp-port nil nil))
+  smtpmail-auth-credentials
+  '((mail-smtp-server mail-smtp-port
+		      user-mail-login nil))
+  smtpmail-default-smtp-server
+  mail-smtp-server
+  smtpmail-smtp-server
+  mail-smtp-server
+  smtpmail-smtp-service
+  mail-smtp-port
+  gnus-ignored-newsgroups
+  "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Semantic
@@ -247,8 +248,8 @@ directory to make multiple eshell windows easier."
 
 (setq package-archives 
       '(("melpa" . "http://melpa.org/packages/")
-        ("melpa-stable" . "http://stable.melpa.org/packages/")
-        ("gnu" . "http://elpa.gnu.org/packages/")
+        ;; ("melpa-stable" . "http://stable.melpa.org/packages/")
+        ;; ("gnu" . "http://elpa.gnu.org/packages/")
         ;; ("marmalade" . "http://marmalade-repo.org/packages/")
         ("org" . "http://orgmode.org/elpa/")))
 
@@ -256,7 +257,8 @@ directory to make multiple eshell windows easier."
 
 (setq my-package-list
       (list 'gist
-            'nyan-mode))
+            'nyan-mode
+	    'parenface))
 
 (setq my-theme-list
       (list 'tronesque-theme
@@ -291,7 +293,8 @@ directory to make multiple eshell windows easier."
 
 (with-optional-init
  'web
- (add-to-list 'my-package-list 'web-mode))
+ (add-to-list 'my-package-list 'web-mode)
+ (add-to-list 'my-package-list 'restclient))
 
 (with-optional-init
  'org
@@ -310,17 +313,29 @@ directory to make multiple eshell windows easier."
   (add-to-list 'my-package-list 'cider)
   (add-to-list 'my-package-list 'clojure-cheatsheet)
 
-  (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
-  
-  (with-optional-init 'auto-complete
-    (add-to-list 'my-package-list 'ac-cider)))
-
-(with-optional-init 'auto-complete
-  (add-to-list 'my-package-list 'ac-capf)
-  (add-to-list 'my-package-list 'auto-complete))
+  (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t))
 
 (with-optional-init 'chicken
   (add-to-list 'my-package-list 'chicken-scheme))
+
+(with-optional-init
+ 'company
+ (add-to-list 'my-package-list 'company)
+ (with-optional-init 'c++
+		     (add-to-list 'my-package-list 'company-c-headers))
+ (with-optional-init 'haskell
+		     (add-to-list 'my-package-list 'company-ghc))
+ (with-optional-init 'ruby
+		     (add-to-list 'my-package-list 'company-inf-ruby))
+ (with-optional-init 'python
+		     (add-to-list 'my-package-list 'company-jedi))
+ (with-optional-init 'rust
+		     (add-to-list 'my-package-list 'company-racer))
+ (with-optional-init 'web
+		     (add-to-list 'my-package-list 'company-restclient)
+		     (add-to-list 'my-package-list 'company-web))
+ (with-optional-init 'js2
+		     (add-to-list 'my-package-list 'company-tern)))
 
 (when (not my-load-debug-geiser)
   (with-optional-init
@@ -329,14 +344,9 @@ directory to make multiple eshell windows easier."
 
 (with-optional-init 'js2
   (add-to-list 'my-package-list 'js2-mode)
-  (with-optional-init 'auto-complete
-    (add-to-list 'my-package-list 'ac-js2))
-  (add-to-list 'my-package-list 'tern)
-  (add-to-list 'my-package-list 'tern-auto-complete))
+  (add-to-list 'my-package-list 'tern))
 
 (with-optional-init 'ruby
-  (with-optional-init 'auto-complete
-    (add-to-list 'my-package-list 'ac-inf-ruby))
   (add-to-list 'my-package-list 'enh-ruby-mode)
   (add-to-list 'my-package-list 'inf-ruby)
   (add-to-list 'my-package-list 'projectile-rails)
@@ -348,8 +358,7 @@ directory to make multiple eshell windows easier."
 
 (with-optional-init 'c++
   (add-to-list 'my-package-list 'function-args)
-  (add-to-list 'my-package-list 'ggtags)
-  (add-to-list 'my-package-list 'auto-complete-exuberant-ctags))
+  (add-to-list 'my-package-list 'ggtags))
 
 (with-optional-init 'haskell
   (add-to-list 'my-package-list 'ghc)
@@ -359,114 +368,12 @@ directory to make multiple eshell windows easier."
   (add-to-list 'my-package-list 'tuareg))
 
 (with-optional-init 'lisp
-  (with-optional-init 'auto-complete
-    (add-to-list 'my-package-list 'ac-slime))
   (add-to-list 'my-package-list 'slime))
 
 (let ((loaded (eval (cons 'require-package (mapcar (lambda (x) `(quote ,x)) (append my-package-list my-theme-list))))))
   (message (format "Installed %s" loaded)))
 
 (reset-theme)
-
-(with-optional-init 'auto-complete
-  (require 'auto-complete-config))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Auto-complete
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-optional-init 'auto-complete
-  (message "Configuring Auto-Complete")
-
-  (ac-config-default)
-
-  (add-to-list 'ac-dictionary-directories (expand-file-name "~/.emacs.d/ac-dict"))
-  (setq ac-comphist-file (expand-file-name "~/.emacs.d/ac-comphist.dat"))
-
-  (setq ac-modes 
-        '(java-mode clojure-mode scala-mode
-		    cider-mode cider-repl-mode
-		    clojure-mode
-                    emacs-lisp-mode
-                    lisp-mode
-                    lisp-interaction-mode 
-                    c-mode cc-mode c++-mode
-                    scheme-mode geiser-repl-mode
-                    slime-repl-mode
-                    ocaml-mode tuareg-mode merlin-mode caml-mode 
-                    perl-mode cperl-mode 
-                    python-mode 
-                    ruby-mode enh-ruby-mode inf-ruby-mode
-                    ecmascript-mode javascript-mode js-mode js2-mode 
-                    php-mode
-		    haskell-mode
-                    css-mode 
-                    makefile-mode 
-                    sh-mode 
-                    fortran-mode f90-mode 
-                    ada-mode 
-                    xml-mode sgml-mode 
-                    lua-mode
-                    slime-repl-mode
-                    web-mode))
-
-  (add-to-list 'ac-sources 'ac-source-capf)
-
-  (defun ac-semantic-setup ()
-    (make-local-variable 'ac-sources)
-    (add-to-list 'ac-sources 'ac-source-semantic))
-
-  (mapc #'(lambda (m) (add-hook m 'ac-semantic-setup))
-        '(c-mode-common-hook))
-
-  (defun ac-css-setup ()
-    (make-local-variable 'ac-sources)
-    (add-to-list 'ac-sources 'ac-source-css-property))
-
-  (defun ac-haskell-setup ()
-    (make-local-variable 'ac-sources)
-    (add-to-list 'ac-sources 'ac-source-ghc-mod))
-  
-  (defun ac-elisp-setup ()
-    (make-local-variable 'ac-sources)
-    (add-to-list 'ac-sources ac-source-functions)
-    (add-to-list 'ac-sources ac-source-symbols)
-    (add-to-list 'ac-sources ac-source-features)
-    (add-to-list 'ac-sources ac-source-variables))
-
-  (defun ac-scheme-setup ()
-    (with-optional-init 'chicken
-      (make-local-variable 'ac-sources)
-      (add-to-list 'ac-sources ac-source-r7rs-symbols)
-      (add-to-list 'ac-sources ac-source-r5rs-symbols)
-      (add-to-list 'ac-sources ac-source-chicken-symbols)
-      (add-to-list 'ac-sources ac-source-chicken-symbols-prefixed)))
-
-  (defun ac-c-common-mode-setup ()
-    (make-local-variable 'ac-sources)
-    (add-to-list 'ac-sources 'ac-source-gtags))
-
-  (defun ac-lisp-setup ()
-    (make-local-variable 'ac-sources))
-
-  (defun ac-slime-setup ()
-    (make-local-variable 'ac-sources)
-    (add-to-list 'ac-sources 'ac-source-slime))
-
-  (defun ac-js2-setup ()
-    (ac-js2-mode))
-
-  (add-hook 'haskell-mode-hook 'ac-haskell-setup)
-  (add-hook 'css-mode-hook 'ac-css-setup)
-  (add-hook 'emacs-lisp-mode-hook 'ac-elisp-setup)
-  (add-hook 'scheme-mode-hook 'ac-scheme-setup)
-  (add-hook 'c-mode-common-hook 'ac-c-common-mode-setup)
-  (add-hook 'lisp-mode-hook 'ac-lisp-setup)
-  (add-hook 'lisp-interaction-mode-hook 'ac-lisp-setup)
-  (add-hook 'js2-mode-hook 'ac-js2-setup)
-  (add-hook 'slime-mode-hook 'ac-slime-setup)
-  (add-hook 'slime-repl-mode-hook 'ac-slime-setup)
-  (add-hook 'inf-ruby-mode-hook 'ac-inf-ruby-enable))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; elisp
@@ -573,9 +480,13 @@ directory to make multiple eshell windows easier."
 (with-optional-init 'c++
   (message "Configuring C and C++")
 
+  (with-optional-init
+   'company
+   (add-to-list 'company-backends 'company-c-headers)
+
   (defun custom-cc-prog-hook ()
     ;; (enable-semantic-mode)
-    (ggtags-mode 1))
+    (ggtags-mode 1)))
 
   (add-hook 'c++-mode-hook 'custom-cc-prog-hook)
   (add-hook 'c-mode-hook 'custom-cc-prog-hook)
@@ -607,9 +518,13 @@ directory to make multiple eshell windows easier."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (with-optional-init 'haskell
+  (with-optional-init
+   'company
+   (add-to-list 'company-backends 'company-ghc))
   (autoload 'ghc-init "ghc" nil t)
   (autoload 'ghc-debug "ghc" nil t)
-  (add-hook 'haskell-mode-hook (lambda () (ghc-init))))
+  (add-hook 'haskell-mode-hook
+	    (lambda () (ghc-init))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Ocaml
@@ -620,7 +535,6 @@ directory to make multiple eshell windows easier."
   (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
   (autoload 'merlin-mode "Merlin" "Merlin Mode" t)
   
-  (setq merlin-use-auto-complete-mode t)
   (setq merlin-command 'opam)
 
   (add-hook 'tuareg-mode-hook 'merlin-mode)
@@ -726,6 +640,10 @@ directory to make multiple eshell windows easier."
 
   (jedi:install-server)
 
+  (with-optional-init
+   'company
+   (add-to-list 'company-backends 'company-jedi))
+
   (defun python-custom-hook ()
     (jedi:setup))
 
@@ -738,11 +656,15 @@ directory to make multiple eshell windows easier."
 (with-optional-init 'ruby
   (message "Configuring Ruby Mode")
 
+  (with-optional-init
+   'company
+   (add-to-list 'company-backends 'company-inf-ruby))
+
   (defun launch-ruby ()
     (interactive)
 
     (projectile-rails-on)
-
+    
     (unless (get-buffer "*ruby*")
       (let ((buf (current-buffer)))
         (inf-ruby)
@@ -760,10 +682,7 @@ directory to make multiple eshell windows easier."
   (add-hook 'enh-ruby-mode-hook 'launch-ruby)
 
   (add-hook 'ruby-mode-hook 'robe-mode)
-  (add-hook 'enh-ruby-mode-hook 'robe-mode)
-
-  (with-optional-init 'auto-complete
-    (add-hook 'robe-mode-hook 'ac-robe-setup)))
+  (add-hook 'enh-ruby-mode-hook 'robe-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Clojure
@@ -773,12 +692,7 @@ directory to make multiple eshell windows easier."
   (add-hook 'clojure-mode-hook 'cider-mode)
   (add-hook 'cider-mode-hook 'eldoc-mode)
   
-  (add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode))
-
-  (with-optional-init 'auto-complete
-    (add-hook 'cider-mode-hook 'ac-flyspell-workaround)
-    (add-hook 'cider-mode-hook 'ac-cider-setup)
-    (add-hook 'cider-repl-mode-hook 'ac-cider-setup)))
+  (add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Web
@@ -793,7 +707,13 @@ directory to make multiple eshell windows easier."
  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
- (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode)))
+ (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+ (with-optional-init
+  'company
+  (add-to-list 'company-backends 'company-web-html)
+  (add-to-list 'company-backends 'company-web-jade)
+  (add-to-list 'company-backends 'company-web-slim)
+  (add-to-list 'company-backends 'company-restclient)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Javascript
@@ -803,15 +723,12 @@ directory to make multiple eshell windows easier."
   (defun js2-mode-custom-hook ()
     (tern-mode t))
 
-  (with-optional-init 'auto-complete
-    (eval-after-load 'tern
-      '(progn
-         (require 'tern-auto-complete)
-         (tern-ac-setup)))
-    (setq tern-ac-on-dot t))
-
   (add-hook 'js2-mode-hook 'js2-mode-custom-hook)
 
+  (with-optional-init
+   'company
+   (add-to-list 'company-backends 'company-web-slim))
+  
   (add-to-list 'auto-mode-alist '("\\.js?\\'" . js2-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -822,6 +739,9 @@ directory to make multiple eshell windows easier."
   (when (file-exists-p racer-cmd)
     (add-to-list 'load-path racer-load-path)
     (eval-after-load "rust-mode" '(require 'racer))
+    (with-optional-init
+     'company
+     (add-to-list 'company-backends 'company-racer))
     (add-hook 'rust-mode-hook 
 	      '(lambda ()
 		 (racer-activate)
@@ -960,6 +880,12 @@ directory to make multiple eshell windows easier."
   (add-hook 'compilation-filter-hook 'my-colorize-compilation-buffer))
 
 (delete-selection-mode t)
+
+(with-optional-init
+ 'company
+ (global-company-mode))
+
+(require 'parenface)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keys
