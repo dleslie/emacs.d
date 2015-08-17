@@ -883,6 +883,7 @@ directory to make multiple eshell windows easier."
 
 (with-optional-init
  'company
+ (add-to-list 'company-backends 'company-ispell)
  (global-company-mode))
 
 (require 'parenface)
