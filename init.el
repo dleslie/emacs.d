@@ -329,8 +329,6 @@ directory to make multiple eshell windows easier."
 		     (add-to-list 'my-package-list 'company-inf-ruby))
  (with-optional-init 'python
 		     (add-to-list 'my-package-list 'company-jedi))
- (with-optional-init 'rust
-		     (add-to-list 'my-package-list 'company-racer))
  (with-optional-init 'web
 		     (add-to-list 'my-package-list 'company-restclient)
 		     (add-to-list 'my-package-list 'company-web))
@@ -736,17 +734,14 @@ directory to make multiple eshell windows easier."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (with-optional-init (list 'racer 'rust)
-  (when (file-exists-p racer-cmd)
+  (when (and (file-exists-p racer-cmd)
+             (file-exists-p racer-load-path))
     (add-to-list 'load-path racer-load-path)
     (eval-after-load "rust-mode" '(require 'racer))
-    (with-optional-init
-     'company
-     (add-to-list 'company-backends 'company-racer))
-    (add-hook 'rust-mode-hook 
-	      '(lambda ()
-		 (racer-activate)
-		 (local-set-key (kbd "M-.") #'racer-find-definition)
-		 (local-set-key (kbd "TAB") #'racer-complete-or-indent)))))
+    (add-to-list 'company-backends 'racer-company-complete)
+    (define-key rust-mode-map (kbd "M-.") #'racer-find-definition)
+    (define-key rust-mode-map (kbd "<C-tab>") #'racer-complete-or-indent)
+    (add-hook 'rust-mode-hook #'racer-turn-on-eldoc)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org-gcal
@@ -884,6 +879,11 @@ directory to make multiple eshell windows easier."
 (with-optional-init
  'company
  (add-to-list 'company-backends 'company-ispell)
+ (add-to-list 'company-backends 'company-elisp)
+ (defun my-anti-ispell-prog-hook ()
+   (make-local-variable 'company-backends)
+   (setq company-backends (remove 'company-ispell company-backends)))
+ (add-hook 'prog-mode-hook 'my-anti-ispell-prog-hook)
  (global-company-mode))
 
 (require 'parenface)
@@ -915,6 +915,9 @@ directory to make multiple eshell windows easier."
 
 (with-optional-init 'magit
 		    (global-set-key "\C-cg" 'magit-status))
+
+(with-optional-init 'company
+		    (global-set-key (kbd "<C-tab>") 'company-complete))
 
 (global-set-key "\C-c," 'scroll-bar-mode)
 (global-set-key "\C-c." 'tool-bar-mode)
