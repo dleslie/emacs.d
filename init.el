@@ -64,7 +64,7 @@
     "/usr/lib/gcc/x86_64-linux-gnu/4.8/include/"
     "/usr/lib/gcc/x86_64-linux-gnu/4.9/include/"))
 
-(setq my-load-debug-geiser nil)
+(setq my-load-debug-geiser t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Init File Configuration
@@ -115,7 +115,7 @@
 
 (defun reset-theme ()
   (interactive)
-    (while custom-enabled-themes
+  (while custom-enabled-themes
     (disable-theme (car custom-enabled-themes))))
 
 (defun override-theme (arg)
@@ -170,6 +170,7 @@ directory to make multiple eshell windows easier."
     (insert (concat "ls"))
     (eshell-send-input)))
 
+;; Because eval-after-load is always sufficient
 (defmacro with-optional-init (feature &rest body)
   `(when
        (if (listp ,feature)
@@ -210,32 +211,34 @@ directory to make multiple eshell windows easier."
 ;; Semantic
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-optional-init 'semantic 
-  (message "Configuring Semantic and CEDET")
+(with-optional-init
+ 'semantic 
+ (message "Configuring Semantic and CEDET")
 
-  ;; (require 'srecode)
-  ;; (require 'srecode/map)
-  ;; (require 'eieio-opt)
+ ;; (require 'srecode)
+ ;; (require 'srecode/map)
+ ;; (require 'eieio-opt)
 
-  (require 'semantic)
-  (require 'semantic/bovine/gcc)
-  ;; (require 'semantic/ia)
-  ;; (require 'semantic/sb)
+ (require 'semantic)
+ (require 'semantic/bovine/gcc)
+ ;; (require 'semantic/ia)
+ ;; (require 'semantic/sb)
 
-  (mapc #'(lambda (s) (semantic-add-system-include s))
-	system-include-paths)
+ (mapc #'(lambda (s) (semantic-add-system-include s))
+       system-include-paths)
 
-  (semanticdb-enable-gnu-global-databases 'c-mode)
-  (semanticdb-enable-gnu-global-databases 'c++-mode))
+ (semanticdb-enable-gnu-global-databases 'c-mode)
+ (semanticdb-enable-gnu-global-databases 'c++-mode))
 
 (defun enable-semantic-mode ()
   (interactive)
-  (with-optional-init 'semantic
-    (semanticdb-minor-mode 1)
-    (semantic-idle-scheduler-mode 1)
-    (semantic-idle-summary-mode 1)
-    (semantic-idle-scheduler-mode 1)
-    (semantic-mode 1)))
+  (with-optional-init
+   'semantic
+   (semanticdb-minor-mode 1)
+   (semantic-idle-scheduler-mode 1)
+   (semantic-idle-summary-mode 1)
+   (semantic-idle-scheduler-mode 1)
+   (semantic-mode 1)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Packages
@@ -301,72 +304,89 @@ directory to make multiple eshell windows easier."
  (add-to-list 'my-package-list 'org-plus-contrib)
  (add-to-list 'my-package-list 'org-gcal))
 
-(with-optional-init 'magit
-  (add-to-list 'my-package-list 'magit)
-  (add-to-list 'my-package-list 'magit-svn))
+(with-optional-init
+ 'magit
+ (add-to-list 'my-package-list 'magit)
+ (add-to-list 'my-package-list 'magit-svn))
 
-(with-optional-init 'rust
-  (add-to-list 'my-package-list 'rust-mode))
+(with-optional-init
+ 'rust
+ (add-to-list 'my-package-list 'rust-mode))
 
-(with-optional-init 'clojure
-  (add-to-list 'my-package-list 'clojure-mode)
-  (add-to-list 'my-package-list 'cider)
-  (add-to-list 'my-package-list 'clojure-cheatsheet)
+(with-optional-init
+ 'clojure
+ (add-to-list 'my-package-list 'clojure-mode)
+ (add-to-list 'my-package-list 'cider)
+ (add-to-list 'my-package-list 'clojure-cheatsheet)
 
-  (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t))
+ (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t))
 
-(with-optional-init 'chicken
-  (add-to-list 'my-package-list 'chicken-scheme))
+(with-optional-init
+ 'chicken
+ (add-to-list 'my-package-list 'chicken-scheme))
 
 (with-optional-init
  'company
  (add-to-list 'my-package-list 'company)
- (with-optional-init 'c++
-		     (add-to-list 'my-package-list 'company-c-headers))
- (with-optional-init 'haskell
-		     (add-to-list 'my-package-list 'company-ghc))
- (with-optional-init 'ruby
-		     (add-to-list 'my-package-list 'company-inf-ruby))
- (with-optional-init 'python
-		     (add-to-list 'my-package-list 'company-jedi))
- (with-optional-init 'web
-		     (add-to-list 'my-package-list 'company-restclient)
-		     (add-to-list 'my-package-list 'company-web))
- (with-optional-init 'js2
-		     (add-to-list 'my-package-list 'company-tern)))
+ (with-optional-init
+  'c++
+  (add-to-list 'my-package-list 'company-c-headers))
+ (with-optional-init
+  'haskell
+  (add-to-list 'my-package-list 'company-ghc))
+ (with-optional-init
+  'ruby
+  (add-to-list 'my-package-list 'company-inf-ruby))
+ (with-optional-init
+  'python
+  (add-to-list 'my-package-list 'company-jedi))
+ (with-optional-init
+  'web
+  (add-to-list 'my-package-list 'company-restclient)
+  (add-to-list 'my-package-list 'company-web))
+ (with-optional-init
+  'js2
+  (add-to-list 'my-package-list 'company-tern)))
 
 (when (not my-load-debug-geiser)
   (with-optional-init
    'geiser
    (add-to-list 'my-package-list 'geiser)))
 
-(with-optional-init 'js2
-  (add-to-list 'my-package-list 'js2-mode)
-  (add-to-list 'my-package-list 'tern))
+(with-optional-init
+ 'js2
+ (add-to-list 'my-package-list 'js2-mode)
+ (add-to-list 'my-package-list 'tern))
 
-(with-optional-init 'ruby
-  (add-to-list 'my-package-list 'enh-ruby-mode)
-  (add-to-list 'my-package-list 'inf-ruby)
-  (add-to-list 'my-package-list 'projectile-rails)
-  (add-to-list 'my-package-list 'robe))
+(with-optional-init
+ 'ruby
+ (add-to-list 'my-package-list 'enh-ruby-mode)
+ (add-to-list 'my-package-list 'inf-ruby)
+ (add-to-list 'my-package-list 'projectile-rails)
+ (add-to-list 'my-package-list 'robe))
 
-(with-optional-init 'python
-  (add-to-list 'my-package-list 'jedi)
-  (add-to-list 'my-package-list 'python-environment))
+(with-optional-init
+ 'python
+ (add-to-list 'my-package-list 'jedi)
+ (add-to-list 'my-package-list 'python-environment))
 
-(with-optional-init 'c++
-  (add-to-list 'my-package-list 'function-args)
-  (add-to-list 'my-package-list 'ggtags))
+(with-optional-init
+ 'c++
+ (add-to-list 'my-package-list 'function-args)
+ (add-to-list 'my-package-list 'ggtags))
 
-(with-optional-init 'haskell
-  (add-to-list 'my-package-list 'ghc)
-  (add-to-list 'my-package-list 'haskell-mode))
+(with-optional-init
+ 'haskell
+ (add-to-list 'my-package-list 'ghc)
+ (add-to-list 'my-package-list 'haskell-mode))
 
-(with-optional-init 'ocaml
-  (add-to-list 'my-package-list 'tuareg))
+(with-optional-init
+ 'ocaml
+ (add-to-list 'my-package-list 'tuareg))
 
-(with-optional-init 'lisp
-  (add-to-list 'my-package-list 'slime))
+(with-optional-init
+ 'lisp
+ (add-to-list 'my-package-list 'slime))
 
 (let ((loaded (eval (cons 'require-package (mapcar (lambda (x) `(quote ,x)) (append my-package-list my-theme-list))))))
   (message (format "Installed %s" loaded)))
@@ -437,106 +457,111 @@ directory to make multiple eshell windows easier."
   (load "/home/dleslie/Workspace/code/dleslie/geiser/elisp/geiser.el")
   (require 'geiser))
 
-(with-optional-init 'chicken
-  (message "Configuring Chicken Scheme")
+(with-optional-init
+ 'chicken
+ (message "Configuring Chicken Scheme")
 
-  (defun custom-scheme-hook ()
-    (interactive)
-    (setup-chicken-scheme))
+ (defun custom-scheme-hook ()
+   (interactive)
+   (setup-chicken-scheme))
 
-  (add-hook 'scheme-mode-hook 'custom-scheme-hook))
+ (add-hook 'scheme-mode-hook 'custom-scheme-hook))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LISP
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-optional-init 'lisp
+(with-optional-init
+ 'lisp
 
-  (message "Configuring LISP")
+ (message "Configuring LISP")
 
-  (setq slime-lisp-implementations
-        '((sbcl ("/usr/bin/sbcl" "--core" "/usr/lib/sbcl/sbcl.core")
-                :coding-system utf-8-unix
-                :env ("SBCL_HOME=/usr/lib/sbcl"))))
+ (setq slime-lisp-implementations
+       '((sbcl ("/usr/bin/sbcl" "--core" "/usr/lib/sbcl/sbcl.core")
+               :coding-system utf-8-unix
+               :env ("SBCL_HOME=/usr/lib/sbcl"))))
 
-  (require 'slime-autoloads)
-  (slime-setup)
+ (require 'slime-autoloads)
+ (slime-setup)
 
-  (defun sbcl-slime ()
-    (interactive)
-    (slime 'sbcl))
+ (defun sbcl-slime ()
+   (interactive)
+   (slime 'sbcl))
 
-  (defun my-lisp-mode-hook ()
-    (slime-mode t))
+ (defun my-lisp-mode-hook ()
+   (slime-mode t))
 
-  (add-hook 'lisp-mode-hook 'my-lisp-mode-hook))
+ (add-hook 'lisp-mode-hook 'my-lisp-mode-hook))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C/C++
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-optional-init 'c++
-  (message "Configuring C and C++")
+(with-optional-init
+ 'c++
+ (message "Configuring C and C++")
 
-  (with-optional-init
-   'company
-   (add-to-list 'company-backends 'company-c-headers)
+ (with-optional-init
+  'company
+  (add-to-list 'company-backends 'company-c-headers)
 
   (defun custom-cc-prog-hook ()
     ;; (enable-semantic-mode)
     (ggtags-mode 1)))
 
-  (add-hook 'c++-mode-hook 'custom-cc-prog-hook)
-  (add-hook 'c-mode-hook 'custom-cc-prog-hook)
+ (add-hook 'c++-mode-hook 'custom-cc-prog-hook)
+ (add-hook 'c-mode-hook 'custom-cc-prog-hook)
 
-  ;; Fixes missing C++11 fontlocking in cc-mode
-  (defun c++-font-lock-fix ()
-    (font-lock-add-keywords 
-     nil 
-     '(("\\<\\(void\\|unsigned\\|signed\\|char\\|short\\|bool\\|int\\|long\\|float\\|double\\)\\>" . font-lock-keyword-face)
-       ;; add the new C++11 keywords
-       ("\\<\\(alignof\\|alignas\\|constexpr\\|decltype\\|noexcept\\|nullptr\\|static_assert\\|thread_local\\|override\\|final\\)\\>" . font-lock-keyword-face)
-       ("\\<\\(char[0-9]+_t\\)\\>" . font-lock-keyword-face)
-       ;; PREPROCESSOR_CONSTANT
-       ("\\<[A-Z]+\\([A-Z_]+\\|[0-9]+\\)\\>" . font-lock-constant-face)
-       ;; hexadecimal numbers
-       ("\\<0[xX][0-9A-Fa-f]+\\>" . font-lock-constant-face)
-       ;; integer/float/scientific numbers
-       ("\\<[\\-+]*[0-9]*\\.?[0-9]+\\([ulUL]+\\|[eE][\\-+]?[0-9]+\\)?\\>" . font-lock-constant-face)
-       ;; user-types
-       ("\\<[A-Za-z_]+[A-Za-z_0-9]*_\\(t\\|ptr\\|c\\|e\\)\\>" . font-lock-type-face)
-       )))
+ ;; Fixes missing C++11 fontlocking in cc-mode
+ (defun c++-font-lock-fix ()
+   (font-lock-add-keywords 
+    nil 
+    '(("\\<\\(void\\|unsigned\\|signed\\|char\\|short\\|bool\\|int\\|long\\|float\\|double\\)\\>" . font-lock-keyword-face)
+      ;; add the new C++11 keywords
+      ("\\<\\(alignof\\|alignas\\|constexpr\\|decltype\\|noexcept\\|nullptr\\|static_assert\\|thread_local\\|override\\|final\\)\\>" . font-lock-keyword-face)
+      ("\\<\\(char[0-9]+_t\\)\\>" . font-lock-keyword-face)
+      ;; PREPROCESSOR_CONSTANT
+      ("\\<[A-Z]+\\([A-Z_]+\\|[0-9]+\\)\\>" . font-lock-constant-face)
+      ;; hexadecimal numbers
+      ("\\<0[xX][0-9A-Fa-f]+\\>" . font-lock-constant-face)
+      ;; integer/float/scientific numbers
+      ("\\<[\\-+]*[0-9]*\\.?[0-9]+\\([ulUL]+\\|[eE][\\-+]?[0-9]+\\)?\\>" . font-lock-constant-face)
+      ;; user-types
+      ("\\<[A-Za-z_]+[A-Za-z_0-9]*_\\(t\\|ptr\\|c\\|e\\)\\>" . font-lock-type-face)
+      )))
 
-  (add-hook 'c++-mode-hook 'c++-font-lock-fix)
+ (add-hook 'c++-mode-hook 'c++-font-lock-fix)
 					;(add-hook 'c-mode-common-hook 'fa-auto)
-  (add-hook 'c-mode-common-hook 'fa-config-default))
+ (add-hook 'c-mode-common-hook 'fa-config-default))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Haskell
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-optional-init 'haskell
-  (with-optional-init
-   'company
-   (add-to-list 'company-backends 'company-ghc))
-  (autoload 'ghc-init "ghc" nil t)
-  (autoload 'ghc-debug "ghc" nil t)
-  (add-hook 'haskell-mode-hook
-	    (lambda () (ghc-init))))
+(with-optional-init
+ 'haskell
+ (with-optional-init
+  'company
+  (add-to-list 'company-backends 'company-ghc))
+ (autoload 'ghc-init "ghc" nil t)
+ (autoload 'ghc-debug "ghc" nil t)
+ (add-hook 'haskell-mode-hook
+           (lambda () (ghc-init))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Ocaml
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-optional-init 'ocaml
-  (setq opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
-  (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
-  (autoload 'merlin-mode "Merlin" "Merlin Mode" t)
-  
-  (setq merlin-command 'opam)
+(with-optional-init
+ 'ocaml
+ (setq opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
+ (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
+ (autoload 'merlin-mode "Merlin" "Merlin Mode" t)
+ 
+ (setq merlin-command 'opam)
 
-  (add-hook 'tuareg-mode-hook 'merlin-mode)
-  (add-hook 'caml-mode-hook 'merlin-mode))
+ (add-hook 'tuareg-mode-hook 'merlin-mode)
+ (add-hook 'caml-mode-hook 'merlin-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Markdown
@@ -633,64 +658,66 @@ directory to make multiple eshell windows easier."
 ;; Python
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-optional-init 'python
-  (message "Configuring Python Mode")
+(with-optional-init
+ 'python
+ (message "Configuring Python Mode")
 
-  (jedi:install-server)
+ (jedi:install-server)
 
-  (with-optional-init
-   'company
-   (add-to-list 'company-backends 'company-jedi))
+ (with-optional-init
+  'company
+  (add-to-list 'company-backends 'company-jedi))
 
-  (defun python-custom-hook ()
-    (jedi:setup))
+ (defun python-custom-hook ()
+   (jedi:setup))
 
-  (add-hook 'python-mode-hook 'python-custom-hook))
+ (add-hook 'python-mode-hook 'python-custom-hook))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Ruby
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-optional-init 'ruby
-  (message "Configuring Ruby Mode")
+(with-optional-init
+ 'ruby
+ (message "Configuring Ruby Mode")
 
-  (with-optional-init
-   'company
-   (add-to-list 'company-backends 'company-inf-ruby))
+ (with-optional-init
+  'company
+  (add-to-list 'company-backends 'company-inf-ruby))
 
-  (defun launch-ruby ()
-    (interactive)
+ (defun launch-ruby ()
+   (interactive)
 
-    (projectile-rails-on)
-    
-    (unless (get-buffer "*ruby*")
-      (let ((buf (current-buffer)))
-        (inf-ruby)
-        (robe-start)
-        (set-buffer buf))))
+   (projectile-rails-on)
+   
+   (unless (get-buffer "*ruby*")
+     (let ((buf (current-buffer)))
+       (inf-ruby)
+       (robe-start)
+       (set-buffer buf))))
 
-  (defun kill-ruby ()
-    (interactive)
-    (when (get-buffer "*ruby*")
-      (kill-buffer "*ruby*")))
+ (defun kill-ruby ()
+   (interactive)
+   (when (get-buffer "*ruby*")
+     (kill-buffer "*ruby*")))
 
-  (advice-add 'projectile-rails-console :before #'kill-ruby)
+ (advice-add 'projectile-rails-console :before #'kill-ruby)
 
-  (add-hook 'ruby-mode-hook 'launch-ruby)
-  (add-hook 'enh-ruby-mode-hook 'launch-ruby)
+ (add-hook 'ruby-mode-hook 'launch-ruby)
+ (add-hook 'enh-ruby-mode-hook 'launch-ruby)
 
-  (add-hook 'ruby-mode-hook 'robe-mode)
-  (add-hook 'enh-ruby-mode-hook 'robe-mode))
+ (add-hook 'ruby-mode-hook 'robe-mode)
+ (add-hook 'enh-ruby-mode-hook 'robe-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Clojure
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (with-optional-init 'clojure
-  (add-hook 'clojure-mode-hook 'cider-mode)
-  (add-hook 'cider-mode-hook 'eldoc-mode)
-  
-  (add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode)))
+                    (add-hook 'clojure-mode-hook 'cider-mode)
+                    (add-hook 'cider-mode-hook 'eldoc-mode)
+                    
+                    (add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Web
@@ -717,31 +744,33 @@ directory to make multiple eshell windows easier."
 ;; Javascript
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-optional-init 'js2
-  (defun js2-mode-custom-hook ()
-    (tern-mode t))
+(with-optional-init
+ 'js2
+ (defun js2-mode-custom-hook ()
+   (tern-mode t))
 
-  (add-hook 'js2-mode-hook 'js2-mode-custom-hook)
+ (add-hook 'js2-mode-hook 'js2-mode-custom-hook)
 
-  (with-optional-init
-   'company
-   (add-to-list 'company-backends 'company-web-slim))
-  
-  (add-to-list 'auto-mode-alist '("\\.js?\\'" . js2-mode)))
+ (with-optional-init
+  'company
+  (add-to-list 'company-backends 'company-web-slim))
+ 
+ (add-to-list 'auto-mode-alist '("\\.js?\\'" . js2-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Rust
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-optional-init (list 'racer 'rust)
-  (when (and (file-exists-p racer-cmd)
-             (file-exists-p racer-load-path))
-    (add-to-list 'load-path racer-load-path)
-    (eval-after-load "rust-mode" '(require 'racer))
-    (add-to-list 'company-backends 'racer-company-complete)
-    (define-key rust-mode-map (kbd "M-.") #'racer-find-definition)
-    (define-key rust-mode-map (kbd "<C-tab>") #'racer-complete-or-indent)
-    (add-hook 'rust-mode-hook #'racer-turn-on-eldoc)))
+(with-optional-init
+ (list 'racer 'rust)
+ (when (and (file-exists-p racer-cmd)
+            (file-exists-p racer-load-path))
+   (add-to-list 'load-path racer-load-path)
+   (eval-after-load "rust-mode" '(require 'racer))
+   (add-to-list 'company-backends 'racer-company-complete)
+   (define-key rust-mode-map (kbd "M-.") #'racer-find-definition)
+   (define-key rust-mode-map (kbd "<C-tab>") #'racer-complete-or-indent)
+   (add-hook 'rust-mode-hook #'racer-turn-on-eldoc)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org-gcal
@@ -772,77 +801,78 @@ directory to make multiple eshell windows easier."
 ;; mu4e
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-optional-init 'mu4e
-  (when (file-exists-p "/usr/local/share/emacs/site-lisp/mu4e")
-    (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e"))
+(with-optional-init
+ 'mu4e
+ (when (file-exists-p "/usr/local/share/emacs/site-lisp/mu4e")
+   (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e"))
 
-  (require 'mu4e)
+ (require 'mu4e)
 
-  (setq 
-   mu4e-maildir 
-   "~/Maildir"
+ (setq 
+  mu4e-maildir 
+  "~/Maildir"
 
-   mu4e-drafts-folder
-   mail-folder-drafts
+  mu4e-drafts-folder
+  mail-folder-drafts
 
-   mu4e-sent-folder
-   mail-folder-sent
+  mu4e-sent-folder
+  mail-folder-sent
 
-   mu4e-trash-folder
-   mail-folder-trash
+  mu4e-trash-folder
+  mail-folder-trash
 
-   mu4e-sent-messages-behavior
-   'sent
+  mu4e-sent-messages-behavior
+  'sent
 
-   mu4e-maildir-shortcuts
-   `((,mail-folder-inbox . ?i)
-     (,mail-folder-sent  . ?s)
-     (,mail-folder-trash . ?t))
+  mu4e-maildir-shortcuts
+  `((,mail-folder-inbox . ?i)
+    (,mail-folder-sent  . ?s)
+    (,mail-folder-trash . ?t))
 
-   mu4e-get-mail-command
-   "offlineimap"
+  mu4e-get-mail-command
+  "offlineimap"
 
-   message-kill-buffer-on-exit
-   t
+  message-kill-buffer-on-exit
+  t
 
-   mu4e-attachment-dir
-   user-mail-attachment-directory
+  mu4e-attachment-dir
+  user-mail-attachment-directory
 
-   mu4e-compose-reply-to-address
-   user-mail-address
+  mu4e-compose-reply-to-address
+  user-mail-address
 
-   mu4e-headers-include-related
-   nil
+  mu4e-headers-include-related
+  nil
 
-   mu4e-headers-results-limit
-   -1
+  mu4e-headers-results-limit
+  -1
 
-   mu4e-sent-messages-behavior
-   (quote sent)
+  mu4e-sent-messages-behavior
+  (quote sent)
 
-   mu4e-update-interval
-   -1
+  mu4e-update-interval
+  -1
 
-   mu4e-user-mail-address-list
-   `(,user-mail-login ,user-mail-address)
+  mu4e-user-mail-address-list
+  `(,user-mail-login ,user-mail-address)
 
-   mu4e-view-show-addresses
-   t
+  mu4e-view-show-addresses
+  t
 
-   mu4e-view-show-images
-   t
+  mu4e-view-show-images
+  t
 
-   mu4e-org-contacts-file
-   (concat org-directory "addresses.org"))
+  mu4e-org-contacts-file
+  (concat org-directory "addresses.org"))
 
-  (when (package-installed-p 'eww)
-    (require 'mu4e-contrib)
-    (setq mu4e-html2text-command 'mu4e-shr2text))
+ (when (package-installed-p 'eww)
+   (require 'mu4e-contrib)
+   (setq mu4e-html2text-command 'mu4e-shr2text))
 
-  (add-to-list 'mu4e-headers-actions
-               '("org-contact-add" . mu4e-action-add-org-contact) t)
-  (add-to-list 'mu4e-view-actions
-               '("org-contact-add" . mu4e-action-add-org-contact) t))
+ (add-to-list 'mu4e-headers-actions
+              '("org-contact-add" . mu4e-action-add-org-contact) t)
+ (add-to-list 'mu4e-view-actions
+              '("org-contact-add" . mu4e-action-add-org-contact) t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc Custom
@@ -864,6 +894,7 @@ directory to make multiple eshell windows easier."
 (add-hook 'prog-mode-hook 'show-paren-mode)
 
 (setq make-backup-files nil)
+(setq indent-tabs-mode nil)
 
 ;; From http://stackoverflow.com/a/20788581
 (with-demoted-errors
@@ -900,24 +931,29 @@ directory to make multiple eshell windows easier."
 (global-set-key "\M-w" 'clipboard-kill-ring-save)
 (global-set-key "\C-y" 'clipboard-yank)
 
-(with-optional-init 'smex
-		    (global-set-key "\M-x" 'smex))
+(with-optional-init
+ 'smex
+ (global-set-key "\M-x" 'smex))
 
-(with-optional-init 'org
-		    (global-set-key "\C-ct" 'org-todo-list)
-		    (global-set-key "\C-cl" 'org-store-link)
-		    (global-set-key "\C-ca" 'org-agenda)
-		    (global-set-key "\C-cb" 'org-iswitchb)
-		    (global-set-key "\C-cc" 'org-capture))
+(with-optional-init
+ 'org
+ (global-set-key "\C-ct" 'org-todo-list)
+ (global-set-key "\C-cl" 'org-store-link)
+ (global-set-key "\C-ca" 'org-agenda)
+ (global-set-key "\C-cb" 'org-iswitchb)
+ (global-set-key "\C-cc" 'org-capture))
 
-(with-optional-init 'mu4e
-		    (global-set-key "\C-cm" 'mu4e))
+(with-optional-init
+ 'mu4e
+ (global-set-key "\C-cm" 'mu4e))
 
-(with-optional-init 'magit
-		    (global-set-key "\C-cg" 'magit-status))
+(with-optional-init
+ 'magit
+ (global-set-key "\C-cg" 'magit-status))
 
-(with-optional-init 'company
-		    (global-set-key (kbd "<C-tab>") 'company-complete))
+(with-optional-init
+ 'company
+ (global-set-key (kbd "<C-tab>") 'company-complete))
 
 (global-set-key "\C-c," 'scroll-bar-mode)
 (global-set-key "\C-c." 'tool-bar-mode)
