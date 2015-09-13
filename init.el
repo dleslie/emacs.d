@@ -261,7 +261,8 @@ directory to make multiple eshell windows easier."
 (setq my-package-list
       (list 'gist
             'nyan-mode
-	    'parenface))
+	    'parenface
+	    'dictionary))
 
 (setq my-theme-list
       (list 'tronesque-theme
@@ -915,6 +916,7 @@ directory to make multiple eshell windows easier."
    (make-local-variable 'company-backends)
    (setq company-backends (remove 'company-ispell company-backends)))
  (add-hook 'prog-mode-hook 'my-anti-ispell-prog-hook)
+ (add-hook 'eshell-mode-hook 'my-anti-ispell-prog-hook)
  (global-company-mode))
 
 (require 'parenface)
@@ -960,6 +962,7 @@ directory to make multiple eshell windows easier."
 (global-set-key "\C-c?" 'menu-bar-mode)
 (global-set-key "\C-c\\" 'comment-or-uncomment-region)
 (global-set-key "\C-cs" 'eshell-here)
+(global-set-key "\C-cd" 'dictionary-search)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; End
