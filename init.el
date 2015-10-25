@@ -70,12 +70,14 @@
 ;; Init File Configuration
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+
 (setq my-optional-init
       '(company
 	compilation
 	elisp
 	email
-	clojure
+	;; clojure
 	geiser
 	;; chicken
 	js2
@@ -467,6 +469,9 @@ directory to make multiple eshell windows easier."
    (setup-chicken-scheme))
 
  (add-hook 'scheme-mode-hook 'custom-scheme-hook))
+
+(require 'multi-mode)
+(require 'scheme-c-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LISP

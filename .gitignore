@@ -3,7 +3,9 @@
 ac-comphist.dat
 .gitignore*
 .Dans-chicken-scheme-symbols-dump.el
+abbrev_defs
 session.*
+custom.el
 ede-projects.el
 projectile-bookmarks.eld
 smex-items
