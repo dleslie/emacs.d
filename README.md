@@ -9,18 +9,25 @@ Setup
 Everything will break if you don't do the following:
 
 * Link this repository to ~/.emacs.d
+* Install gnutls and certifi, so we can use TLS:
+
+```
+sudo apt-get install gnutls-bin
+python -m pip install --user certifi
+```
+
 * Install all the external tools and programming languages supported:
 
 ```
 # Ubuntu specific: install every damned language and tool
 # Except opam. You'll have to figure out how to install that yourself.
-sudo apt-get install global python python-pip sbcl ruby chicken-bin nodejs nodejs-legacy npm opam haskell-platform guile chicken-bin clojure1.4
+sudo apt-get install global python python-pip sbcl ruby chicken-bin nodejs nodejs-legacy npm opam haskell-platform guile-2.0 chicken-bin clojure1.4
 
 # Python
-pip install jedi epc virtualenv
+sudo pip install jedi epc virtualenv
 
 # Ruby
-gem install pry pry-doc
+sudo gem install pry pry-doc
 
 # Node
 npm install tern

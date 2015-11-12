@@ -1,5 +1,6 @@
 .*
 */
+gcal-settings.el
 ac-comphist.dat
 .gitignore*
 .Dans-chicken-scheme-symbols-dump.el

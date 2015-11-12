@@ -1,70 +1,4 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Local Configuration
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(message "Setting Local Configuration")
-
-(setq 
- org-directory 
- "~/ownCloud/org/")
-
-(setq 
- tern-command 
- '("~/node_modules/.bin/tern"))
-
-(setq
- user-mail-address 
- "dan@ironoxide.ca"
- user-full-name 
- "Dan Leslie"
- user-mail-login 
- "dleslie@gmail.com"
- user-mail-attachment-directory
- "/home/dleslie/Downloads/Attachments"
- mail-smtp-server
- "smtp.gmail.com"
- mail-smtp-port
- 587
- mail-folder-inbox
- "/INBOX"
- mail-folder-drafts
- "/[Gmail].Drafts"
- mail-folder-sent
- "/[Gmail].Sent Mail"
- mail-folder-trash
- "/[Gmail].Trash"
- mu4e-compose-signature
- (concat "-" user-full-name "\n")
- gnus-select-method
- '(nntp "GMane"
-        (nntp-address "news.gmane.org")))
-
-(setq
- racer-cmd
- "/home/dleslie/Workspace/code/dleslie/racer/target/release/racer"
- racer-rust-src-path
- "/usr/local/src/rustc-1.1.0/src"
- racer-load-path
- "/home/dleslie/Workspace/code/dleslie/racer/editors/emacs")
-
-(setq magit-last-seen-setup-instructions "1.4.0")
-
-(defvar system-include-paths
-  '("/usr/local/include" 
-    "/usr/include"
-    "/usr/include/c++/4.4/" 
-    "/usr/include/c++/4.7/" 
-    "/usr/include/c++/4.8/" 
-    "/usr/include/c++/4.9/" 
-    "/usr/include/x86_64-linux-gnu"
-    "/usr/include/x86_64-linux-gnu/c++/4.7/"
-    "/usr/include/x86_64-linux-gnu/c++/4.8/"
-    "/usr/include/x86_64-linux-gnu/c++/4.9/"
-    "/usr/lib/gcc/x86_64-linux-gnu/4.7/include/"
-    "/usr/lib/gcc/x86_64-linux-gnu/4.8/include/"
-    "/usr/lib/gcc/x86_64-linux-gnu/4.9/include/"))
-
-(setq my-load-debug-geiser t)
+(load (expand-file-name "configuration.el" user-emacs-directory))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Init File Configuration
@@ -243,6 +177,40 @@ directory to make multiple eshell windows easier."
    (semantic-mode 1)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Fix TLS
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; From:
+;; https://glyph.twistedmatrix.com/2015/11/editor-malware.html
+
+(setq tls-checktrust 1)
+
+(let ((trustfile
+       (replace-regexp-in-string
+        "\\\\" "/"
+        (replace-regexp-in-string
+         "\n" ""
+         (shell-command-to-string "python -m certifi")))))
+  (setq tls-program
+        (list
+         (format "gnutls-cli%s --x509cafile %s -p %%p %%h"
+                 (if (eq window-system 'w32) ".exe" "") trustfile)))
+  (setq gnutls-verify-error t)
+  (setq gnutls-trustfiles (list trustfile)))
+
+(if (condition-case e
+        (progn
+          (url-retrieve "https://wrong.host.badssl.com/"
+                        (lambda (retrieved) t))
+          (url-retrieve "https://self-signed.badssl.com/"
+                        (lambda (retrieved) t))
+          t)
+      ('error nil))
+    (error "tls misconfigured")
+  (url-retrieve "https://badssl.com"
+                (lambda (retrieved) t)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -252,10 +220,7 @@ directory to make multiple eshell windows easier."
 (package-initialize)
 
 (setq package-archives 
-      '(("melpa" . "http://melpa.org/packages/")
-        ;; ("melpa-stable" . "http://stable.melpa.org/packages/")
-        ;; ("gnu" . "http://elpa.gnu.org/packages/")
-        ;; ("marmalade" . "http://marmalade-repo.org/packages/")
+      '(("melpa" . "https://melpa.org/packages/")
         ("org" . "http://orgmode.org/elpa/")))
 
 (message "Check for packages")
