@@ -33,6 +33,7 @@
 	text
 	rust
 	racer
+	w3m
 	web))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -853,6 +854,28 @@ directory to make multiple eshell windows easier."
               '("org-contact-add" . mu4e-action-add-org-contact) t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Elfeed
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-optional-init
+ 'elfeed
+ (defun update-elfeed ()
+   (interactive)
+   (message "Updating RSS")
+   (elfeed-update))
+ 
+ (run-with-timer 3600 3600 'update-elfeed))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; w3m
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-optional-init
+ 'w3m
+ (setq browse-url-browser-function 'w3m-browse-url)
+ (autoload 'w3m-browse-url "w3m" "Ask a WWW browser to show a URL." t))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc Custom
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -899,15 +922,6 @@ directory to make multiple eshell windows easier."
 (require 'parenface)
 
 (setq magit-last-seen-setup-instructions "1.4.0")
-
-(with-optional-init
- 'elfeed
- (defun update-elfeed ()
-   (interactive)
-   (message "Updating RSS")
-   (elfeed-update))
- 
- (run-with-timer 3600 3600 'update-elfeed))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; End

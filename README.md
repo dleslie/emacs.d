@@ -9,10 +9,10 @@ Setup
 Everything will break if you don't do the following:
 
 * Link this repository to ~/.emacs.d
-* Install gnutls and certifi, so we can use TLS:
+* Install w3m, gnutls and certifi, so we can use TLS and look at HTML:
 
 ```
-sudo apt-get install gnutls-bin
+sudo apt-get install w3m w3m-img gnutls-bin
 python -m pip install --user certifi
 ```
 
@@ -21,6 +21,7 @@ python -m pip install --user certifi
 ```
 # Ubuntu specific: install every damned language and tool
 # Except opam. You'll have to figure out how to install that yourself.
+
 sudo apt-get install global python python-pip sbcl ruby chicken-bin nodejs nodejs-legacy npm opam haskell-platform guile-2.0 chicken-bin clojure1.4
 
 # Python

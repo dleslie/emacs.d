@@ -107,3 +107,5 @@
 (global-set-key "\C-cd" 'dictionary-search)
 
 (global-set-key "\C-cf" 'elfeed)
+
+(global-set-key "\C-cw" 'browse-url)
