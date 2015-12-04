@@ -9,6 +9,7 @@
 (setq my-optional-init
       '(company
 	compilation
+	elfeed
 	elisp
 	email
 	;; clojure
@@ -160,8 +161,9 @@ directory to make multiple eshell windows easier."
  ;; (require 'semantic/ia)
  ;; (require 'semantic/sb)
 
- (mapc #'(lambda (s) (semantic-add-system-include s))
-       system-include-paths)
+ (when my-system-include-paths
+   (mapc #'(lambda (s) (semantic-add-system-include s))
+	 my-system-include-paths))
 
  (semanticdb-enable-gnu-global-databases 'c-mode)
  (semanticdb-enable-gnu-global-databases 'c++-mode))
@@ -316,7 +318,7 @@ directory to make multiple eshell windows easier."
   'js2
   (add-to-list 'my-package-list 'company-tern)))
 
-(when (not my-load-debug-geiser)
+(when (not my-debug-geiser-path)
   (with-optional-init
    'geiser
    (add-to-list 'my-package-list 'geiser)))
@@ -355,6 +357,10 @@ directory to make multiple eshell windows easier."
 (with-optional-init
  'lisp
  (add-to-list 'my-package-list 'slime))
+
+(with-optional-init
+ 'elfeed
+ (add-to-list 'my-package-list 'elfeed))
 
 (let ((loaded (eval (cons 'require-package (mapcar (lambda (x) `(quote ,x)) (append my-package-list my-theme-list))))))
   (message (format "Installed %s" loaded)))
@@ -420,9 +426,9 @@ directory to make multiple eshell windows easier."
 
 (when
     (and
-     my-load-debug-geiser
-     (file-exists-p "/home/dleslie/Workspace/code/dleslie/geiser/elisp/geiser.el"))
-  (load "/home/dleslie/Workspace/code/dleslie/geiser/elisp/geiser.el")
+     my-debug-geiser-path
+     (file-exists-p my-debug-geiser-path))
+  (load my-debug-geiser-path)
   (require 'geiser))
 
 (with-optional-init
@@ -435,8 +441,8 @@ directory to make multiple eshell windows easier."
 
  (add-hook 'scheme-mode-hook 'custom-scheme-hook))
 
-(require 'multi-mode)
-(require 'scheme-c-mode)
+;(require 'multi-mode)
+;(require 'scheme-c-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LISP
@@ -751,6 +757,7 @@ directory to make multiple eshell windows easier."
  'org
  (defun update-gcal ()
    (interactive)
+   (message "Updating Calendar")
    (org-gcal-refresh-token)
    (org-gcal-fetch))
 
@@ -891,48 +898,16 @@ directory to make multiple eshell windows easier."
 
 (require 'parenface)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Keys
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(message "Configuring custom keys")
-
-(global-set-key [mouse-2] '(lambda () (interactive) (message "mouse-2 paste disabled")))
-
-(global-set-key "\C-w" 'clipboard-kill-region)
-(global-set-key "\M-w" 'clipboard-kill-ring-save)
-(global-set-key "\C-y" 'clipboard-yank)
+(setq magit-last-seen-setup-instructions "1.4.0")
 
 (with-optional-init
- 'smex
- (global-set-key "\M-x" 'smex))
-
-(with-optional-init
- 'org
- (global-set-key "\C-ct" 'org-todo-list)
- (global-set-key "\C-cl" 'org-store-link)
- (global-set-key "\C-ca" 'org-agenda)
- (global-set-key "\C-cb" 'org-iswitchb)
- (global-set-key "\C-cc" 'org-capture))
-
-(with-optional-init
- 'mu4e
- (global-set-key "\C-cm" 'mu4e))
-
-(with-optional-init
- 'magit
- (global-set-key "\C-cg" 'magit-status))
-
-(with-optional-init
- 'company
- (global-set-key (kbd "<C-tab>") 'company-complete))
-
-(global-set-key "\C-c," 'scroll-bar-mode)
-(global-set-key "\C-c." 'tool-bar-mode)
-(global-set-key "\C-c?" 'menu-bar-mode)
-(global-set-key "\C-c\\" 'comment-or-uncomment-region)
-(global-set-key "\C-cs" 'eshell-here)
-(global-set-key "\C-cd" 'dictionary-search)
+ 'elfeed
+ (defun update-elfeed ()
+   (interactive)
+   (message "Updating RSS")
+   (elfeed-update))
+ 
+ (run-with-timer 3600 3600 'update-elfeed))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; End
