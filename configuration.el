@@ -73,7 +73,9 @@
 	("http://rss.cbc.ca/lineup/canada-britishcolumbia.xml" news bc)
 	("http://www.wired.com/category/science/feed/" news science)
 	("http://www.wired.com/category/gear/feed/" news tech)
-	("http://www.wired.com/category/science/science-blogs/feed/" blog science)))
+	("http://www.wired.com/category/science/science-blogs/feed/" blog science)
+	("https://www.reddit.com/r/lisp+emacs+scheme.rss" aggregator programming)
+	("https://www.reddit.com/r/canada+canadapolitics+environment+science+worldnews.rss" aggregator news)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keys
