@@ -5,10 +5,12 @@
 (message "Defining Custom Functions")
 
 (defun find-exe (name)
-  (executable-find
-   (if (string= system-type "windows-nt")
-       (format "%s.exe" name)
-     name)))
+  (if (string= system-type "windows-nt")
+      (or
+       (executable-find name)
+       (executable-find	(format "%s.exe" name))
+       (executable-find	(format "%s.bat" name)))
+    (executable-find name)))
 
 (defun reset-theme ()
   (interactive)
