@@ -18,24 +18,23 @@
  user-full-name 
  "Dan Leslie"
  user-mail-login 
- "dleslie@gmail.com"
+ "dan@ironoxide.ca"
  user-mail-attachment-directory
  "/home/dleslie/Downloads/Attachments"
  mail-smtp-server
- "smtp.gmail.com"
+ "boomer.asoshared.com"
  mail-smtp-port
- 587
+ 465
  mail-folder-inbox
- "/INBOX"
+ "/"
  mail-folder-drafts
- "/[Gmail].Drafts"
+ "/Drafts"
  mail-folder-sent
- "/[Gmail].Sent Mail"
+ "/Sent"
  mail-folder-trash
- "/[Gmail].Trash"
+ "/Trash"
  mu4e-compose-signature
  nil
- ;(concat "-" user-full-name "\n")
  gnus-select-method
  '(nntp "GMane"
         (nntp-address "news.gmane.org")))
@@ -44,7 +43,7 @@
  racer-cmd
  "/home/dleslie/Workspace/code/dleslie/racer/target/release/racer"
  racer-rust-src-path
- "/usr/local/src/rustc-1.1.0/src"
+ "/usr/local/src/rustc-1.5.0/src"
  racer-load-path
  "/home/dleslie/Workspace/code/dleslie/racer/editors/emacs")
 
