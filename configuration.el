@@ -80,33 +80,41 @@
 ;; Keys
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(global-set-key [mouse-2] '(lambda () (interactive) (message "mouse-2 paste disabled")))
+(global-set-key [mouse-2]
+		'(lambda () (interactive) (message "mouse-2 paste disabled")))
 
 (global-set-key "\C-w" 'clipboard-kill-region)
 (global-set-key "\M-w" 'clipboard-kill-ring-save)
 (global-set-key "\C-y" 'clipboard-yank)
-
-(global-set-key "\C-ct" 'org-todo-list)
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cb" 'org-iswitchb)
-(global-set-key "\C-cc" 'org-capture)
-
-(global-set-key "\M-x" 'smex)
-
-(global-set-key "\C-cm" 'mu4e)
-
-(global-set-key "\C-cg" 'magit-status)
-
-(global-set-key (kbd "<C-tab>") 'company-complete)
-
 (global-set-key "\C-c," 'scroll-bar-mode)
 (global-set-key "\C-c." 'tool-bar-mode)
 (global-set-key "\C-c?" 'menu-bar-mode)
 (global-set-key "\C-c\\" 'comment-or-uncomment-region)
 (global-set-key "\C-cs" 'eshell-here)
-(global-set-key "\C-cd" 'dictionary-search)
-
-(global-set-key "\C-cf" 'elfeed)
-
 (global-set-key "\C-cw" 'browse-url)
+
+(eval-after-load "org"
+  '(progn
+     (global-set-key "\C-ct" 'org-todo-list)
+     (global-set-key "\C-cl" 'org-store-link)
+     (global-set-key "\C-ca" 'org-agenda)
+     (global-set-key "\C-cb" 'org-iswitchb)
+     (global-set-key "\C-cc" 'org-capture)))
+
+(eval-after-load "smex"
+  '(global-set-key "\M-x" 'smex))
+
+(eval-after-load "mu4e"
+  '(global-set-key "\C-cm" 'mu4e))
+
+(eval-after-load "magit"
+  '(global-set-key "\C-cg" 'magit-status))
+
+(eval-after-load "company"
+  '(global-set-key (kbd "<C-tab>") 'company-complete))
+
+(eval-after-load "dictionary"
+  '(global-set-key "\C-cd" 'dictionary-search))
+
+(eval-after-load "elfeed"
+  '(global-set-key "\C-cf" 'elfeed))

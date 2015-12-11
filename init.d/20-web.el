@@ -16,7 +16,7 @@
 (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 
-(eval-after-load "company-mode"
+(eval-after-load "company"
   '(progn
      (require-package 'company-web)
      (require-package 'company-restclient)

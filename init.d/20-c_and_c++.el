@@ -7,7 +7,7 @@
 (require-package 'function-args)
 (require-package 'ggtags)
 
-(eval-after-load "company-mode"
+(eval-after-load "company"
   '(progn
      (require-package 'company-c-headers)
      (add-to-list 'company-backends 'company-c-headers)))

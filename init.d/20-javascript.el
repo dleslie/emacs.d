@@ -12,7 +12,7 @@
 
 (add-hook 'js2-mode-hook 'js2-mode-custom-hook)
 
-(eval-after-load "company-mode"
+(eval-after-load "company"
   '(require-package 'company-tern))
  
 (add-to-list 'auto-mode-alist '("\\.js?\\'" . js2-mode))

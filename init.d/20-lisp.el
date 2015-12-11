@@ -23,5 +23,5 @@
 
 (add-hook 'lisp-mode-hook 'my-lisp-mode-hook)
 
-(eval-after-load "paredit-mode"
+(eval-after-load "paredit"
   '(add-hook 'lisp-mode-hook 'paredit-mode))

@@ -9,7 +9,7 @@
 
 (jedi:install-server)
 
-(eval-after-load "company-mode"
+(eval-after-load "company"
   '(progn
      (require-package 'company-jedi)
      (add-to-list 'company-backends 'company-jedi)))
