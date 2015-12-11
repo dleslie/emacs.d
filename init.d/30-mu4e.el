@@ -2,10 +2,11 @@
 ;; mu4e
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (file-exists-p "/usr/local/share/emacs/site-lisp/mu4e")
+(when (and (find-exe "mu")
+	   (file-exists-p my-mu4e-lisp-path))
   (message "Configuring mu4e")
 
-  (add-to-list 'load-path "/usr/local/share/emacs/site-lisp/mu4e")
+  (add-to-list 'load-path my-mu4e-lisp-path)
 
   (require 'mu4e)
 

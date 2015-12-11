@@ -2,19 +2,20 @@
 ;; Python
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(message "Configuring Python Mode")
+(when (and (find-exe "pip") (find-exe "python"))
+  (message "Configuring Python Mode")
 
-(require-package 'jedi)
-(require-package 'python-environment)
+  (require-package 'jedi)
+  (require-package 'python-environment)
 
-(jedi:install-server)
+  (jedi:install-server)
 
-(eval-after-load "company"
-  '(progn
-     (require-package 'company-jedi)
-     (add-to-list 'company-backends 'company-jedi)))
+  (eval-after-load "company"
+    '(progn
+       (require-package 'company-jedi)
+       (add-to-list 'company-backends 'company-jedi)))
 
-(defun python-custom-hook ()
-  (jedi:setup))
+  (defun python-custom-hook ()
+    (jedi:setup))
 
-(add-hook 'python-mode-hook 'python-custom-hook)
+  (add-hook 'python-mode-hook 'python-custom-hook))

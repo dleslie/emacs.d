@@ -13,6 +13,8 @@
  '("~/node_modules/.bin/tern"))
 
 (setq
+ my-mu4e-lisp-path
+ "/usr/local/share/emacs/site-lisp/mu4e"
  user-mail-address 
  "dan@ironoxide.ca"
  user-full-name 
@@ -40,11 +42,11 @@
         (nntp-address "news.gmane.org")))
 
 (setq
- racer-cmd
- "/home/dleslie/Workspace/code/dleslie/racer/target/release/racer"
  racer-rust-src-path
  "/usr/local/src/rustc-1.5.0/src"
- racer-load-path
+ my-racer-cmd
+ "/home/dleslie/Workspace/code/dleslie/racer/target/release/racer"
+ my-racer-load-path
  "/home/dleslie/Workspace/code/dleslie/racer/editors/emacs")
 
 (setq my-system-include-paths
@@ -75,6 +77,10 @@
 	("http://www.wired.com/category/science/science-blogs/feed/" blog science)
 	("https://www.reddit.com/r/lisp+emacs+scheme.rss" aggregator programming)
 	("https://www.reddit.com/r/canada+canadapolitics+environment+science+worldnews.rss" aggregator news)))
+
+(setq slime-lisp-implementations
+      '((sbcl ((find-exe "sbcl"))
+	      :coding-system utf-8-unix)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keys

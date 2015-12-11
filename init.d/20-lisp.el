@@ -2,26 +2,22 @@
 ;; LISP
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(message "Configuring LISP")
+(when (find-exe "sbcl")
+  (message "Configuring LISP")
 
-(require-package 'slime)
+  (require-package 'slime)
 
-(setq slime-lisp-implementations
-      '((sbcl ("/usr/bin/sbcl" "--core" "/usr/lib/sbcl/sbcl.core")
-	      :coding-system utf-8-unix
-	      :env ("SBCL_HOME=/usr/lib/sbcl"))))
+  (require 'slime-autoloads)
+  (slime-setup)
 
-(require 'slime-autoloads)
-(slime-setup)
+  (defun sbcl-slime ()
+    (interactive)
+    (slime 'sbcl))
 
-(defun sbcl-slime ()
-  (interactive)
-  (slime 'sbcl))
+  (defun my-lisp-mode-hook ()
+    (slime-mode t))
 
-(defun my-lisp-mode-hook ()
-  (slime-mode t))
+  (add-hook 'lisp-mode-hook 'my-lisp-mode-hook)
 
-(add-hook 'lisp-mode-hook 'my-lisp-mode-hook)
-
-(eval-after-load "paredit"
-  '(add-hook 'lisp-mode-hook 'paredit-mode))
+  (eval-after-load "paredit"
+    '(add-hook 'lisp-mode-hook 'paredit-mode)))

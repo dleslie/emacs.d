@@ -4,6 +4,12 @@
 
 (message "Defining Custom Functions")
 
+(defun find-exe (name)
+  (executable-find
+   (if (string= system-type "windows-nt")
+       (format "%s.exe" name)
+     name)))
+
 (defun reset-theme ()
   (interactive)
   (while custom-enabled-themes
