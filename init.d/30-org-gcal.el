@@ -20,8 +20,3 @@
       (newline))))
 
 (add-hook 'before-save-hook 'force-gcal-category)
-
-(let ((gcal-config (expand-file-name "gcal-settings.el" user-emacs-directory)))
-  (when (file-exists-p gcal-config)
-    (load gcal-config)
-    (run-with-timer 3600 3600 'update-gcal)))
