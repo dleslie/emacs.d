@@ -28,13 +28,13 @@
  mail-smtp-port
  465
  mail-folder-inbox
- "/"
+ "/INBOX"
  mail-folder-drafts
- "/Drafts"
+ "/INBOX.Drafts"
  mail-folder-sent
- "/Sent"
+ "/INBOX.Sent"
  mail-folder-trash
- "/Trash"
+ "/INBOX.Trash"
  mu4e-compose-signature
  nil
  gnus-select-method
