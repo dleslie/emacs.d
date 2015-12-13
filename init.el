@@ -1,4 +1,31 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Functions used during init
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun find-exe (name)
+  (if (string= system-type "windows-nt")
+      (or
+       (executable-find name)
+       (executable-find	(format "%s.exe" name))
+       (executable-find	(format "%s.bat" name)))
+    (executable-find name)))
+
+(setq packages-refreshed-at-least-once nil)
+
+(defun require-package (package-name)
+  "Loads and imports packages, installing from ELPA if necessary"
+  (with-demoted-errors
+      "Error: %S"
+    
+    (unless (package-installed-p package-name)
+      (unless my-first-boot-package-inited
+	(package-refresh-contents)
+	(setq packages-refreshed-at-least-once t))
+
+      (package-install package-name))
+    (package-installed-p package-name)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Base configuration
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -17,7 +44,6 @@
       (if (file-exists-p my-init-directory)
 	  (sort (directory-files my-init-directory nil ".*\.el$") 'string<)
 	'()))
-
 
 (mapcar	#'(lambda (file)
             (message (format "Processing %s" file))
