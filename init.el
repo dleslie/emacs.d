@@ -18,7 +18,7 @@
       "Error: %S"
     
     (unless (package-installed-p package-name)
-      (unless my-first-boot-package-inited
+      (unless packages-refreshed-at-least-once
 	(package-refresh-contents)
 	(setq packages-refreshed-at-least-once t))
 

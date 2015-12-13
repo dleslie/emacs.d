@@ -6,52 +6,110 @@ A collection of my emacs settings, tuned for Emacs 24.3 and higher.
 Setup
 =====
 
-Everything will break if you don't do the following:
+This is Linux-focused, but wherever possible this configuration also works with Windows. I use MSYS2 alongside of the official distributions of the various supported languages.
 
 * Link this repository to ~/.emacs.d
-* Install w3m, gnutls and certifi, so we can use TLS and look at HTML:
+* Install gnutls and certifi, so we can use TLS properly:
 
 ```
-sudo apt-get install w3m w3m-img gnutls-bin
+sudo apt-get install gnutls-bin
 python -m pip install --user certifi
 ```
 
-* Install all the external tools and programming languages supported:
+* (Optional, Windows) MSYS2 dependencies
 
 ```
-# Ubuntu specific: install every damned language and tool
-# Except opam. You'll have to figure out how to install that yourself.
+pacman -Sy
+pacman -S mingw-w64-cross-toolchain base-devel mingw64/mingw-w64-x86_64-cmake global
+```
 
-sudo apt-get install global python python-pip sbcl ruby chicken-bin nodejs nodejs-legacy npm opam haskell-platform guile-2.0 chicken-bin clojure1.4
+* (Optional) Install extra stuff to use particular languages and features
 
-# Python
-sudo pip install jedi epc virtualenv
+** C/C++
 
-# Ruby
-sudo gem install pry pry-doc
+```
+sudo apt-get install global
+```
 
-# Node
-npm install tern
+** w3m
 
-# O'Caml
-opam install merlin
+```
+sudo apt-get install  w3m w3m-img
+```
 
-# Haskell
-cabal install ghc-mod
+** Clojure
 
-# Setup Chicken for Geiser
-# 1. Install the necessary support eggs:
+```
+sudo apt-get install clojure1.4
+```
+
+** LISP
+
+```
+sudo apt-get install sbcl
+```
+
+** Scheme
+
+```
+sudo apt-get install chicken-bin guile-2.0 racket
+```
+
+Then configure Chicken to support Geiser:
+
+```
 chicken-install -s apropos chicken-doc
-# 2. Update the Chicken documentation database:
 cd `csi -p '(chicken-home)'`
 curl http://3e8.org/pub/chicken-doc/chicken-doc-repo.tgz | sudo tar zx
 ```
 
-* The first time you launch it will require an active internet connection to fetch all the necessary packages
+** Python
 
-* Feel free to configure obvious things (like where to find tern) in `init.el`
+```
+sudo apt-get install python python-pip 
+python -m pip install jedi epc virtualenv
+```
 
-* Check the "Keys" section for predefined custom keys
+** Ruby
+
+For Windows, Pry and Pry-Doc are shipped with the latest Ruby releases and need not be installed seperately.
+
+```
+sudo apt-get install ruby
+gem install pry pry-doc
+```
+
+** Node
+
+```
+sudo apt-get install nodejs nodejs-legacy npm
+npm install -g tern
+```
+
+** O'Caml
+
+Windows users are SOL. Use a VM, I suppose.
+
+```
+sudo apt-get install opam
+opam install merlin
+```
+
+** Haskell
+
+```
+sudo apt-get install haskell-platform
+cabal update
+cabal install ghc-mod
+```
+
+* Notes
+
+** The first time you launch it will require an active internet connection to fetch all the necessary packages
+
+** Feel free to configure obvious things (like where to find tern) in `configuration.el`
+
+** Check the "Keys" section for predefined custom keys
 
 Making it Launch Quickly
 ========================
@@ -68,8 +126,8 @@ Connect Emacs clients as desired:
 emacsclient -c
 ```
 
-Advanced Email Setup
-====================
+Email Configuration
+===================
 
 mu4e is a mail client that requires a little bit of extra legwork to get running.
 
