@@ -19,7 +19,7 @@
  user-mail-login "dan@ironoxide.ca"
  user-mail-attachment-directory "/home/dleslie/Downloads/Attachments"
  mail-smtp-server "boomer.asoshared.com"
- mail-smtp-port 465
+ mail-smtp-port 587
  mail-folder-inbox "/INBOX"
  mail-folder-drafts "/INBOX.Drafts"
  mail-folder-sent "/INBOX.Sent"
@@ -28,11 +28,6 @@
 ;; mu4e
 (setq 
  my-mu4e-lisp-path "/usr/local/share/emacs/site-lisp/mu4e"
- message-kill-buffer-on-exit t
- message-send-mail-function 'smtpmail-send-it
- smtpmail-default-smtp-server mail-smtp-server
- smtpmail-smtp-server mail-smtp-server
- smtpmail-local-domain nil
  mail-user-agent 'mu4e-user-agent
  mu4e-compose-signature nil
  mu4e-maildir "~/Maildir"
