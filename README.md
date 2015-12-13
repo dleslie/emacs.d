@@ -23,6 +23,9 @@ pacman -Sy
 pacman -S mingw-w64-cross-toolchain base-devel mingw64/mingw-w64-x86_64-cmake global
 ```
 
+A Google Drive repository of tools resides here:
+https://drive.google.com/folderview?id=0B868nNRNhuc2bFRhSmVXbXIwcXM&usp=sharing
+
 ## (Optional) Install extra stuff to use particular languages and features
 
 ### C/C++
