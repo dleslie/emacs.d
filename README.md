@@ -34,12 +34,6 @@ https://drive.google.com/folderview?id=0B868nNRNhuc2bFRhSmVXbXIwcXM&usp=sharing
 sudo apt-get install global
 ```
 
-### w3m
-
-```
-sudo apt-get install  w3m w3m-img
-```
-
 ###Clojure
 
 ```
