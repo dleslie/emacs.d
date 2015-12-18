@@ -84,6 +84,11 @@
       '((sbcl ((find-exe "sbcl"))
 	      :coding-system utf-8-unix)))
 
+;; General Emacs Sanity
+(setq gc-cons-threshold 20000000
+      make-backup-files nil
+      indent-tabs-mode nil)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keys
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -108,9 +113,6 @@
      (global-set-key "\C-ca" 'org-agenda)
      (global-set-key "\C-cb" 'org-iswitchb)
      (global-set-key "\C-cc" 'org-capture)))
-
-(eval-after-load "smex"
-  '(global-set-key "\M-x" 'smex))
 
 (eval-after-load "mu4e"
   '(global-set-key "\C-cm" 'mu4e))

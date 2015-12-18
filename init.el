@@ -23,7 +23,9 @@
 	(setq packages-refreshed-at-least-once t))
 
       (package-install package-name))
-    (package-installed-p package-name)))
+    (if (package-installed-p package-name)
+	(require package-name)
+      nil)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Base configuration
