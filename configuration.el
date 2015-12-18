@@ -59,7 +59,8 @@
 ;; Semantic
 (setq my-system-include-paths
       (append
-       (directory-files "/usr/include/c++/" t "[^.][0-9.]+")
+       (when (file-exists-p "/usr/include/c++/")
+	 (directory-files "/usr/include/c++/" t "[^.][0-9.]+"))
        '("/usr/local/include" "/usr/include")))
 
 ;; Geiser
@@ -125,3 +126,6 @@
 
 (eval-after-load "elfeed"
   '(global-set-key "\C-cf" 'elfeed))
+
+(eval-after-load "omnisharp"
+  '(define-key omnisharp-mode-map "\M-." 'omnisharp-go-to-definition))
