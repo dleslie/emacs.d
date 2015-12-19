@@ -88,8 +88,9 @@
 
 ;; General Emacs Sanity
 (setq gc-cons-threshold 20000000
-      make-backup-files nil
-      indent-tabs-mode nil)
+      indent-tabs-mode nil
+      make-backup-files nil)
+(delete-selection-mode 1)
 
 ;; Ido
 (setq ido-create-new-buffer 'always
