@@ -8,10 +8,8 @@
   (require-package 'slime)
   (require 'slime-autoloads)
   (setq slime-contribs '(slime-fancy))
+  (slime-setup)
   
   (defun run-sbcl ()
     (interactive)
-    (slime 'sbcl))
-
-  (eval-after-load "paredit"
-    '(add-hook 'lisp-mode-hook 'paredit-mode)))
+    (slime 'sbcl)))
