@@ -6,18 +6,12 @@
   (message "Configuring LISP")
 
   (require-package 'slime)
-
   (require 'slime-autoloads)
-  (slime-setup)
-
-  (defun sbcl-slime ()
+  (setq slime-contribs '(slime-fancy))
+  
+  (defun run-sbcl ()
     (interactive)
     (slime 'sbcl))
-
-  (defun my-lisp-mode-hook ()
-    (slime-mode t))
-
-  (add-hook 'lisp-mode-hook 'my-lisp-mode-hook)
 
   (eval-after-load "paredit"
     '(add-hook 'lisp-mode-hook 'paredit-mode)))

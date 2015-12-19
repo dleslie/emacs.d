@@ -81,13 +81,20 @@
 
 ;; Lisp
 (setq slime-lisp-implementations
-      '((sbcl ((find-exe "sbcl"))
-	      :coding-system utf-8-unix)))
+      `((sbcl (,(find-exe "sbcl"))
+	      :coding-system utf-8-unix))
+      inferior-lisp-program
+      (find-exe "sbcl"))
 
 ;; General Emacs Sanity
 (setq gc-cons-threshold 20000000
       make-backup-files nil
       indent-tabs-mode nil)
+
+;; Ido
+(setq ido-create-new-buffer 'always
+      ido-enable-flex-matching t
+      ido-everywhere t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keys
@@ -131,3 +138,6 @@
 
 (eval-after-load "omnisharp"
   '(define-key omnisharp-mode-map "\M-." 'omnisharp-go-to-definition))
+
+(eval-after-load "smex"
+  '(global-set-key "\M-x" 'smex))

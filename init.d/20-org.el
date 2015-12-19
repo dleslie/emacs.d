@@ -4,7 +4,7 @@
 
 (message "Configuring Org Mode")
 
-(require-package 'org-plus-contrib)
+(require-package 'org-plus-contrib 'org)
 (require-package 'writegood-mode)
 
 (setq
