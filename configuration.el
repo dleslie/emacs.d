@@ -97,6 +97,12 @@
       ido-enable-flex-matching t
       ido-everywhere t)
 
+;; Projectile
+
+(setq projectile-switch-project-action 'projectile-find-dir
+      projectile-find-dir-includes-top-level t
+      projectile-keymap-prefix (kbd "M-p")) ;; Projectile wrongly uses the C-c prefix. tsk tsk
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keys
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
