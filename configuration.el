@@ -6,7 +6,7 @@
 
 ;; Org
 (setq 
- org-directory "~/ownCloud/org/")
+ org-directory "~/Dropbox/org/")
 
 ;; Javascript
 (setq 
