@@ -103,6 +103,11 @@
       projectile-find-dir-includes-top-level t
       projectile-keymap-prefix (kbd "M-p")) ;; Projectile wrongly uses the C-c prefix. tsk tsk
 
+;; Theme
+
+(eval-after-load "init"
+  '(override-theme 'yellow-term))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keys
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
