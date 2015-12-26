@@ -11,8 +11,7 @@
   (mapc #'(lambda (s) (semantic-add-system-include s)) my-system-include-paths))
 
 (semantic-mode 1)
-
-(semantic-idle-scheduler-mode 1)
-(semantic-idle-summary-mode 1)
-(semantic-idle-scheduler-mode 1)
-(semantic-idle-breadcrumbs-mode 1)
+(global-semantic-idle-completions-mode 1)
+(global-semantic-idle-summary-mode 1)
+(global-semantic-idle-scheduler-mode 1)
+(global-semantic-idle-breadcrumbs-mode 1)
