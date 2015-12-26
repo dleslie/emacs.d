@@ -15,10 +15,11 @@
        (org-gcal-fetch))
 
      (defun force-gcal-category ()
-       (let ((category (assoc buffer-file-name org-gcal-forced-category-file-alist)))
-	 (when category
-	   (goto-char (point-min))
-	   (insert (format "#+CATEGORY: %s" (cdr category)))
-	   (newline))))
+       (when org-gcal-forced-category-file-alist
+	 (let ((category (assoc buffer-file-name org-gcal-forced-category-file-alist)))
+	   (when category
+	     (goto-char (point-min))
+	     (insert (format "#+CATEGORY: %s" (cdr category)))
+	     (newline)))))
 
      (add-hook 'before-save-hook 'force-gcal-category)))

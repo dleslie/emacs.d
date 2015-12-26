@@ -16,4 +16,11 @@
   (autoload 'ghc-init "ghc" nil t)
   (autoload 'ghc-debug "ghc" nil t)
   (add-hook 'haskell-mode-hook (lambda () (ghc-init)))
+
+  (eval-after-load 'flycheck
+    '(progn
+       (require-package 'flycheck-ghcmod)
+       (require-package 'flycheck-haskell)
+       (add-hook 'flycheck-mode-hook #'flycheck-haskell-setup)
+       (require 'flycheck-ghcmod)))
   )

@@ -19,4 +19,8 @@
 
     (define-key rust-mode-map (kbd "M-.") #'racer-find-definition)
     (define-key rust-mode-map (kbd "<C-tab>") #'racer-complete-or-indent)
-    (add-hook 'rust-mode-hook #'racer-turn-on-eldoc)))
+    (add-hook 'rust-mode-hook #'racer-turn-on-eldoc))
+
+  (with-eval-after-load 'flycheck
+    (require-package 'flycheck-rust)
+    (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))

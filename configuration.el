@@ -153,3 +153,6 @@
 
 (eval-after-load "smex"
   '(global-set-key "\M-x" 'smex))
+
+(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+(define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark)

@@ -14,4 +14,12 @@
   (setq merlin-command 'opam)
 
   (add-hook 'tuareg-mode-hook 'merlin-mode)
-  (add-hook 'caml-mode-hook 'merlin-mode))
+  (add-hook 'caml-mode-hook 'merlin-mode)
+
+  (with-eval-after-load 'flycheck
+    (with-eval-after-load 'merlin
+     ;; Disable Merlin's own error checking
+     (setq merlin-error-after-save nil)
+
+     ;; Enable Flycheck checker
+     (flycheck-ocaml-setup))))

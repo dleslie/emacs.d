@@ -10,13 +10,9 @@
 (when my-system-include-paths
   (mapc #'(lambda (s) (semantic-add-system-include s)) my-system-include-paths))
 
-(semanticdb-enable-gnu-global-databases 'c-mode)
-(semanticdb-enable-gnu-global-databases 'c++-mode)
+(semantic-mode 1)
 
-(defun enable-semantic-mode ()
-  (interactive)
-  (semanticdb-minor-mode 1)
-  (semantic-idle-scheduler-mode 1)
-  (semantic-idle-summary-mode 1)
-  (semantic-idle-scheduler-mode 1)
-  (semantic-mode 1))
+(semantic-idle-scheduler-mode 1)
+(semantic-idle-summary-mode 1)
+(semantic-idle-scheduler-mode 1)
+(semantic-idle-breadcrumbs-mode 1)

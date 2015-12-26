@@ -18,4 +18,8 @@
     '(progn
        (add-hook 'clojure-mode-hook 'paredit-mode)
        (add-hook 'cider-mode-hook 'paredit-mode)))
-  )
+
+  (eval-after-load 'flycheck
+    '(progn
+       (require-package 'flycheck-clojure)
+       (flycheck-clojure-setup))))

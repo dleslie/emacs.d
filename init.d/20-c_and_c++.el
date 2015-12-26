@@ -4,20 +4,9 @@
 
 (message "Configuring C and C++")
 
-(require-package 'function-args)
-(require-package 'ggtags)
-
-(eval-after-load "company"
-  '(progn
-     (require-package 'company-c-headers)
-     (add-to-list 'company-backends 'company-c-headers)))
-
-(defun custom-cc-prog-hook ()
-  ;; (enable-semantic-mode)
-  (ggtags-mode 1))
-
-(add-hook 'c++-mode-hook 'custom-cc-prog-hook)
-(add-hook 'c-mode-hook 'custom-cc-prog-hook)
+(with-eval-after-load 'company
+  (require-package 'company-c-headers)
+  (add-to-list 'company-backends 'company-c-headers))
 
  ;; Fixes missing C++11 fontlocking in cc-mode
 
@@ -39,6 +28,7 @@
      )))
 
 (add-hook 'c++-mode-hook 'c++-font-lock-fix)
-					;(add-hook 'c-mode-common-hook 'fa-auto)
 
-(add-hook 'c-mode-common-hook 'fa-config-default)
+(with-eval-after-load 'flycheck
+  (add-hook 'c++-mode-hook
+	    (lambda () (setq flycheck-gcc-language-standard "c++11"))))

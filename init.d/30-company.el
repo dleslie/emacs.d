@@ -6,8 +6,8 @@
 
 (require-package 'company)
 
-(setq company-backends
-      '(company-ispell company-elisp))
+(add-to-list 'company-backends 'company-ispell)
+(add-to-list 'company-backends 'company-elisp)
 
 (defun my-anti-ispell-prog-hook ()
   (make-local-variable 'company-backends)
