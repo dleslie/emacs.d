@@ -1,4 +1,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Disable Emacs SPAM
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(setq inhibit-startup-screen t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Functions used during init
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

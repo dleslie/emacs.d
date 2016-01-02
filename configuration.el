@@ -64,7 +64,7 @@
        '("/usr/local/include" "/usr/include")))
 
 ;; Geiser
-(setq my-debug-geiser-path "/home/dleslie/Workspace/code/dleslie/geiser/elisp/geiser.el")
+(setq my-debug-geiser-path "/home/dleslie/Workspace/code/dleslie/geiser/elisp/geiser-load.el")
 
 ;; Elfeed
 (setq elfeed-feeds
@@ -100,8 +100,7 @@
 ;; Projectile
 
 (setq projectile-switch-project-action 'projectile-find-dir
-      projectile-find-dir-includes-top-level t
-      projectile-keymap-prefix (kbd "M-p")) ;; Projectile wrongly uses the C-c prefix. tsk tsk
+      projectile-find-dir-includes-top-level t)
 
 ;; Theme
 
