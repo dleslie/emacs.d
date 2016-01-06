@@ -16,4 +16,6 @@
       (ansi-color-apply-on-region compilation-filter-start (point-max))))
   (add-hook 'compilation-filter-hook 'my-colorize-compilation-buffer))
 
+(show-paren-mode 1)
+
 (reset-theme)
