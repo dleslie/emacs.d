@@ -62,10 +62,7 @@ curl http://3e8.org/pub/chicken-doc/chicken-doc-repo.tgz | sudo tar zx
 
 ### Python
 
-```
-sudo apt-get install python python-pip 
-python -m pip install jedi epc virtualenv
-```
+This is rather straightforward; launch emacs and ```M-x elpy-config```
 
 ### Ruby
 
