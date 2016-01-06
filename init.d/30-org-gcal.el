@@ -4,22 +4,13 @@
 
 (message "Configuring org-gcal")
 
-(eval-after-load "org"
-  '(progn
-     (require-package 'org-gcal)
+(with-eval-after-load "org"
+  (when (file-exists-p (concat user-emacs-directory "gcal-settings.el"))
+    (require-package 'org-gcal)
 
-     (defun update-gcal ()
-       (interactive)
-       (message "Updating Calendar")
-       (org-gcal-refresh-token)
-       (org-gcal-fetch))
-
-     (defun force-gcal-category ()
-       (when org-gcal-forced-category-file-alist
-	 (let ((category (assoc buffer-file-name org-gcal-forced-category-file-alist)))
-	   (when category
-	     (goto-char (point-min))
-	     (insert (format "#+CATEGORY: %s" (cdr category)))
-	     (newline)))))
-
-     (add-hook 'before-save-hook 'force-gcal-category)))
+    (load (expand-file-name (concat user-emacs-directory "gcal-settings.el")))
+    
+    (defun update-gcal ()
+      (interactive)
+      (message "Updating Calendar")
+      (org-gcal-fetch))))
