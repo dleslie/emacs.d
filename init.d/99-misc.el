@@ -18,4 +18,6 @@
 
 (show-paren-mode 1)
 
+(imenu-add-to-menubar "I")
+
 (reset-theme)

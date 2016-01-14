@@ -10,5 +10,5 @@
       (require 'geiser))
   (require-package 'geiser))
 
-(eval-after-load "paredit"
-  '(add-hook 'scheme-mode-hook 'paredit-mode))
+(with-eval-after-load "paredit"
+  (add-hook 'scheme-mode-hook 'paredit-mode))

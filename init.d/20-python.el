@@ -6,4 +6,8 @@
   (message "Configuring Python Mode")
 
   (require-package 'elpy)
-  (elpy-enable))
+  (elpy-enable)
+  
+  (with-eval-after-load "company"
+    (require-package 'company-jedi)
+    (add-to-list 'company-backends '(company-jedi company-files))))
