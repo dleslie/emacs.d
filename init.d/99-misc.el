@@ -18,6 +18,8 @@
 
 (show-paren-mode 1)
 
-(imenu-add-to-menubar "I")
+(defun my-try-to-add-imenu ()
+  (condition-case nil (imenu-add-to-menubar "Imenu") (error nil)))
+(add-hook 'font-lock-mode-hook 'my-try-to-add-imenu)
 
 (reset-theme)
