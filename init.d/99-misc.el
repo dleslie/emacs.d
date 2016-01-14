@@ -6,6 +6,7 @@
 
 (require-package 'gist)
 (require-package 'dictionary)
+(require-package 'menu-bar+)
 
 ;; From http://stackoverflow.com/a/20788581
 (with-demoted-errors
@@ -21,5 +22,7 @@
 (defun my-try-to-add-imenu ()
   (condition-case nil (imenu-add-to-menubar "Imenu") (error nil)))
 (add-hook 'font-lock-mode-hook 'my-try-to-add-imenu)
+
+(eval-after-load "menu-bar" '(require 'menu-bar+))
 
 (reset-theme)
