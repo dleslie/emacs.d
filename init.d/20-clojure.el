@@ -7,7 +7,6 @@
 
   (require-package 'clojure-mode)
   (require-package 'cider)
-  (require-package 'clojure-cheatsheet)
 
   (add-hook 'clojure-mode-hook 'cider-mode)
   (add-hook 'cider-mode-hook 'eldoc-mode)
