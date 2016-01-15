@@ -4,10 +4,6 @@
 
 (message "Configuring C and C++")
 
-(with-eval-after-load 'company
-  (require-package 'company-c-headers)
-  (add-to-list 'company-backends 'company-c-headers))
-
  ;; Fixes missing C++11 fontlocking in cc-mode
 
 (defun c++-font-lock-fix ()
@@ -31,4 +27,6 @@
 
 (with-eval-after-load 'flycheck
   (add-hook 'c++-mode-hook
-	    (lambda () (setq flycheck-gcc-language-standard "c++11"))))
+	    (lambda () (setq flycheck-gcc-language-standard "c++11")))
+  (add-hook 'c-mode-hook
+	    (lambda () (setq flycheck-gcc-language-standard "c11"))))

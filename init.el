@@ -3,6 +3,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (setq inhibit-startup-screen t)
+(setq my-init-start-time (float-time))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Functions used during init
@@ -56,9 +57,10 @@
 	'()))
 
 (mapcar	#'(lambda (file)
-            (message (format "Processing %s" file))
-            (with-demoted-errors "Load Error: %S"
-              (load file nil t)))
+	    (let ((begin-time (float-time)))
+	      (with-demoted-errors "Load Error: %S"
+		(load file nil t))
+	      (message (format "Processed %s in %s seconds" file (- (float-time) begin-time)))))
 	my-init-files)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -76,4 +78,4 @@
 ;; End
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(message "Init Complete.")
+(message (format "Init completed in %s seconds." (- (float-time) my-init-start-time)))
