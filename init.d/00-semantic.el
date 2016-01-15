@@ -11,7 +11,6 @@
 (require 'semantic/senator)
 
 (require 'srecode)
-(require-package 'srefactor)
 
 (when my-system-include-paths
   (mapc #'(lambda (s) (semantic-add-system-include s)) my-system-include-paths))
