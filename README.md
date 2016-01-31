@@ -34,6 +34,24 @@ https://drive.google.com/folderview?id=0B868nNRNhuc2bFRhSmVXbXIwcXM&usp=sharing
 sudo apt-get install global
 ```
 
+### Rust
+
+Install from the official distribution. Set RUST_SRC_PATH appropriately.
+
+```
+cargo install racer
+```
+
+### Go
+
+Install Go from golang.org
+
+```
+go get -u github.com/alecthomas/gometalinter
+go get -u github.com/nsf/gocode
+gometalinter --install --update
+```
+
 ###Clojure
 
 ```

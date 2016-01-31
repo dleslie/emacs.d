@@ -50,11 +50,8 @@
  mu4e-view-show-images t
  mu4e-org-contacts-file (concat org-directory "addresses.org"))
 
-;; Rust
-(setq
- racer-rust-src-path "/usr/local/src/rustc-1.5.0/src"
- my-racer-cmd "/home/dleslie/Workspace/code/dleslie/racer/target/release/racer"
- my-racer-load-path "/home/dleslie/Workspace/code/dleslie/racer/editors/emacs")
+;; Company
+(setq company-tooltip-align-annotations t)
 
 ;; Semantic
 (setq my-system-include-paths

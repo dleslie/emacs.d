@@ -10,4 +10,5 @@
   
   (with-eval-after-load "company"
     (require-package 'company-jedi)
-    (add-to-list 'company-backends '(company-jedi company-files))))
+    (add-to-list 'company-backends 'company-files)
+    (add-to-list 'company-backends 'company-jedi)))
