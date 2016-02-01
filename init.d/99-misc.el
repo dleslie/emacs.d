@@ -25,8 +25,8 @@
 
 (eval-after-load "menu-bar" '(require 'menu-bar+))
 
-(require-package 'borland-blue-theme)
-(require-package 'paper-theme)
-(require-package 'white-sand-theme)
+(require-package 'borland-blue-theme nil t)
+(require-package 'paper-theme nil t)
+(require-package 'white-sand-theme nil t)
 
 (reset-theme)

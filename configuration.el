@@ -145,6 +145,17 @@
 (eval-after-load "smex"
   '(global-set-key "\M-x" 'smex))
 
+; VS-style debug commands
+(global-set-key [f5] 'gud-cont)
+(global-set-key [f7] 'gud-tbreak)
+(global-set-key [S-f11] 'gud-finish)
+(global-set-key [f9] 'gud-break)
+(global-set-key [f10] 'gud-next)
+(global-set-key [f11] 'gud-step)
+
+(global-set-key [f2] 'menu-bar-open)
+(global-set-key [f12] 'toggle-frame-fullscreen)
+
 (define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
 (define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark)
 (define-key global-map (kbd "C-c r") 'srefactor-refactor-at-point)

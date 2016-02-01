@@ -19,7 +19,7 @@
 
 (setq packages-refreshed-at-least-once nil)
 
-(defun require-package (package-name &optional require-name)
+(defun require-package (package-name &optional require-name dont-load)
   "Loads and imports packages, installing from ELPA if necessary"
   (with-demoted-errors
       "Error: %S"
@@ -30,7 +30,7 @@
 	(setq packages-refreshed-at-least-once t))
 
       (package-install package-name))
-    (if (package-installed-p package-name)
+    (if (and (not dont-load) (package-installed-p package-name))
 	(if require-name
 	    (require require-name)
 	  (require package-name))
