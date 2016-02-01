@@ -25,4 +25,8 @@
 
 (eval-after-load "menu-bar" '(require 'menu-bar+))
 
+(require-package 'borland-blue-theme)
+(require-package 'paper-theme)
+(require-package 'white-sand-theme)
+
 (reset-theme)

@@ -99,11 +99,6 @@
 (setq projectile-switch-project-action 'projectile-find-dir
       projectile-find-dir-includes-top-level t)
 
-;; Theme
-
-(eval-after-load "init"
-  '(override-theme 'yellow-term))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Keys
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
