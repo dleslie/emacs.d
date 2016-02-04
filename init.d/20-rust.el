@@ -9,6 +9,7 @@
 
   (when (find-exe "racer")
     (require-package 'racer)
+    (require-package 'toml-mode)
 
     (setq racer-cmd (find-exe "racer"))
     (setq racer-rust-src-path (getenv "RUST_SRC_PATH"))
