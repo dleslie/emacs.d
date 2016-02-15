@@ -25,6 +25,12 @@
 
 (add-hook 'c++-mode-hook 'c++-font-lock-fix)
 
+(defun my-semantic-jump ()
+  (local-set-key "\M-." 'semantic-ia-fast-jump))
+
+(add-hook 'c-mode-hook 'my-semantic-jump)
+(add-hook 'c++-mode-hook 'my-semantic-jump)
+
 (with-eval-after-load 'flycheck
   (add-hook 'c++-mode-hook
 	    (lambda () (setq flycheck-gcc-language-standard "c++11")))
