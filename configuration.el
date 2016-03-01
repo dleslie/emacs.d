@@ -61,7 +61,7 @@
        '("/usr/local/include" "/usr/include")))
 
 ;; Geiser
-(setq my-debug-geiser-path "/home/dleslie/Workspace/code/dleslie/geiser/elisp/geiser-load.el")
+(setq my-debug-geiser-path "/home/dleslie/Workspace/code/github/dleslie/geiser/elisp/geiser-load.el")
 
 ;; Elfeed
 (setq elfeed-feeds
