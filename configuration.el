@@ -68,7 +68,7 @@
 
 ;; Elfeed
 (setq elfeed-feeds
-      '(("https://news.ycombinator.com/rss" aggregator tech)
+      '(("http://news.ycombinator.com/rss" aggregator tech)
 	("http://rss.cbc.ca/lineup/technology.xml" news tech)
 	("http://rss.cbc.ca/lineup/world.xml" news world)
 	("http://rss.cbc.ca/lineup/canada.xml" news canada)
@@ -76,8 +76,8 @@
 	("http://www.wired.com/category/science/feed/" news science)
 	("http://www.wired.com/category/gear/feed/" news tech)
 	("http://www.wired.com/category/science/science-blogs/feed/" blog science)
-	("https://www.reddit.com/r/lisp+emacs+scheme.rss" aggregator programming)
-	("https://www.reddit.com/r/canada+canadapolitics+environment+science+worldnews.rss" aggregator news)))
+	("http://www.reddit.com/r/lisp+emacs+scheme.rss" aggregator programming)
+	("http://www.reddit.com/r/canada+canadapolitics+environment+science+worldnews.rss" aggregator news)))
 
 ;; Lisp
 (setq slime-lisp-implementations
