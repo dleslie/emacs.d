@@ -2,7 +2,7 @@
 ;; Fix TLS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (find-exe "gnuts-cli")
+(when (and (not (string= system-type "windows-nt")) (find-exe "gnuts-cli"))
   (message "Fixing TLS")
   
   ;; From:
