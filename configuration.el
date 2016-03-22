@@ -54,6 +54,9 @@
 (setq company-tooltip-align-annotations t)
 
 ;; Semantic
+(with-eval-after-load "semantic"
+  (global-set-key "\M-." 'semantic-ia-fast-jump))
+
 (setq my-system-include-paths
       (append
        (when (file-exists-p "/usr/include/c++/")
