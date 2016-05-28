@@ -9,6 +9,12 @@ Setup
 This is Linux-focused, but wherever possible this configuration also works with Windows. I use MSYS2 alongside of the official distributions of the various supported languages.
 
 * Link this repository to ~/.emacs.d
+* Quick Ubuntu apt package requirements:
+
+```
+sudo apt-get install gnutls-bin global golang cargo rustc clojure1.6 sbcl chicken-bin guile-2.0 racket ruby nodejs nodejs-legacy npm opam haskell-platform rust-gdb rust-doc build-essential gcc gdb g++ git make libtool cmake-curses-gui autoproject automake autoconf
+```
+
 * Install gnutls and certifi, so we can use TLS properly:
 
 ```
@@ -18,13 +24,12 @@ python -m pip install --user certifi
 
 ## (Optional, Windows) MSYS2 dependencies
 
+Run from a MingW64 shell.
+
 ```
 pacman -Sy
 pacman -S mingw-w64-cross-toolchain base-devel mingw64/mingw-w64-x86_64-cmake global
 ```
-
-A Google Drive repository of tools resides here:
-https://drive.google.com/folderview?id=0B868nNRNhuc2bFRhSmVXbXIwcXM&usp=sharing
 
 ## (Optional) Install extra stuff to use particular languages and features
 
