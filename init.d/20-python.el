@@ -6,7 +6,7 @@
   (message "Configuring Python Mode")
 
   (require-package 'elpy)
-  (elpy-enable)
+  (add-hook 'python-mode-hook 'elpy-enable)
   
   (with-eval-after-load "company"
     (require-package 'company-jedi)
