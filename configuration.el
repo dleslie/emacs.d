@@ -118,6 +118,7 @@
 (global-set-key "\C-c\\" 'comment-or-uncomment-region)
 (global-set-key "\C-cs" 'eshell-here)
 (global-set-key "\C-cw" 'browse-url)
+(global-set-key "\C-c/" 'speedbar-get-focus)
 
 (eval-after-load "org"
   '(progn
