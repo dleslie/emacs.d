@@ -55,3 +55,8 @@
 
   (when (eq system-type 'windows-nt)
     (setq w32-pipe-read-delay 0)))
+
+(when (find-exe "global")
+  (require-package 'ggtags)
+  (add-hook 'c++-mode-hook 'ggtags-mode)
+  (add-hook 'c-mode-hook 'ggtags-mode))

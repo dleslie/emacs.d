@@ -26,8 +26,6 @@
 (eval-after-load "menu-bar" '(require 'menu-bar+))
 
 (require-package 'borland-blue-theme nil t)
-(require-package 'paper-theme nil t)
-(require-package 'white-sand-theme nil t)
 
 (when (find-exe "ag")
   (require-package 'ag))
