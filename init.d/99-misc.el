@@ -30,4 +30,17 @@
 (when (find-exe "ag")
   (require-package 'ag))
 
+;; From https://stackoverflow.com/questions/4012321/how-can-i-access-the-path-to-the-current-directory-in-an-emacs-directory-variabl
+(defun my-dir-locals-dir ()
+  "Return the directory local variables directory.
+Code taken from `hack-dir-local-variables'."
+  (let ((variables-file (dir-locals-find-file (or (buffer-file-name) default-directory)))
+        (dir-name nil))
+    (cond
+     ((stringp variables-file)
+      (setq dir-name (file-name-directory variables-file)))
+     ((consp variables-file)
+      (setq dir-name (nth 0 variables-file))))
+    dir-name))
+
 (reset-theme)
