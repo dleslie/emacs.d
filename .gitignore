@@ -1,5 +1,8 @@
 .*
-*/
+projectile.cache
+\#*
+org-gcal/
+elpa/
 ido.last
 history
 gcal-settings.el
