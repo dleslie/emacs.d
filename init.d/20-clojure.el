@@ -2,7 +2,7 @@
 ;; Clojure
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (find-exe "clojure")
+(when (or (find-exe "lein") (find-exe "clojure"))
   (message "Configuring Clojure")
 
   (require-package 'clojure-mode)
