@@ -11,15 +11,12 @@
     (require-package 'racer)
     (require-package 'toml-mode)
 
+    (add-hook 'rust-mode-hook #'racer-mode)
+    (add-hook 'racer-mode-hook #'eldoc-mode)
+    (add-hook 'racer-mode-hook #'company-mode)
+    
     (setq racer-cmd (find-exe "racer"))
-    (setq racer-rust-src-path (getenv "RUST_SRC_PATH"))
-
-    (defun my-rust-hook ()
-      (interactive)
-      (company-mode 1)
-      (racer-mode 1)
-      (eldoc-mode 1))
-    (add-hook 'rust-mode-hook #'my-rust-hook))
+    (setq racer-rust-src-path (getenv "RUST_SRC_PATH")))
 
   (eval-after-load "flycheck"
     '(progn

@@ -135,7 +135,9 @@
   '(global-set-key "\C-cg" 'magit-status))
 
 (eval-after-load "company"
-  '(global-set-key (kbd "<C-tab>") 'company-complete))
+  '(progn
+     (global-set-key (kbd "<C-tab>") 'company-indent-or-complete-common)
+     (setq company-tooltip-align-annotations t)))
 
 (eval-after-load "dictionary"
   '(global-set-key "\C-cd" 'dictionary-search))
