@@ -1,4 +1,5 @@
 .*
+eshell/
 semanticdb/
 projectile.cache
 \#*
