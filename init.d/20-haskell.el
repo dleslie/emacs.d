@@ -8,10 +8,12 @@
   (require-package 'ghc)
   (require-package 'haskell-mode)
 
-  (eval-after-load "company"
-    '(progn
-       (require-package 'company-ghc)
-       (add-to-list 'company-backends 'company-ghc)))
+  (with-eval-after-load "company"
+    (require-package 'company-ghc)
+    (defun ghc-company-fix ()
+      (make-local-variable 'company-backends)
+      (setq company-backends (list 'company-haskell)))
+    (add-hook 'haskell-mode-hook 'haskell-company-fix))
 
   (autoload 'ghc-init "ghc" nil t)
   (autoload 'ghc-debug "ghc" nil t)

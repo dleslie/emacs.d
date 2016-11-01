@@ -5,6 +5,7 @@
 (message "Configuring Company")
 
 (require-package 'company)
+(global-company-mode)
 
 (add-to-list 'company-backends 'company-ispell)
 (add-to-list 'company-backends 'company-elisp)
@@ -15,5 +16,3 @@
 
 (add-hook 'prog-mode-hook 'my-anti-ispell-prog-hook)
 (add-hook 'eshell-mode-hook 'my-anti-ispell-prog-hook)
-
-(global-company-mode)

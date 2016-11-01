@@ -9,10 +9,12 @@
   (require-package 'inf-ruby)
   (require-package 'robe)
 
-  (eval-after-load "company"
-    '(progn
-       (require-package 'company-inf-ruby)
-       (add-to-list 'company-backends 'company-inf-ruby)))
+  (with-eval-after-load "company"
+    (require-package 'company-inf-ruby)
+    (defun inf-ruby-company-fix ()
+      (make-local-variable 'company-backends)
+      (setq company-backends (list 'company-jedi)))
+    (add-hook 'inf-ruby-mode-hook 'inf-ruby-company-fix))
 
   (defun launch-ruby ()
     (interactive)

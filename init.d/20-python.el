@@ -10,5 +10,8 @@
   
   (with-eval-after-load "company"
     (require-package 'company-jedi)
-    (add-to-list 'company-backends 'company-files)
-    (add-to-list 'company-backends 'company-jedi)))
+    
+    (defun python-company-fix ()
+      (make-local-variable 'company-backends)
+      (setq company-backends (list 'company-jedi)))
+    (add-hook 'python-mode-hook 'python-company-fix)))

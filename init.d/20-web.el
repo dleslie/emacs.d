@@ -16,12 +16,15 @@
 (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 
-(eval-after-load "company"
-  '(progn
-     (require-package 'company-web)
-     (require-package 'company-restclient)
-     
-     (add-to-list 'company-backends 'company-web-html)
-     (add-to-list 'company-backends 'company-web-jade)
-     (add-to-list 'company-backends 'company-web-slim)
-     (add-to-list 'company-backends 'company-restclient)))
+(with-eval-after-load "company"
+  (require-package 'company-web)
+  (require-package 'company-restclient)
+
+  (defun web-company-fix ()
+    (make-local-variable 'company-backends)
+    (setq company-backends 
+	  (list 'company-web-html
+		'company-web-jade
+		'company-web-slim
+		'company-restclient)))
+  (add-hook 'web-mode-hook 'web-company-fix))
