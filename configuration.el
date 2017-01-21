@@ -6,7 +6,7 @@
 
 ;; Org
 (setq 
- org-directory "~/Dropbox/org/")
+ org-directory "~/OneDrive/org/")
 
 ;; Javascript
 (setq 

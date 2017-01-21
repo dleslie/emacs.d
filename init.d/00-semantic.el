@@ -14,6 +14,11 @@
 (when my-system-include-paths
   (mapc #'(lambda (s) (semantic-add-system-include s)) my-system-include-paths))
 
+(global-semantic-idle-summary-mode 1)
+(global-semantic-decoration-mode 1)
+(global-semantic-highlight-func-mode 1)
+(global-semantic-highlight-edits-mode 1)
+
 (semantic-mode 1)
 
 (with-eval-after-load "company"
