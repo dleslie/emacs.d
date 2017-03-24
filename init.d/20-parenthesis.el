@@ -5,17 +5,31 @@
 (message "Configuring Parenthesis")
 
 (require-package 'paredit)
+(require-package 'rainbow-delimiters)
 
 (put 'paredit-forward-delete 'delete-selection 'supersede)
 
-(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
-(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
-(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
-(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
-(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
-(add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
+(defvar-local paren-modes
+  (list 'emacs-lisp-mode-hook
+       'eval-expression-minibuffer-setup-hook
+       'ielm-mode-hook
+       'lisp-mode-hook
+       'lisp-interaction-mode-hook
+       'scheme-mode-hook
+       'slime-repl-mode-hook
+       'clojure-mode-hook))
+
+(mapc
+ (lambda (mode-hook)
+   (add-hook mode-hook #'enable-paredit-mode))
+ paren-modes)
+
+(mapc
+ (lambda (mode-hook)
+   (add-hook mode-hook #'rainbow-delimiters-mode))
+ (append paren-modes
+	 (list 'c-mode-hook
+	       'c++-mode-hook)))
 
 (eval-after-load "eldoc"
   '(eldoc-add-command

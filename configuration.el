@@ -12,44 +12,6 @@
 (setq 
  tern-command '("~/node_modules/.bin/tern"))
 
-;; Mail
-(setq
- user-mail-address "dan@ironoxide.ca"
- user-full-name "Dan Leslie"
- user-mail-login "dan@ironoxide.ca"
- user-mail-attachment-directory "/home/dleslie/Downloads/Attachments"
- mail-smtp-server "boomer.asoshared.com"
- mail-smtp-port 587
- mail-folder-inbox "/INBOX"
- mail-folder-drafts "/INBOX.Drafts"
- mail-folder-sent "/INBOX.Sent"
- mail-folder-trash "/INBOX.Trash")
-
-;; mu4e
-(setq 
- my-mu4e-lisp-path "/usr/local/share/emacs/site-lisp/mu4e"
- mail-user-agent 'mu4e-user-agent
- mu4e-compose-signature nil
- mu4e-maildir "~/Maildir"
- mu4e-drafts-folder mail-folder-drafts
- mu4e-sent-folder mail-folder-sent
- mu4e-trash-folder mail-folder-trash
- mu4e-sent-messages-behavior 'sent
- mu4e-maildir-shortcuts `((,mail-folder-inbox . ?i)
-			  (,mail-folder-sent  . ?s)
-			  (,mail-folder-trash . ?t))
- mu4e-get-mail-command "offlineimap"
- mu4e-attachment-dir user-mail-attachment-directory
- mu4e-compose-reply-to-address user-mail-address
- mu4e-headers-include-related nil
- mu4e-headers-results-limit -1
- mu4e-sent-messages-behavior 'sent
- mu4e-update-interval -1
- mu4e-user-mail-address-list `(,user-mail-login ,user-mail-address)
- mu4e-view-show-addresses t
- mu4e-view-show-images t
- mu4e-org-contacts-file (concat org-directory "addresses.org"))
-
 ;; Company
 (setq company-tooltip-align-annotations t)
 
@@ -69,15 +31,11 @@
 ;; Elfeed
 (setq elfeed-feeds
       '(("http://news.ycombinator.com/rss" aggregator tech)
-	("http://rss.cbc.ca/lineup/technology.xml" news tech)
-	("http://rss.cbc.ca/lineup/world.xml" news world)
-	("http://rss.cbc.ca/lineup/canada.xml" news canada)
-	("http://rss.cbc.ca/lineup/canada-britishcolumbia.xml" news bc)
-	("http://www.wired.com/category/science/feed/" news science)
-	("http://www.wired.com/category/gear/feed/" news tech)
-	("http://www.wired.com/category/science/science-blogs/feed/" blog science)
-	("http://www.reddit.com/r/lisp+emacs+scheme.rss" aggregator programming)
-	("http://www.reddit.com/r/canada+canadapolitics+environment+science+worldnews.rss" aggregator news)))
+        ("http://rss.cbc.ca/lineup/world.xml" news world)
+        ("http://rss.cbc.ca/lineup/canada.xml" news canada)
+        ("http://rss.cbc.ca/lineup/canada-britishcolumbia.xml" news bc)
+        ("http://www.reddit.com/r/lisp+emacs+scheme.rss" aggregator programming)
+        ("http://www.reddit.com/r/canada+canadapolitics+environment+science+worldnews.rss" aggregator news)))
 
 ;; Lisp
 (setq slime-lisp-implementations

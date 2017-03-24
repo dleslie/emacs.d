@@ -7,12 +7,12 @@
 (require-package 'company)
 (global-company-mode)
 
-(add-to-list 'company-backends 'company-ispell)
 (add-to-list 'company-backends 'company-elisp)
 
-(defun my-anti-ispell-prog-hook ()
+(defun my-company-ispell-hook ()
   (make-local-variable 'company-backends)
-  (setq company-backends (remove 'company-ispell company-backends)))
+  (add-to-list 'company-backends 'company-ispell))
 
-(add-hook 'prog-mode-hook 'my-anti-ispell-prog-hook)
-(add-hook 'eshell-mode-hook 'my-anti-ispell-prog-hook)
+(add-hook 'text-mode-hook 'my-company-ispell-hook)
+(add-hook 'org-mode-hook 'my-company-ispell-hook)
+(add-hook 'writegood-mode-hook 'my-company-ispell-hook)

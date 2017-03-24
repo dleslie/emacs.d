@@ -1,6 +1,6 @@
-;;; bright-yellow-term-theme.el --- Emacs 24 theme with a dark background.
+;;; yellow-term-bright-theme.el --- Emacs 24 theme with a dark background.
 
-;; Copyright (C) 2014 , Dan Leslie
+;; Copyright (C) 2017, Dan Leslie
 
 ;; Author: Dan Leslie
 ;; 
@@ -28,7 +28,7 @@
 
 ;;; Code:
 
-(deftheme bright-yellow-term)
+(deftheme yellow-term-bright)
 (let ((class '((class color) (min-colors 89)))
       (fg4 "#E0F000")
       (fg3 "#F0E000")
@@ -43,7 +43,7 @@
       (al3 "#F0F0A0")
       (al4 "#ffffff"))
   (custom-theme-set-faces
-   'bright-yellow-term
+   'yellow-term-bright
    `(default ((,class (:background ,bg1 :foreground ,fg3))))
    `(default-italic ((,class (:italic t))))
    `(cursor ((,class (:background ,bg3))))
@@ -73,8 +73,7 @@
    `(region ((,class (:background ,fg1 :foreground ,bg1))))
    `(show-paren-match-face ((,class (:background ,bg3 :foreground ,al4))))
    `(vertical-border ((,class (:foreground ,fg3))))
-   `(link ((,class (:foreground ,al1 :underline t))))
-   `(parenthesis ((,class (:foreground ,bg3))))))
+   `(link ((,class (:foreground ,al1 :underline t))))))
 
 
 ;;;###autoload
@@ -82,7 +81,7 @@
   (add-to-list 'custom-theme-load-path
                (file-name-as-directory (file-name-directory load-file-name))))
 
-(provide-theme 'bright-yellow-term)
+(provide-theme 'yellow-term-bright)
 
 ;; Local Variables:
 ;; no-byte-compile: t

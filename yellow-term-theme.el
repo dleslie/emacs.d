@@ -73,7 +73,9 @@
    `(region ((,class (:background ,fg1 :foreground ,bg1))))
    `(show-paren-match-face ((,class (:background ,bg3 :foreground ,al4))))
    `(vertical-border ((,class (:foreground ,fg3))))
-   `(link ((,class (:foreground ,al1 :underline t))))))
+   `(link ((,class (:foreground ,al1 :underline t))))
+   `(parenthesis ((,class (:foreground ,bg3))))
+   ))
 
 
 ;;;###autoload

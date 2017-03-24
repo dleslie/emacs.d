@@ -5,6 +5,7 @@
 (message "Configuring Org Mode")
 
 (require-package 'org-plus-contrib 'org)
+(require-package 'writegood-mode)
 
 (setq
  org-default-notes-file 

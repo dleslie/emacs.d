@@ -45,33 +45,14 @@
            ))
     ) t)
 
+(require-package 'cov)
+
+(add-hook 'c++-mode-hook 'c++-font-lock-fix)
 (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1)))
 (add-hook 'c-mode-hook (lambda () (eldoc-mode 1)))
 
 (with-eval-after-load 'flycheck
   (add-hook 'c++-mode-hook
-	    (lambda () (setq flycheck-gcc-language-standard "c++11")))
+	    (lambda () (setq flycheck-gcc-language-standard "c++14")))
   (add-hook 'c-mode-hook
-	    (lambda () (setq flycheck-gcc-language-standard "c11"))))
-
-;; (require-package 'irony)
-;; (require-package 'irony-eldoc)
-
-;; (with-eval-after-load 'irony
-;;   (add-hook 'c++-mode-hook 'irony-mode)
-;;   (add-hook 'c-mode-hook 'irony-mode)
-;;   (add-hook 'objc-mode-hook 'irony-mode)
-;;   (add-hook 'irony-mode-hook 'irony-eldoc)
-  
-;;   ;; replace the `completion-at-point' and `complete-symbol' bindings in
-;;   ;; irony-mode's buffers by irony-mode's asynchronous function
-;;   (defun my-irony-mode-hook ()
-;;     (define-key irony-mode-map [remap completion-at-point]
-;;       'irony-completion-at-point-async)
-;;     (define-key irony-mode-map [remap complete-symbol]
-;;       'irony-completion-at-point-async))
-;;   (add-hook 'irony-mode-hook 'my-irony-mode-hook)
-
-;;   (when (eq system-type 'windows-nt)
-;;     (setq w32-pipe-read-delay 0)))
-
+            (lambda () (setq flycheck-gcc-language-standard "c14"))))
