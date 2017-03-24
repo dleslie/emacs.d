@@ -4,6 +4,12 @@
 
 (message "Setting Local Configuration")
 
+;; Emacs default scrolling behaviour is the worst
+(setq
+ scroll-step 2
+ scroll-conservatively 10000
+ auto-window-vscroll nil)
+
 ;; Org
 (setq 
  org-directory "~/OneDrive/org/")
