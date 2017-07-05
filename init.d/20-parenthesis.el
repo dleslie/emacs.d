@@ -4,6 +4,7 @@
 
 (message "Configuring Parenthesis")
 
+;(require-package 'parinfer)
 (require-package 'paredit)
 (require-package 'rainbow-delimiters)
 
@@ -21,7 +22,8 @@
 
 (mapc
  (lambda (mode-hook)
-   (add-hook mode-hook #'enable-paredit-mode))
+   ;(add-hook mode-hook #'parinfer-mode)
+   (add-hook mode-hook #'paredit-mode))
  paren-modes)
 
 (mapc

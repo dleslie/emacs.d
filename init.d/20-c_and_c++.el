@@ -48,6 +48,7 @@
 (require-package 'cov)
 
 (add-hook 'c++-mode-hook 'c++-font-lock-fix)
+(add-hook 'c-mode-hook 'c++-font-lock-fix)
 (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1)))
 (add-hook 'c-mode-hook (lambda () (eldoc-mode 1)))
 

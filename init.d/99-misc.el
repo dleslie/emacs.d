@@ -43,4 +43,11 @@ Code taken from `hack-dir-local-variables'."
       (setq dir-name (nth 0 variables-file))))
     dir-name))
 
+(require-package 'git-gutter)
+(global-git-gutter-mode t)
+(setq git-gutter:visual-line t)
+
+(global-hl-line-mode t)
+(global-flycheck-mode t)
+
 (reset-theme)

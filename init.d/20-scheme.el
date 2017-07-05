@@ -8,7 +8,4 @@
     (progn
       (load my-debug-geiser-path)
       (require 'geiser))
-  (require-package 'geiser))
-
-(with-eval-after-load "paredit"
-  (add-hook 'scheme-mode-hook 'paredit-mode))
+  (require-package 'geiser)))
