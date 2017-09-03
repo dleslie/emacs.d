@@ -50,4 +50,9 @@ Code taken from `hack-dir-local-variables'."
 (global-hl-line-mode t)
 (global-flycheck-mode t)
 
+(require-package 'quiz)
+
+(when (find-exe "ag")
+  (require-package 'ag))
+
 (reset-theme)

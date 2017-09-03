@@ -83,6 +83,8 @@
 (global-set-key "\C-cs" 'eshell-here)
 (global-set-key "\C-cw" 'browse-url)
 (global-set-key "\C-c/" 'speedbar-get-focus)
+(global-set-key "\C-cq" 'quiz)
+(global-set-key "\C-ca" 'ag)
 
 (eval-after-load "org"
   '(progn

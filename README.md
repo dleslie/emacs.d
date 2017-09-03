@@ -12,7 +12,7 @@ This is Linux-focused, but wherever possible this configuration also works with 
 * Quick Ubuntu apt package requirements:
 
 ```
-sudo apt-get install gnutls-bin global golang cargo rustc clojure1.6 sbcl chicken-bin guile-2.0 racket ruby nodejs nodejs-legacy npm opam haskell-platform rust-gdb rust-doc build-essential gcc gdb g++ git make libtool cmake-curses-gui autoproject automake autoconf
+sudo apt-get install gnutls-bin golang cargo rustc clojure1.6 sbcl chicken-bin guile-2.0 racket ruby nodejs nodejs-legacy npm opam haskell-platform rust-gdb rust-doc build-essential gcc gdb g++ git make libtool cmake-curses-gui autoproject automake autoconf
 ```
 
 * Install gnutls and certifi, so we can use TLS properly:
@@ -32,12 +32,6 @@ pacman -S mingw-w64-cross-toolchain base-devel mingw64/mingw-w64-x86_64-cmake gl
 ```
 
 ## (Optional) Install extra stuff to use particular languages and features
-
-### C/C++
-
-```
-sudo apt-get install global
-```
 
 ### Rust
 
@@ -79,13 +73,18 @@ Then configure Chicken to support Geiser:
 
 ```
 chicken-install -s apropos chicken-doc
-cd `csi -p '(chicken-home)'`
-curl http://3e8.org/pub/chicken-doc/chicken-doc-repo.tgz | sudo tar zx
+cd `csi -p '(chicken-home)'` && curl http://3e8.org/pub/chicken-doc/chicken-doc-repo.tgz | sudo tar zx
 ```
 
 ### Python
 
-This is rather straightforward; launch emacs and ```M-x elpy-config```
+This is rather straightforward:
+
+```
+sudo apt install python-pip python3-pip
+```
+
+Then launch emacs and ```M-x elpy-config```
 
 ### Ruby
 
@@ -113,6 +112,9 @@ opam install merlin
 ```
 
 ### Haskell
+
+You should be using stack, if you can; but if you must use Ubuntu's repositories:
+
 
 ```
 sudo apt-get install haskell-platform
