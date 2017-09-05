@@ -2,9 +2,10 @@
 ;; Disable Emacs SPAM
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(package-initialize)
+
 (setq my-init-start-time (float-time))
 
-(package-initialize)
 
 (setq inhibit-startup-screen t)
 
