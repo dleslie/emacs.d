@@ -18,9 +18,6 @@
 (setq 
  tern-command '("~/node_modules/.bin/tern"))
 
-;; Company
-(setq company-tooltip-align-annotations t)
-
 ;; Semantic
 (with-eval-after-load "semantic"
   (global-set-key "\M-." 'semantic-ia-fast-jump))
