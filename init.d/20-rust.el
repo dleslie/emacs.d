@@ -13,7 +13,9 @@
 
     (add-hook 'rust-mode-hook #'racer-mode)
     (add-hook 'racer-mode-hook #'eldoc-mode)
-    (add-hook 'racer-mode-hook #'company-mode)
+
+    (with-eval-after-load "company"
+      (add-hook 'racer-mode-hook #'company-mode))
     
     (setq racer-cmd (find-exe "racer"))
     (setq racer-rust-src-path (getenv "RUST_SRC_PATH")))

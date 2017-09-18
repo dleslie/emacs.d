@@ -1,18 +1,15 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Company
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (and (boundp 'enable-company) enable-company)
+  (message "Configuring Company")
 
-(message "Configuring Company")
+  (require-package 'company)
+  (global-company-mode)
 
-(require-package 'company)
-(global-company-mode)
+  (add-to-list 'company-backends 'company-elisp)
 
-(add-to-list 'company-backends 'company-elisp)
+  (defun my-company-ispell-hook ()
+    (make-local-variable 'company-backends)
+    (add-to-list 'company-backends 'company-ispell))
 
-(defun my-company-ispell-hook ()
-  (make-local-variable 'company-backends)
-  (add-to-list 'company-backends 'company-ispell))
-
-(add-hook 'text-mode-hook 'my-company-ispell-hook)
-(add-hook 'org-mode-hook 'my-company-ispell-hook)
-(add-hook 'writegood-mode-hook 'my-company-ispell-hook)
+  (add-hook 'text-mode-hook 'my-company-ispell-hook)
+  (add-hook 'org-mode-hook 'my-company-ispell-hook)
+  (add-hook 'writegood-mode-hook 'my-company-ispell-hook))

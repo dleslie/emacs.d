@@ -15,6 +15,10 @@
       (setq company-backends (list 'company-haskell)))
     (add-hook 'haskell-mode-hook 'haskell-company-fix))
 
+  (with-eval-after-load "auto-complete"
+    (add-hook 'haskell-mode-hook
+	      (lambda () (add-to-list 'ac-sources 'ac-source-ghc-mod))))
+
   (autoload 'ghc-init "ghc" nil t)
   (autoload 'ghc-debug "ghc" nil t)
   (add-hook 'haskell-mode-hook (lambda () (ghc-init)))

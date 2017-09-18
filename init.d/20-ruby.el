@@ -16,6 +16,11 @@
       (setq company-backends (list 'company-jedi)))
     (add-hook 'inf-ruby-mode-hook 'inf-ruby-company-fix))
 
+  (with-eval-after-load "auto-complete"
+    (add-hook 'inf-ruby-mode-hook
+	      (lambda ()
+		(add-to-list 'ac-sources 'ac-source-robe))))
+  
   (defun launch-ruby ()
     (interactive)
 
