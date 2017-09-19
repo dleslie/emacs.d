@@ -7,6 +7,10 @@
 (require-package 'gist)
 (require-package 'dictionary)
 (require-package 'menu-bar+)
+(require-package 'fuzzy)
+
+(with-eval-after-load "fuzzy"
+  (turn-on-fuzzy-isearch))
 
 ;; From http://stackoverflow.com/a/20788581
 (with-demoted-errors

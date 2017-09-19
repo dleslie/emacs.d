@@ -6,8 +6,8 @@
 
 (setq
  enable-semantic nil
- enable-company nil
- enable-auto-complete t)
+ enable-company t
+ enable-auto-complete nil)
 
 ;; Emacs default scrolling behaviour is the worst
 (setq
@@ -20,6 +20,10 @@
       indent-tabs-mode nil
       make-backup-files nil)
 (delete-selection-mode 1)
+
+;; Windows performance tweaks
+(when (boundp 'w32-pipe-read-delay)
+  (setq w32-pipe-read-delay 0))
 
 ;; Org
 (setq org-directory "~/OneDrive/org/")
@@ -82,6 +86,12 @@
 (with-eval-after-load "company"
   (global-set-key (kbd "<C-tab>") 'company-indent-or-complete-common)
   (setq company-tooltip-align-annotations t))
+
+(with-eval-after-load "auto-complete"
+  (global-set-key (kbd "<C-tab>") 'auto-complete)
+  (with-eval-after-load "fuzzy"
+    (setq ac-fuzzy-enable t)
+    (global-set-key (kbd "<C-tab>") 'ac-fuzzy-complete)))
 
 (with-eval-after-load "dictionary"
   (global-set-key "\C-cd" 'dictionary-search))
