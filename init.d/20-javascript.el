@@ -24,7 +24,7 @@
     (require-package 'company-tern)))
 
 (with-eval-after-load "auto-complete"
-  (require-package 'company-js2))
+  (require-package 'ac-js2))
 
 (when (find-exe "tsc")
   (message "Configuring Typescript")

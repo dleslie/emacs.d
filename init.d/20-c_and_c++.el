@@ -19,7 +19,9 @@
 
     (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
 
-    (add-to-list 'company-backends 'company-irony))
+    (require-package 'company-irony)
+    (with-eval-after-load "company-irony"
+      (add-to-list 'company-backends 'company-irony)))
   
   (require-package 'company-c-headers)
   (with-eval-after-load "company-c-headers"
@@ -27,11 +29,12 @@
 
 (with-eval-after-load "auto-complete"
   (require-package 'ac-c-headers)
+  (defun ac-source-c-headers-enable-hook ()
+    (make-local-variable 'ac-sources)
+    (add-to-list 'ac-sources 'ac-source-c-headers)
+    (add-to-list 'ac-sources 'ac-source-c-header-symbols t))
   (with-eval-after-load "ac-c-headers"
-    (add-hook 'c-mode-hook
-	      (lambda ()
-		(add-to-list 'ac-sources 'ac-source-c-headers)
-		(add-to-list 'ac-sources 'ac-source-c-header-symbols t)))))
+    (add-hook 'c-mode-hook 'ac-source-c-headers-enable-hook)))
 
 (require-package 'ggtags)
 (with-eval-after-load "ggtags"
@@ -42,7 +45,10 @@
     (add-to-list 'company-backends 'company-gtags))
 
   (with-eval-after-load "auto-complete"
-    (add-to-list 'ac-sources 'ac-source-gtags)))
+    (defun ac-source-gtags-enable-hook ()
+      (make-local-variable 'ac-sources)
+      (add-to-list 'ac-sources 'ac-source-gtags))
+    (add-hook 'ggtags-mode-hook 'ac-source-gtags-enable-hook)))
 
 (require-package 'flycheck)
 (with-eval-after-load 'flycheck

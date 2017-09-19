@@ -17,15 +17,16 @@
     (add-hook 'inf-ruby-mode-hook 'inf-ruby-company-fix))
 
   (with-eval-after-load "auto-complete"
-    (add-hook 'inf-ruby-mode-hook
-	      (lambda ()
-		(add-to-list 'ac-sources 'ac-source-robe))))
+    (defun ac-asource-robe-enable-hook ()
+      (make-local-variable 'ac-sources)
+      (add-to-list 'ac-sources 'ac-source-robe))
+    (add-hook 'inf-ruby-mode-hook 'ac-source-robe-enable-hook))
   
   (defun launch-ruby ()
     (interactive)
 
-    (eval-after-load "projectile"
-      '(projectile-rails-on))
+    (with-eval-after-load "projectile"
+      (projectile-rails-on))
     
     (unless (get-buffer "*ruby*")
       (let ((buf (current-buffer)))

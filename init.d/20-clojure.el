@@ -12,14 +12,15 @@
   (add-hook 'cider-mode-hook 'eldoc-mode)
   
   (add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode))
-
+  
   (with-eval-after-load "auto-complete"
     (require-package 'ac-cider)
-    (add-hook 'cider-mode-hook
-	      (lambda ()
-		(add-to-list 'ac-sources 'ac-source-cider))))
+    (defun ac-cider-enable-hook ()
+      (make-local-variable 'ac-sources)
+      (add-to-list 'ac-sources 'ac-source-cider))
+    (add-hook 'cider-mode-hook 'ac-cider-enable-hook))
 
-  (eval-after-load 'flycheck
-    '(progn
-       (require-package 'flycheck-clojure)
-       (flycheck-clojure-setup))))
+  (with-eval-after-load "flycheck"
+    (require-package 'flycheck-clojure)
+    (with-eval-after-load "flycheck-clojure"
+      (add-hook 'clojure-mode-hook 'flycheck-clojure-setup))))
