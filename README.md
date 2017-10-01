@@ -12,14 +12,7 @@ This is Linux-focused, but wherever possible this configuration also works with 
 * Quick Ubuntu apt package requirements:
 
 ```
-sudo apt-get install gnutls-bin golang cargo rustc clojure1.6 sbcl chicken-bin guile-2.0 racket ruby nodejs nodejs-legacy npm opam haskell-platform rust-gdb rust-doc build-essential gcc gdb g++ git make libtool cmake-curses-gui autoproject automake autoconf
-```
-
-* Install gnutls and certifi, so we can use TLS properly:
-
-```
-sudo apt-get install gnutls-bin
-python -m pip install --user certifi
+sudo apt-get install gnutls-bin golang cargo rustc clojure1.6 sbcl chicken-bin guile-2.0 racket ruby nodejs nodejs-legacy npm opam haskell-platform rust-gdb rust-doc build-essential gcc gdb g++ git make libtool cmake-curses-gui autoproject automake autoconf clang libclang-dev
 ```
 
 ## (Optional, Windows) MSYS2 dependencies
@@ -32,6 +25,10 @@ pacman -S mingw-w64-cross-toolchain base-devel mingw64/mingw-w64-x86_64-cmake gl
 ```
 
 ## (Optional) Install extra stuff to use particular languages and features
+
+### C++
+
+At least once, use `M-x` to execute `irony-install-server`
 
 ### Rust
 
@@ -51,7 +48,7 @@ go get -u github.com/nsf/gocode
 gometalinter --install --update
 ```
 
-###Clojure
+### Clojure
 
 ```
 sudo apt-get install clojure1.4
@@ -122,6 +119,13 @@ cabal update
 cabal install ghc-mod
 ```
 
+If you're using stack,
+
+```
+stack install ghc-mod
+```
+
+
 ## Notes
 
 * The first time you launch it will require an active internet connection to fetch all the necessary packages
@@ -130,8 +134,12 @@ cabal install ghc-mod
 
 * Check the "Keys" section for predefined custom keys
 
+* There's a fair amount of undocumented behaviour. Check out the `init.d` folder and have a poke around.
+
 Making it Launch Quickly
 ========================
+
+You'll want to launch Emacs at least once as a regular application before using it in daemon mode, in order to answer any questions that arise in initial setup.
 
 Run Emacs as a server:
 

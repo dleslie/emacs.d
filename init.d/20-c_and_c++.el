@@ -7,25 +7,39 @@
 (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1)))
 (add-hook 'c-mode-hook (lambda () (eldoc-mode 1)))
 
-(with-eval-after-load "company"
-  (require-package 'irony)
-  (with-eval-after-load "irony"
-    ;; Set the buffer size to 64K on Windows (from the original 4K)
-    (when (boundp 'w32-pipe-buffer-size)
-      (setq irony-server-w32-pipe-buffer-size (* 64 1024)))
-    (add-hook 'c++-mode-hook 'irony-mode)
-    (add-hook 'c-mode-hook 'irony-mode)
-    (add-hook 'objc-mode-hook 'irony-mode)
+(when (and (find-exe "clang") (find-exe "cmake"))
+  (with-eval-after-load "company"
+    (require-package 'irony)
+    (with-eval-after-load "irony"
+      ;; Set the buffer size to 64K on Windows (from the original 4K)
+      (when (boundp 'w32-pipe-buffer-size)
+	(setq irony-server-w32-pipe-buffer-size (* 64 1024)))
+      (add-hook 'c++-mode-hook 'irony-mode)
+      (add-hook 'c-mode-hook 'irony-mode)
+      (add-hook 'objc-mode-hook 'irony-mode)
 
-    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+      (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
 
-    (require-package 'company-irony)
-    (with-eval-after-load "company-irony"
-      (add-to-list 'company-backends 'company-irony)))
-  
-  (require-package 'company-c-headers)
-  (with-eval-after-load "company-c-headers"
-    (add-to-list 'company-backends 'company-c-headers)))
+      (with-eval-after-load "flycheck"
+	(require-package 'flycheck-irony)
+	(with-eval-after-load "flycheck-irony"
+	  (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)))
+
+      (require-package 'irony-eldoc)
+      (with-eval-after-load "irony-eldoc"
+	(add-hook 'irony-mode-hook #'irony-eldoc))
+
+      (require-package 'flycheck-irony)
+      (eval-after-load 'flycheck
+	'(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
+      
+      (require-package 'company-irony)
+      (with-eval-after-load "company-irony"
+	(add-to-list 'company-backends 'company-irony)))))
+
+(require-package 'company-c-headers)
+(with-eval-after-load "company-c-headers"
+  (add-to-list 'company-backends 'company-c-headers))
 
 (with-eval-after-load "auto-complete"
   (require-package 'ac-c-headers)
@@ -49,14 +63,3 @@
       (make-local-variable 'ac-sources)
       (add-to-list 'ac-sources 'ac-source-gtags))
     (add-hook 'ggtags-mode-hook 'ac-source-gtags-enable-hook)))
-
-(require-package 'flycheck)
-(with-eval-after-load 'flycheck
-  (add-hook 'c++-mode-hook
-	    (lambda ()
-	      (make-local-variable 'flycheck-gcc-language-standard)
-	      (setq flycheck-gcc-language-standard "c++17")))
-  (add-hook 'c-mode-hook
-            (lambda ()
-	      (make-local-variable 'flycheck-gcc-language-standard)
-	      (setq flycheck-gcc-language-standard "c11"))))

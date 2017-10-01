@@ -1,5 +1,4 @@
-;(require-package 'flycheck)
-;(require-package 'flycheck-color-mode-line)
+(require-package 'flycheck)
 
-;(add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode)
-;(add-hook 'after-init-hook #'global-flycheck-mode)
+(add-hook 'after-init-hook #'global-flycheck-mode)
+

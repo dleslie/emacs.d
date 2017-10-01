@@ -18,9 +18,4 @@
       (add-hook 'racer-mode-hook #'company-mode))
     
     (setq racer-cmd (find-exe "racer"))
-    (setq racer-rust-src-path (getenv "RUST_SRC_PATH")))
-
-  (eval-after-load "flycheck"
-    '(progn
-       (require-package 'flycheck-rust)
-       (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))))
+    (setq racer-rust-src-path (getenv "RUST_SRC_PATH"))))

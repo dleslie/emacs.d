@@ -7,8 +7,19 @@
 (require-package 'gist)
 (require-package 'dictionary)
 (require-package 'menu-bar+)
-(require-package 'fuzzy)
+(require-package 'quiz)
 
+(require-package 'flycheck)
+
+(when (find-exe "ag")
+  (require-package 'ag))
+
+(require-package 'git-gutter)
+(with-eval-after-load "git-gutter"
+  (global-git-gutter-mode t)
+  (setq git-gutter:visual-line t))
+
+(require-package 'fuzzy)
 (with-eval-after-load "fuzzy"
   (turn-on-fuzzy-isearch))
 
@@ -29,11 +40,6 @@
 
 (eval-after-load "menu-bar" '(require 'menu-bar+))
 
-(require-package 'borland-blue-theme nil t)
-
-(when (find-exe "ag")
-  (require-package 'ag))
-
 ;; From https://stackoverflow.com/questions/4012321/how-can-i-access-the-path-to-the-current-directory-in-an-emacs-directory-variabl
 (defun my-dir-locals-dir ()
   "Return the directory local variables directory.
@@ -47,16 +53,7 @@ Code taken from `hack-dir-local-variables'."
       (setq dir-name (nth 0 variables-file))))
     dir-name))
 
-(require-package 'git-gutter)
-(global-git-gutter-mode t)
-(setq git-gutter:visual-line t)
-
 (global-hl-line-mode t)
 (global-flycheck-mode t)
-
-(require-package 'quiz)
-
-(when (find-exe "ag")
-  (require-package 'ag))
 
 (reset-theme)
