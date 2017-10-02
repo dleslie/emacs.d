@@ -39,8 +39,8 @@
     (when (get-buffer "*ruby*")
       (kill-buffer "*ruby*")))
 
-  (eval-after-load "projectile"
-    '(require-package 'projectile-rails))
+  (with-eval-after-load "projectile"
+    (require-package 'projectile-rails))
 
   (advice-add 'projectile-rails-console :before #'kill-ruby)
 

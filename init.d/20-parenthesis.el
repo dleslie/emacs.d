@@ -33,7 +33,7 @@
 	 (list 'c-mode-hook
 	       'c++-mode-hook)))
 
-(eval-after-load "eldoc"
-  '(eldoc-add-command
-    'paredit-backward-delete
-    'paredit-close-round))
+(with-eval-after-load "eldoc"
+  (eldoc-add-command
+   'paredit-backward-delete
+   'paredit-close-round))

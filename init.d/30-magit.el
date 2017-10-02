@@ -2,8 +2,7 @@
 ;; Magit
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Magit on windows is ludicrously slow
-(when (not (string= system-type "windows-nt"))
+(when (find-exe "git")
   (message "Configuring Magit")
 
   (require-package 'magit)

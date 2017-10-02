@@ -1,4 +1,5 @@
 (when (and (boundp 'enable-auto-complete) enable-auto-complete)
+  (message "Configuring Auto Complete")
   (require-package 'auto-complete)
   (require-package 'ac-capf)
   (ac-config-default)
