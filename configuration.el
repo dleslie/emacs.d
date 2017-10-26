@@ -25,9 +25,6 @@
 (when (boundp 'w32-pipe-read-delay)
   (setq w32-pipe-read-delay 0))
 
-;; Org
-(setq org-directory "~/OneDrive/org/")
-
 ;; Javascript
 (setq tern-command '("~/node_modules/.bin/tern"))
 
