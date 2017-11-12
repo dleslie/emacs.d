@@ -12,7 +12,7 @@ This is Linux-focused, but wherever possible this configuration also works with 
 * Quick Ubuntu apt package requirements:
 
 ```
-sudo apt-get install gnutls-bin golang cargo rustc clojure1.6 sbcl chicken-bin guile-2.0 racket ruby nodejs nodejs-legacy npm opam haskell-platform rust-gdb rust-doc build-essential gcc gdb g++ git make libtool cmake-curses-gui autoproject automake autoconf clang libclang-dev
+sudo apt-get install gnutls-bin golang cargo rustc clojure sbcl chicken-bin guile-2.0 racket ruby nodejs npm opam haskell-platform rust-gdb rust-doc build-essential gcc gdb g++ git make libtool cmake-curses-gui autoproject automake autoconf clang libclang-dev
 ```
 
 ## (Optional, Windows) MSYS2 dependencies

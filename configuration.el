@@ -87,8 +87,7 @@
 (with-eval-after-load "auto-complete"
   (global-set-key (kbd "<C-tab>") 'auto-complete)
   (with-eval-after-load "fuzzy"
-    (setq ac-fuzzy-enable t)
-    (global-set-key (kbd "<C-tab>") 'ac-fuzzy-complete)))
+    (setq ac-fuzzy-enable t)))
 
 (with-eval-after-load "dictionary"
   (global-set-key "\C-cd" 'dictionary-search))
@@ -120,7 +119,11 @@
 
 (global-set-key [f12] 'toggle-frame-fullscreen)
 
-(with-eval-after-load "ace-jump"
+(with-eval-after-load "ace-jump-mode"
   (define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
-  (define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark)
-  (define-key global-map (kbd "C-c r") 'srefactor-refactor-at-point))
+  (define-key global-map (kbd "C-x SPC") 'ace-jump-mode-pop-mark))
+
+(with-eval-after-load 'dumb-jump
+  (define-key global-map (kbd "C-c j") 'dumb-jump-go)
+  (define-key global-map (kbd "C-c j") 'dumb-jump-quick-look)
+  (define-key global-map (kbd "C-x j") 'dumb-jump-back))

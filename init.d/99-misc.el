@@ -12,6 +12,7 @@
 (require-package 'smex)
 (require-package 'nyan-mode)
 (require-package 'projectile)
+(require-package 'dumb-jump)
 
 (when (find-exe "ag")
   (require-package 'ag))
