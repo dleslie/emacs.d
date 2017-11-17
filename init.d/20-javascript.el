@@ -10,7 +10,7 @@
 
 (add-to-list 'auto-mode-alist '("\\.js?\\'" . js2-mode))
 
-(when (find-exe "tern")
+(when-find-exe/error "tern" "Could not locate tern."
   (message "Configuring Tern")
   
   (require-package 'tern)
@@ -26,7 +26,7 @@
 (with-eval-after-load "auto-complete"
   (require-package 'ac-js2))
 
-(when (find-exe "tsc")
+(when-find-exe/error "tsc" "Could not locate tsc."
   (message "Configuring Typescript")
 
   (add-to-list 'auto-mode-alist '("\\.ts?\\'" . typescript-mode))

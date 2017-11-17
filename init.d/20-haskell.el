@@ -2,11 +2,12 @@
 ;; Haskell
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (find-exe "ghc")
+(require-package 'haskell-mode)
+
+(when-find-exe/error "ghc-mod" "Could not locate ghc-mod."
   (message "Configuring Haskell")
 
   (require-package 'ghc)
-  (require-package 'haskell-mode)
 
   (with-eval-after-load "company"
     (require-package 'company-ghc)

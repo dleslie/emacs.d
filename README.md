@@ -9,20 +9,6 @@ Setup
 This is Linux-focused, but wherever possible this configuration also works with Windows. I use MSYS2 alongside of the official distributions of the various supported languages.
 
 * Link this repository to ~/.emacs.d
-* Quick Ubuntu apt package requirements:
-
-```
-sudo apt-get install gnutls-bin golang cargo rustc clojure sbcl chicken-bin guile-2.0 racket ruby nodejs npm opam haskell-platform rust-gdb rust-doc build-essential gcc gdb g++ git make libtool cmake-curses-gui autoproject automake autoconf clang libclang-dev
-```
-
-## (Optional, Windows) MSYS2 dependencies
-
-Run from a MingW64 shell.
-
-```
-pacman -Sy
-pacman -S mingw-w64-cross-toolchain base-devel mingw64/mingw-w64-x86_64-cmake global
-```
 
 ## (Optional) Install extra stuff to use particular languages and features
 
@@ -32,10 +18,11 @@ At least once, use `M-x` to execute `irony-install-server`
 
 ### Rust
 
-Install from the official distribution. Set RUST_SRC_PATH appropriately.
+Install from the official distribution. Do the following:
 
 ```
 cargo install racer
+rustup component add rust-src
 ```
 
 ### Go
@@ -48,29 +35,15 @@ go get -u github.com/nsf/gocode
 gometalinter --install --update
 ```
 
-### Clojure
-
-```
-sudo apt-get install clojure1.4
-```
-
-### LISP
-
-```
-sudo apt-get install sbcl
-```
-
 ### Scheme
 
-```
-sudo apt-get install chicken-bin guile-2.0 racket
-```
+Install Chicken, Guile, or Racket.
 
-Then configure Chicken to support Geiser:
+For Chicken support in Geiser:
 
 ```
-chicken-install -s apropos chicken-doc
-cd `csi -p '(chicken-home)'` && curl http://3e8.org/pub/chicken-doc/chicken-doc-repo.tgz | sudo tar zx
+chicken-install apropos chicken-doc
+cd `csi -p '(chicken-home)'` && curl http://3e8.org/pub/chicken-doc/chicken-doc-repo.tgz | tar zx
 ```
 
 ### Python
@@ -88,14 +61,12 @@ Then launch emacs and ```M-x elpy-config```
 For Windows, Pry and Pry-Doc are shipped with the latest Ruby releases and need not be installed seperately.
 
 ```
-sudo apt-get install ruby
 gem install pry pry-doc
 ```
 
 ### Node
 
 ```
-sudo apt-get install nodejs nodejs-legacy npm
 npm install -g tern
 ```
 
@@ -104,27 +75,14 @@ npm install -g tern
 Windows users are SOL. Use a VM, I suppose.
 
 ```
-sudo apt-get install opam
 opam install merlin
 ```
 
 ### Haskell
 
-You should be using stack, if you can; but if you must use Ubuntu's repositories:
-
-
-```
-sudo apt-get install haskell-platform
-cabal update
-cabal install ghc-mod
-```
-
-If you're using stack,
-
 ```
 stack install ghc-mod
 ```
-
 
 ## Notes
 

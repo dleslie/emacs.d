@@ -2,7 +2,7 @@
 ;; Magit
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (find-exe "git")
+(when-find-exe/error "git" "Could not locate git."
   (message "Configuring Magit")
 
   (require-package 'magit)

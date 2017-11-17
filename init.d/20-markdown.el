@@ -2,7 +2,7 @@
 ;; Markdown
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (find-exe "markdown")
+(when-find-exe/error "markdown" "Could not locate markdown."
   (message "Configuring Markdown Mode")
 
   (require-package 'markdown-mode)

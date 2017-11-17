@@ -1,4 +1,4 @@
-(when (find-exe "global")
+(when-find-exe/error "global" "Could not locate global."
   (message "Configuring gtags")
   (require-package 'ggtags)
   (with-eval-after-load "ggtags"

@@ -2,7 +2,7 @@
 ;; LISP
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (find-exe "sbcl")
+(when-find-exe/error "sbcl" "Could not locate sbcl."
   (message "Configuring LISP")
 
   (require-package 'slime)

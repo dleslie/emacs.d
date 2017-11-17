@@ -2,12 +2,12 @@
 ;; Go
 ;;;;;;;;;;;;;;;;;;;;
 
-(when (find-exe "go")
+(when-find-exe/error "go" "Could not locate go."
   (message "Configuring Go")
 
   (require-package 'go-mode)
 
-  (when (find-exe "gocode")
+  (when-find-exe/error "gocode" "Could not locate gocode."
     (require-package 'go-eldoc)
     (add-hook 'go-mode-hook 'go-eldoc-setup)
     

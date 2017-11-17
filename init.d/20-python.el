@@ -2,7 +2,7 @@
 ;; Python
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (and (find-exe "pip") (find-exe "python"))
+(when-find-exe/error "pip3" "Could not locate pip3."
   (message "Configuring Python Mode")
 
   (require-package 'elpy)

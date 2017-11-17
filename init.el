@@ -40,6 +40,10 @@
 	  (require package-name))
       nil)))
 
+(defmacro when-find-exe/error (exe error &rest body)
+  (declare (indent 1) (debug t))
+  (list 'if `(find-exe ,exe) (cons 'progn body) `(error ,error)))
+ 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Base configuration
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

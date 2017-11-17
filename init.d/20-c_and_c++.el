@@ -7,7 +7,7 @@
 (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1)))
 (add-hook 'c-mode-hook (lambda () (eldoc-mode 1)))
 
-(when (and (find-exe "clang") (find-exe "cmake"))
+(when-find-exe/error "clang" "Could not find clang."
   (message "Configuring Irony")
   (require-package 'irony)
   (with-eval-after-load "irony"

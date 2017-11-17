@@ -2,12 +2,12 @@
 ;; Rust
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (find-exe "rustc")
+(when-find-exe/error "rustc" "Could not locate rustc."
   (message "Configuring Rust")
 
   (require-package 'rust-mode)
 
-  (when (find-exe "racer")
+  (when-find-exe/error "racer" "Could not locate racer."
     (require-package 'racer)
     (require-package 'toml-mode)
 

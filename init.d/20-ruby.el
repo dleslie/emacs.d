@@ -2,7 +2,7 @@
 ;; Ruby
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (and (find-exe "irb") (find-exe "gem"))
+(when-find-exe/error "gem" "Could not locate gem."
   (message "Configuring Ruby Mode")
 
   (require-package 'enh-ruby-mode)

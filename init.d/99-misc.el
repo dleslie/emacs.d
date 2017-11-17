@@ -14,7 +14,7 @@
 (require-package 'projectile)
 (require-package 'dumb-jump)
 
-(when (find-exe "ag")
+(when-find-exe/error "ag" "Could not locate ag."
   (require-package 'ag))
 
 (require-package 'git-gutter)
