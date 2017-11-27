@@ -1,32 +1,28 @@
 emacs.d
 =======
 
-A collection of my emacs settings.
+A collection of my Emacs settings.
+
+For the most part it is configuration-minimal. If it can locate the package manager for a programming language it will use it to install dependencies, under the assumption that superuser permissions are _not_ required to do so.
+
+When dependencies are missing it is logged in the `*Messages*` buffer; so if something isn't working, look there first. I recommend restarting once or twice after the first install in order to avoid all the Emacs package-install logs.
 
 Setup
 =====
 
 * Link this repository to ~/.emacs.d
 
-## (Optional) Install extra stuff to use particular languages and features
+## Language-specific external requirements
 
 ### C++
 
-Install clang.
+Install clang somehow.
 
 At least once, use `M-x` to execute `irony-install-server`
 
 ### C#
 
 At least once, use `M-x` to execute `omnisharp-install-server`
-
-### Rust
-
-Install from the official distribution. 
-
-### Go
-
-Install Go from golang.org
 
 ### Scheme
 
@@ -44,6 +40,14 @@ cd `csi -p '(chicken-home)'` && curl http://3e8.org/pub/chicken-doc/chicken-doc-
 Install Python and Pip.
 
 At least once, use `M-x` to execute `elpy-config`
+
+### Rust
+
+Install from the official distribution. 
+
+### Go
+
+Install Go from golang.org
 
 ### Ruby
 
