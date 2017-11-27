@@ -143,6 +143,19 @@ Code taken from `hack-dir-local-variables'."
 	  ("elpy" . "https://jorgenschaefer.github.io/packages/"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; use-package
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-time-display "use-package"
+  (add-to-list 'load-path (expand-file-name "use-package" (expand-file-name "lisp" user-emacs-directory)))
+
+  (eval-when-compile
+    (require 'use-package))
+  (require 'bind-key)
+
+  (setq use-package-always-ensure t))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; compilation
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -206,19 +219,6 @@ Code taken from `hack-dir-local-variables'."
 
       (with-eval-after-load "company"
 	(add-to-list 'company-backends 'company-semantic)))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; use-package
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-time-display "use-package"
-  (add-to-list 'load-path (expand-file-name "use-package" (expand-file-name "lisp" user-emacs-directory)))
-
-  (eval-when-compile
-    (require 'use-package))
-  (require 'bind-key)
-
-  (setq use-package-always-ensure t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; auto-complete
