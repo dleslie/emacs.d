@@ -1,12 +1,10 @@
 emacs.d
 =======
 
-A collection of my emacs settings, tuned for Emacs 24.3 and higher.
+A collection of my emacs settings.
 
 Setup
 =====
-
-This is Linux-focused, but wherever possible this configuration also works with Windows. I use MSYS2 alongside of the official distributions of the various supported languages.
 
 * Link this repository to ~/.emacs.d
 
@@ -14,26 +12,21 @@ This is Linux-focused, but wherever possible this configuration also works with 
 
 ### C++
 
+Install clang.
+
 At least once, use `M-x` to execute `irony-install-server`
+
+### C#
+
+At least once, use `M-x` to execute `omnisharp-install-server`
 
 ### Rust
 
-Install from the official distribution. Do the following:
-
-```
-cargo install racer
-rustup component add rust-src
-```
+Install from the official distribution. 
 
 ### Go
 
 Install Go from golang.org
-
-```
-go get -u github.com/alecthomas/gometalinter
-go get -u github.com/nsf/gocode
-gometalinter --install --update
-```
 
 ### Scheme
 
@@ -48,51 +41,27 @@ cd `csi -p '(chicken-home)'` && curl http://3e8.org/pub/chicken-doc/chicken-doc-
 
 ### Python
 
-This is rather straightforward:
+Install Python and Pip.
 
-```
-sudo apt install python-pip python3-pip
-```
-
-Then launch emacs and ```M-x elpy-config```
+At least once, use `M-x` to execute `elpy-config`
 
 ### Ruby
 
-For Windows, Pry and Pry-Doc are shipped with the latest Ruby releases and need not be installed seperately.
-
-```
-gem install pry pry-doc
-```
+Install the official Ruby distribution.
 
 ### Node
 
-```
-npm install -g tern
-```
-
-### O'Caml
-
-Windows users are SOL. Use a VM, I suppose.
-
-```
-opam install merlin
-```
+Install Node somehow.
 
 ### Haskell
 
-```
-stack install ghc-mod
-```
+Install the Haskell Stack.
 
 ## Notes
 
 * The first time you launch it will require an active internet connection to fetch all the necessary packages
 
-* Feel free to configure obvious things (like where to find tern) in `configuration.el`
-
-* Check the "Keys" section for predefined custom keys
-
-* There's a fair amount of undocumented behaviour. Check out the `init.d` folder and have a poke around.
+* First time launch will be a while; get a coffee
 
 Making it Launch Quickly
 ========================
