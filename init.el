@@ -149,8 +149,7 @@ Code taken from `hack-dir-local-variables'."
 (with-time-display "use-package"
   (add-to-list 'load-path (expand-file-name "use-package" (expand-file-name "lisp" user-emacs-directory)))
 
-  (eval-when-compile
-    (require 'use-package))
+  (require 'use-package)
   (require 'bind-key)
 
   (setq use-package-always-ensure t))
