@@ -11,7 +11,6 @@
 
 (defvar enable-semantic nil)
 (defvar enable-company t)
-(defvar enable-auto-complete nil)
 
 ;; Emacs default scrolling behaviour is the worst
 (setq
@@ -137,10 +136,10 @@ Code taken from `hack-dir-local-variables'."
   (package-initialize)
   (require 'package)
   (setq package-archives
-	'(("gnu" . "https://elpa.gnu.org/packages/")
-	  ("melpa" . "https://melpa.org/packages/")
-	  ("org" . "https://orgmode.org/elpa/")
-	  ("elpy" . "https://jorgenschaefer.github.io/packages/"))))
+        '(("gnu" . "https://elpa.gnu.org/packages/")
+          ("melpa" . "https://melpa.org/packages/")
+          ("org" . "https://orgmode.org/elpa/")
+          ("elpy" . "https://jorgenschaefer.github.io/packages/"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; use-package
@@ -180,7 +179,7 @@ Code taken from `hack-dir-local-variables'."
     (use-package semantic
       :bind
       (:map semantic-mode-map
-	    ("M-." . semantic-ia-fast-jump))
+            ("M-." . semantic-ia-fast-jump))
       
       :init
       (require 'semantic/bovine)
@@ -194,11 +193,11 @@ Code taken from `hack-dir-local-variables'."
       (require 'srecode)
 
       (let ((semantic-system-include-paths
-	     (append
-	      (when (file-exists-p "/usr/include/c++/")
-		(directory-files "/usr/include/c++/" t "[^.][0-9.]+"))
-	      '("/usr/local/include" "/usr/include"))))
-	(mapc #'(lambda (s) (semantic-add-system-include s)) semantic-system-include-paths))
+             (append
+              (when (file-exists-p "/usr/include/c++/")
+                (directory-files "/usr/include/c++/" t "[^.][0-9.]+"))
+              '("/usr/local/include" "/usr/include"))))
+        (mapc #'(lambda (s) (semantic-add-system-include s)) semantic-system-include-paths))
 
       (add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode t)
       (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode t)
@@ -217,27 +216,7 @@ Code taken from `hack-dir-local-variables'."
       (semantic-mode 1)
 
       (with-eval-after-load "company"
-	(add-to-list 'company-backends 'company-semantic)))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; auto-complete
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-time-display "auto-complete"
-  (when-set-and-true enable-auto-complete
-    (use-package auto-complete
-      :init
-      (ac-config-default)
-
-      (with-eval-after-load "fuzzy"
-	(setq ac-fuzzy-enable t))
-      
-      (use-package ac-capf
-	:init
-	(add-to-list 'ac-sources 'ac-source-capf))
-
-      (add-to-list 'ac-sources 'ac-source-dictionary)
-      (add-to-list 'ac-sources 'ac-source-imenu))))
+        (add-to-list 'company-backends 'company-semantic)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; company
@@ -254,16 +233,16 @@ Code taken from `hack-dir-local-variables'."
       (add-to-list 'company-backends 'company-elisp)
 
       (defun my-company-ispell-hook ()
-	(make-local-variable 'company-backends)
-	(add-to-list 'company-backends 'company-ispell))
+        (make-local-variable 'company-backends)
+        (add-to-list 'company-backends 'company-ispell))
       
       (add-hook 'text-mode-hook 'my-company-ispell-hook)
       (with-eval-after-load "org"
-	(add-hook 'org-mode-hook 'my-company-ispell-hook))
+        (add-hook 'org-mode-hook 'my-company-ispell-hook))
       (with-eval-after-load "markdown-mode"
-	(add-hook 'markdown-mode-hook 'my-company-ispell-hook))
+        (add-hook 'markdown-mode-hook 'my-company-ispell-hook))
       (with-eval-after-load "writegood-mode"
-	(add-hook 'writegood-mode-hook 'my-company-ispell-hook)))))
+        (add-hook 'writegood-mode-hook 'my-company-ispell-hook)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; c and c++
@@ -301,16 +280,7 @@ Code taken from `hack-dir-local-variables'."
       (with-eval-after-load "company"
         (use-package company-c-headers
           :init
-          (add-to-list 'company-backends 'company-c-headers)))
-
-      (with-eval-after-load "auto-complete"
-        (use-package ac-c-headers
-          :init
-          (defun ac-source-c-headers-enable-hook ()
-            (make-local-variable 'ac-sources)
-            (add-to-list 'ac-sources 'ac-source-c-headers)
-            (add-to-list 'ac-sources 'ac-source-c-header-symbols t))
-          (add-hook 'c-mode-hook 'ac-source-c-headers-enable-hook))))))
+          (add-to-list 'company-backends 'company-c-headers))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; c-sharp
@@ -323,12 +293,12 @@ Code taken from `hack-dir-local-variables'."
     (use-package omnisharp
       :bind
       (:map csharp-mode-map
-       ("M-." . omnisharp-go-to-definition)
-       ("C-c C-c" . recompile))
+            ("M-." . omnisharp-go-to-definition)
+            ("C-c C-c" . recompile))
       :init
       (add-hook 'csharp-mode-hook 'omnisharp-mode)
       (with-eval-after-load "company"
-	(add-to-list 'company-backends 'company-omnisharp)))))
+        (add-to-list 'company-backends 'company-omnisharp)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; clojure
@@ -345,14 +315,6 @@ Code taken from `hack-dir-local-variables'."
         :init
         (add-hook 'clojure-mode-hook 'cider-mode)
         (add-hook 'cider-mode-hook 'eldoc-mode))
-      
-      (with-eval-after-load "auto-complete"
-        (use-package ac-cider
-          :init
-          (defun ac-cider-enable-hook ()
-            (make-local-variable 'ac-sources)
-            (add-to-list 'ac-sources 'ac-source-cider))
-          (add-hook 'cider-mode-hook 'ac-cider-enable-hook)))
 
       (with-eval-after-load "flycheck"
         (use-package flycheck-clojure
@@ -433,10 +395,7 @@ Code taken from `hack-dir-local-variables'."
       (add-hook 'js2-mode-hook 'my-js2-mode-custom-hook)
 
       (with-eval-after-load "company"
-        (use-package company-tern))
-
-      (with-eval-after-load "auto-complete"
-        (use-package ac-js2)))
+        (use-package company-tern)))
     
     (use-package typescript-mode
       :init
@@ -461,7 +420,7 @@ Code taken from `hack-dir-local-variables'."
     (setq
      tide-format-options
      '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t
-       :placeOpenBraceOnNewLineForFunctions nil))))
+                                                             :placeOpenBraceOnNewLineForFunctions nil))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; lisp
@@ -483,7 +442,7 @@ Code taken from `hack-dir-local-variables'."
 
        slime-lisp-implementations
        `((sbcl (,(find-exe "sbcl")) :coding-system utf-8-unix)))
-    
+      
       (defun run-sbcl ()
         (interactive)
         (slime 'sbcl)))
@@ -579,14 +538,7 @@ Code taken from `hack-dir-local-variables'."
           (defun my-inf-ruby-company-fix ()
             (make-local-variable 'company-backends)
             (setq company-backends '(company-jedi)))
-          (add-hook 'inf-ruby-mode-hook 'my-inf-ruby-company-fix)))
-
-      (with-eval-after-load "auto-complete"
-        (defun my-ac-asource-robe-enable-hook ()
-          (make-local-variable 'ac-sources)
-          (with-eval-after-load "robe"
-            (add-to-list 'ac-sources 'ac-source-robe)))
-        (add-hook 'inf-ruby-mode-hook 'my-ac-source-robe-enable-hook)))))
+          (add-hook 'inf-ruby-mode-hook 'my-inf-ruby-company-fix))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; rust
@@ -608,22 +560,14 @@ Code taken from `hack-dir-local-variables'."
         
         (with-eval-after-load "company"
           (add-hook 'racer-mode-hook #'company-mode))
-))))
+        ))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; scheme
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (with-time-display "scheme"
-  (use-package geiser
-    :init
-    (with-eval-after-load "auto-complete"
-      (use-package ac-geiser
-	:init
-	(defun ac-source-geiser-enable-hook ()
-	  (make-local-variable 'ac-sources)
-	  (add-to-list 'ac-sources 'ac-source-geiser))
-	(add-hook 'scheme-mode-hook 'ac-source-geiser-enable-hook)))))
+  (use-package geiser))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; web-mode
@@ -650,11 +594,11 @@ Code taken from `hack-dir-local-variables'."
 
     (defun my-tsx-web-mode-hook ()
       (when (string-equal "tsx" (file-name-extension buffer-file-name))
-	(setup-tide-mode)))
+        (setup-tide-mode)))
 
     (defun my-jsx-web-mode-hook ()
       (when (string-equal "jsx" (file-name-extension buffer-file-name))
-	(setup-tide-mode)))
+        (setup-tide-mode)))
 
     (add-hook 'web-mode-hook #'my-tsx-web-mode-hook)
     (add-hook 'web-mode-hook #'my-jsx-web-mode-hook)
@@ -662,8 +606,8 @@ Code taken from `hack-dir-local-variables'."
     (with-eval-after-load "company"
       (use-package company-web)
       (defun my-web-company-fix ()
-	(make-local-variable 'company-backends)
-	(setq company-backends '(company-web-html company-web-jade company-web-slim company-restclient)))
+        (make-local-variable 'company-backends)
+        (setq company-backends '(company-web-html company-web-jade company-web-slim company-restclient)))
       (add-hook 'web-mode-hook 'my-web-company-fix))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -694,7 +638,7 @@ Code taken from `hack-dir-local-variables'."
       (visual-line-mode t)
       (flyspell-mode t)
       (with-eval-after-load "writegood"
-	(writegood-mode t)))
+        (writegood-mode t)))
     (add-hook 'text-mode-hook 'my-custom-text-mode-hook)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -743,13 +687,7 @@ Code taken from `hack-dir-local-variables'."
       (add-hook 'c++-mode-hook #'ggtags-mode)
 
       (with-eval-after-load "company"
-        (add-to-list 'company-backends 'company-gtags))
-
-      (with-eval-after-load "auto-complete"
-        (defun my-ac-source-gtags-enable-hook ()
-          (make-local-variable 'ac-sources)
-          (add-to-list 'ac-sources 'ac-source-gtags))
-        (add-hook 'ggtags-mode-hook 'my-ac-source-gtags-enable-hook)))))
+        (add-to-list 'company-backends 'company-gtags)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; git
@@ -896,46 +834,46 @@ Code taken from `hack-dir-local-variables'."
        ("DONE" . (:foreground "grey" :weight bold)))
      org-capture-templates
      '(("n" "Note" entry (file+headline "notes.org" "Notes")
-	"* %^{topic} %T %^g\n   :CATEGORY: %^{category}\n%i%?\n")
+        "* %^{topic} %T %^g\n   :CATEGORY: %^{category}\n%i%?\n")
        ("t" "To Do" entry (file+headline "todo.org" "To Do")
-	"* TODO %^{todo} %^g\n   DEADLINE: %^{due}t\n   :CATEGORY: %^{category}\n")
+        "* TODO %^{todo} %^g\n   DEADLINE: %^{due}t\n   :CATEGORY: %^{category}\n")
        ("d" "Daily review" entry (file+headline "diary.org" "Daily Review")
-	"* %T %^g\n   :CATEGORY: Review\n   %?%[~/ownCloud/org/template_daily_review.org]\n")
+        "* %T %^g\n   :CATEGORY: Review\n   %?%[~/ownCloud/org/template_daily_review.org]\n")
        ("i" "Idea" entry (file+headline "ideas.org" "Ideas")
-	"* %^{topic} %T %^g\n   :CATEGORY: Idea\n   %i%?\n")
+        "* %^{topic} %T %^g\n   :CATEGORY: Idea\n   %i%?\n")
        ("j" "Journal" entry (file+headline "diary.org" "Journal")
-	"* %^{topic} %T %^g\n   :CATEGORY: Journal\n   %i%?\n")
+        "* %^{topic} %T %^g\n   :CATEGORY: Journal\n   %i%?\n")
        ("l" "Letter" entry (file+headline "letters.org" "Letter")
-	"* %^{topic} %T %^g\n   :CATEGORY: Letter\n   %i%?\n")
+        "* %^{topic} %T %^g\n   :CATEGORY: Letter\n   %i%?\n")
        ("w" "Work Log" entry (file+headline "work.org" "Work Log")
-	"* %^{topic} %T %^g\n   :CATEGORY: Log\n   %i%?\n")
+        "* %^{topic} %T %^g\n   :CATEGORY: Log\n   %i%?\n")
        ("a" "Article" entry (file+headline "articles.org" "Article")
-	"* %^{topic} %T %^g\n   :CATEGORY: Article\n   %i%?\n")
+        "* %^{topic} %T %^g\n   :CATEGORY: Article\n   %i%?\n")
        ("e" "Event" entry (file+headline "agenda.org" "Events")
-	"* %^{title} %^g\n     SCHEDULED: %^{when}t\n   %i%?\n")
+        "* %^{title} %^g\n     SCHEDULED: %^{when}t\n   %i%?\n")
        ("c" "Contact" entry (file+headline "addresses.org" "Addresses")
-	"* %(org-contacts-template-name)\n   :PROPERTIES:\n   :EMAIL: %(org-contacts-template-email)\n   :END:\n   %i%?\n"))
+        "* %(org-contacts-template-name)\n   :PROPERTIES:\n   :EMAIL: %(org-contacts-template-email)\n   :END:\n   %i%?\n"))
      org-modules
      '(org-bbdb org-bibtex org-docview org-gnus org-info org-jsinfo org-habit org-irc org-mew org-mhe org-rmail org-special-blocks org-vm org-wl org-w3m org-mouse org-bookmark org-drill org-eshell org-invoice org-registry org-contacts))
 
     (let ((gcal-settings (expand-file-name "gcal-settings.el" user-emacs-directory)))
       (when (file-exists-p gcal-settings)
-	(use-package org-gcal
-	  :init
-	  (load gcal-settings)
-	  (defun update-gcal ()
-	    (interactive)
-	    (message "Updating Calendar")
-	    (org-gcal-fetch))
-	  (update-gcal))))
+        (use-package org-gcal
+          :init
+          (load gcal-settings)
+          (defun update-gcal ()
+            (interactive)
+            (message "Updating Calendar")
+            (org-gcal-fetch))
+          (update-gcal))))
 
     (defun my-custom-org-hook ()
       (interactive)
       (visual-line-mode t)
       (with-eval-after-load "flyspell"
-	(flyspell-mode t))
+        (flyspell-mode t))
       (with-eval-after-load "writegood"
-	(writegood-mode t)))
+        (writegood-mode t)))
     (add-hook 'org-mode-hook 'my-custom-org-hook)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
