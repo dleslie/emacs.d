@@ -485,17 +485,10 @@ Code taken from `hack-dir-local-variables'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (with-time-display "python"
-  (when (or (find-exe "pip3") (find-exe "pip"))
-    (use-package elpy
-      :init
-      (add-hook 'python-mode-hook 'elpy-enable)
-      (with-eval-after-load "company"
-        (use-package company-jedi
-          :init
-          (defun my-python-company-fix ()
-            (make-local-variable 'company-backends)
-            (setq company-backends '(company-jedi)))
-          (add-hook 'python-mode-hook 'my-python-company-fix))))))
+  (use-package anaconda-mode
+    :init
+    (add-hook 'python-mode-hook 'anaconda-mode)
+    (add-hook 'python-mode-hook 'anaconda-eldoc-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ruby
@@ -561,13 +554,6 @@ Code taken from `hack-dir-local-variables'."
         (with-eval-after-load "company"
           (add-hook 'racer-mode-hook #'company-mode))
         ))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; scheme
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-time-display "scheme"
-  (use-package geiser))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; web-mode
@@ -875,6 +861,14 @@ Code taken from `hack-dir-local-variables'."
       (with-eval-after-load "writegood"
         (writegood-mode t)))
     (add-hook 'org-mode-hook 'my-custom-org-hook)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; scheme
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-time-display "scheme"
+  (use-package geiser))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; themes
