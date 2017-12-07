@@ -454,6 +454,14 @@ Code taken from `hack-dir-local-variables'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (with-time-display "parenthesis"
+  (show-paren-mode t)
+  (use-package highlight-parentheses
+    :init
+    (define-globalized-minor-mode global-highlight-parentheses-mode
+      highlight-parentheses-mode
+      (lambda ()
+        (highlight-parentheses-mode t)))
+    (global-highlight-parentheses-mode t))
   (defvar-local paren-modes
     '(emacs-lisp-mode-hook
       eval-expression-minibuffer-setup-hook
