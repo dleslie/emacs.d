@@ -9,7 +9,7 @@
 
 (defvar my-init-start-time (float-time))
 
-(defvar enable-semantic nil)
+(defvar enable-semantic t)
 (defvar enable-company t)
 
 ;; Emacs default scrolling behaviour is the worst
@@ -199,22 +199,24 @@ Code taken from `hack-dir-local-variables'."
               '("/usr/local/include" "/usr/include"))))
         (mapc #'(lambda (s) (semantic-add-system-include s)) semantic-system-include-paths))
 
-      (add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode t)
+      (setq semantic-default-submods '())
       (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode t)
-      (add-to-list 'semantic-default-submodes 'global-semantic-highlight-func-mode t)
       (add-to-list 'semantic-default-submodes 'global-semantic-highlight-edits-mode t)
-      (add-to-list 'semantic-default-submodes 'global-semantic-show-unmatched-syntax-mode t)
+      (add-to-list 'semantic-default-submodes 'global-semantic-highlight-func-mode t)
+      (add-to-list 'semantic-default-submodes 'global-semantic-idle-breadcrumbs-mode t)
+      (add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode t)
       (add-to-list 'semantic-default-submodes 'global-semantic-idle-local-symbol-highlight-mode t)
       (add-to-list 'semantic-default-submodes 'global-semantic-idle-scheduler-mode t)
-      (add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode t)
+      (add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode t)
       (add-to-list 'semantic-default-submodes 'global-semantic-show-parser-state-mode t)
+      (add-to-list 'semantic-default-submodes 'global-semantic-show-unmatched-syntax-mode t)
 
-      (global-ede-mode 1)
+      (global-ede-mode t)
 
       (setq semanticdb-find-default-throttle '(local file unloaded project system recursive omniscience))
 
-      (semantic-mode 1)
-
+      (semantic-mode t)
+      
       (with-eval-after-load "company"
         (add-to-list 'company-backends 'company-semantic)))))
 
@@ -252,7 +254,7 @@ Code taken from `hack-dir-local-variables'."
   (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1)))
   (add-hook 'c-mode-hook (lambda () (eldoc-mode 1)))
 
-  (when-find-exe "clang"
+  (when (and (not enable-semantic) (find-exe "clang"))
     (use-package irony
       :init
       (when (boundp 'w32-pipe-buffer-size)
@@ -665,7 +667,7 @@ Code taken from `hack-dir-local-variables'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (with-time-display "tags"
-  (when-find-exe "global"
+  (when (and (not enable-semantic) (find-exe "global"))
     (use-package ggtags
       :bind
       (:map ggtags-mode-map
