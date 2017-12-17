@@ -65,7 +65,7 @@
 (defmacro when-find-exe (exe &rest body)
   "When EXE is found execute BODY."
   (declare (indent 1) (debug t))
-  `(if (find-exe ,exe) ,(cons 'progn body) (error (format "Could not locate %s" ,exe))))
+  `(if (find-exe ,exe) ,(cons 'progn body) (warn (format "Could not locate %s" ,exe))))
 
 (defun execute-cmd (name args)
   "Execute NAME with ARGS."
@@ -436,6 +436,9 @@ Code taken from `hack-dir-local-variables'."
     (setq
      slime-contribs
      '(slime-fancy))
+
+    (setq inferior-lisp-program nil
+          slime-lisp-implementations nil)
 
     (when-find-exe "sbcl"
       (setq
