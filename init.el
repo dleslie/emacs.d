@@ -21,7 +21,9 @@
 ;; General Emacs Sanity
 (setq gc-cons-threshold 20000000
       indent-tabs-mode nil
-      make-backup-files nil)
+      make-backup-files nil
+      debug-on-error nil)
+
 (delete-selection-mode 1)
 
 ;; Windows performance tweaks
