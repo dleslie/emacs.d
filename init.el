@@ -192,13 +192,6 @@ Code taken from `hack-dir-local-variables'."
       (require 'semantic/analyze)
       (require 'srecode)
 
-      (let ((semantic-system-include-paths
-             (append
-              (when (file-exists-p "/usr/include/c++/")
-                (directory-files "/usr/include/c++/" t "[^.][0-9.]+"))
-              '("/usr/local/include" "/usr/include"))))
-        (mapc #'(lambda (s) (semantic-add-system-include s)) semantic-system-include-paths))
-
       (setq semantic-default-submods '())
       (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode t)
       (add-to-list 'semantic-default-submodes 'global-semantic-highlight-edits-mode t)
@@ -209,13 +202,21 @@ Code taken from `hack-dir-local-variables'."
       (add-to-list 'semantic-default-submodes 'global-semantic-idle-scheduler-mode t)
       (add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode t)
       (add-to-list 'semantic-default-submodes 'global-semantic-show-parser-state-mode t)
-      (add-to-list 'semantic-default-submodes 'global-semantic-show-unmatched-syntax-mode t)
+      (add-to-list 'semantic-default-submodes 'global-semantic-show-unmatched-syntax-mode nil)
 
       (global-ede-mode t)
+      (global-semanticdb-minor-mode t)
 
       (setq semanticdb-find-default-throttle '(local file unloaded project system recursive omniscience))
 
       (semantic-mode t)
+
+      (let ((semantic-system-include-paths
+             (append
+              (when (file-exists-p "/usr/include/c++/")
+                (directory-files "/usr/include/c++/" t "[^.][0-9.]+"))
+              '("/usr/local/include" "/usr/include"))))
+        (mapc #'(lambda (s) (semantic-add-system-include s)) semantic-system-include-paths))
       
       (with-eval-after-load "company"
         (add-to-list 'company-backends 'company-semantic)))))
@@ -272,6 +273,14 @@ Code taken from `hack-dir-local-variables'."
       (with-eval-after-load "flycheck"
         (use-package flycheck-irony
           :init
+          (defun add-c-flycheck-arg (arg)
+            (add-to-list 'flycheck-clang-args arg)
+            (add-to-list 'flycheck-gcc-args arg))
+          (defun add-c-flycheck-path (path)
+            "Add PATH as a flycheck search path in C modes."
+            (add-to-list 'flycheck-clang-include-path path)
+            (add-to-list 'flycheck-gcc-include-path path)
+            (add-to-list 'flycheck-cppcheck-include-path path))
           (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)))
 
       (with-eval-after-load "company"
@@ -785,7 +794,9 @@ Code taken from `hack-dir-local-variables'."
     :bind (("C-c d" . dictionary-search)))
   
   (use-package quiz
-    :bind (("C-c q" . quiz))))
+    :bind (("C-c q" . quiz)))
+
+  (use-package f))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org
