@@ -91,25 +91,27 @@ Because I work on a fair amount of C/C++ projects in my hobby time I've develope
 
 ```
 ((nil . ((tab-width . 2)
-				 (eval .
-							 (progn
-								 (let* ((build-root (file-name-as-directory (f-join (dir-locals-dir) "build")))
-												(targets (delete ".." (delete "." (directory-files build-root))))
-												(target-dirs (mapcar (lambda (d) (file-name-as-directory (f-join build-root d))) targets)))
-									 (dolist (d target-dirs)
-										 (let ((include-dir (file-name-as-directory (f-join d "include"))))
-											 (semantic-add-system-include include-dir)
-											 (add-c-flycheck-path include-dir))))
-								 (let ((include-dir (f-join (dir-locals-dir) "dl")))
-									 (add-c-flycheck-path include-dir)
-									 (semantic-add-system-include include-dir))))))
+	 (eval .
+	       (progn
+		 (let* ((build-root (file-name-as-directory (f-join (dir-locals-dir) "build")))
+			(targets (when build-root (delete ".." (delete "." (directory-files build-root)))))
+			(target-dirs (when targets (mapcar (lambda (d) (file-name-as-directory (f-join build-root d))) targets))))
+		   (when target-dirs
+		     (dolist (d target-dirs)
+		       (let ((include-dir (file-name-as-directory (f-join d "include"))))
+			 (semantic-add-system-include include-dir)
+			 (add-c-flycheck-path include-dir)))))
+		 (let ((include-dir (f-join (dir-locals-dir) "dl")))
+		   (when (file-exists-p include-dir)
+		     (add-c-flycheck-path include-dir)
+		     (semantic-add-system-include include-dir)))))))
  (scheme-mode . ((indent-tabs-mode . nil)))
  (c-mode . ((indent-tabs-mode . nil)
-						(eval . (progn
-											(add-c-flycheck-arg "-std=c99")))))
+	    (eval . (progn
+		      (add-c-flycheck-arg "-std=c99")))))
  (c++-mode . ((indent-tabs-mode . nil)
-							(eval . (progn
-												(add-c-flycheck-arg "-std=c++14"))))))
+	      (eval . (progn
+			(add-c-flycheck-arg "-std=c++14"))))))
 ```
 
 Using .projectile to Create a Project Root

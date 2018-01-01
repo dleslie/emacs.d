@@ -9,43 +9,8 @@
 
 (defvar my-init-start-time (float-time))
 
-(defvar enable-semantic t)
+(defvar enable-semantic nil)
 (defvar enable-company t)
-
-;; Emacs default scrolling behaviour is the worst
-(setq
- scroll-step 2
- scroll-conservatively 10000
- auto-window-vscroll nil)
-
-;; General Emacs Sanity
-(setq gc-cons-threshold 20000000
-      indent-tabs-mode nil
-      make-backup-files nil
-      debug-on-error nil)
-
-(delete-selection-mode 1)
-
-;; Windows performance tweaks
-(when (boundp 'w32-pipe-read-delay)
-  (setq w32-pipe-read-delay 0))
-
-;; Don't be a dick
-(setq
- indent-tabs-mode nil
- truncate-lines t
- tab-width 2)
-
-;; Useful bindings
-(global-set-key "\C-w" 'clipboard-kill-region)
-(global-set-key "\M-w" 'clipboard-kill-ring-save)
-(global-set-key "\C-y" 'clipboard-yank)
-(global-set-key "\C-c," 'scroll-bar-mode)
-(global-set-key "\C-c." 'tool-bar-mode)
-(global-set-key "\C-c?" 'menu-bar-mode)
-(global-set-key "\C-c\\" 'comment-or-uncomment-region)
-(global-set-key "\C-cs" 'eshell-here)
-(global-set-key [f12] 'toggle-frame-fullscreen)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; custom functions
@@ -208,10 +173,9 @@ Code taken from `hack-dir-local-variables'."
 
       (global-ede-mode t)
       (global-semanticdb-minor-mode t)
-
-      (setq semanticdb-find-default-throttle '(local file unloaded project system recursive omniscience))
-
       (semantic-mode t)
+
+      (setq semanticdb-find-default-throttle '(local file project system recursive omniscience unloaded))
 
       (let ((semantic-system-include-paths
              (append
@@ -257,43 +221,41 @@ Code taken from `hack-dir-local-variables'."
   (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1)))
   (add-hook 'c-mode-hook (lambda () (eldoc-mode 1)))
 
+  (defun add-c-flycheck-arg (arg)
+    (add-to-list 'flycheck-clang-args arg)
+    (add-to-list 'flycheck-gcc-args arg))
+  
+  (defun add-c-flycheck-path (path)
+    "Add PATH as a flycheck search path in C modes."
+    (add-to-list 'flycheck-clang-include-path path)
+    (add-to-list 'flycheck-gcc-include-path path)
+    (add-to-list 'flycheck-cppcheck-include-path path))
+
   (when (and (not enable-semantic) (find-exe "clang"))
     (use-package irony
       :init
       (when (boundp 'w32-pipe-buffer-size)
-        (setq irony-server-w32-pipe-buffer-size (* 64 1024)))
-      
+        (setq irony-server-w32-pipe-buffer-size (* 64 1024)))      
       (add-hook 'c++-mode-hook 'irony-mode)
       (add-hook 'c-mode-hook 'irony-mode)
       (add-hook 'objc-mode-hook 'irony-mode)
       (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-
       (use-package irony-eldoc
         :init
         (add-hook 'irony-mode-hook #'irony-eldoc))
-
       (with-eval-after-load "flycheck"
         (use-package flycheck-irony
           :init
-          (defun add-c-flycheck-arg (arg)
-            (add-to-list 'flycheck-clang-args arg)
-            (add-to-list 'flycheck-gcc-args arg))
-          (defun add-c-flycheck-path (path)
-            "Add PATH as a flycheck search path in C modes."
-            (add-to-list 'flycheck-clang-include-path path)
-            (add-to-list 'flycheck-gcc-include-path path)
-            (add-to-list 'flycheck-cppcheck-include-path path))
           (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)))
-
       (with-eval-after-load "company"
         (use-package company-irony
           :init
-          (add-to-list 'company-backends 'company-irony)))
+          (add-to-list 'company-backends 'company-irony)))))
 
-      (with-eval-after-load "company"
-        (use-package company-c-headers
-          :init
-          (add-to-list 'company-backends 'company-c-headers))))))
+  (with-eval-after-load "company"
+    (use-package company-c-headers
+      :init
+      (add-to-list 'company-backends 'company-c-headers))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; c-sharp
@@ -902,6 +864,46 @@ Code taken from `hack-dir-local-variables'."
 
 (with-time-display "themes"
   (use-package doom-themes))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; basic settings
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-time-display "settings"
+  ;; Emacs default scrolling behaviour is the worst
+  (setq
+   scroll-step 2
+   scroll-conservatively 10000
+   auto-window-vscroll nil)
+
+  ;; General Emacs Sanity
+  (setq gc-cons-threshold 20000000
+        make-backup-files nil
+        debug-on-error nil)
+
+  (delete-selection-mode t)
+
+  ;; Windows performance tweaks
+  (when (boundp 'w32-pipe-read-delay)
+    (setq w32-pipe-read-delay 0))
+
+  ;; Don't be a dick
+  (setq
+   truncate-lines t
+   tab-width 2
+   indent-tabs-mode nil)
+
+  ;; Useful bindings
+  (global-set-key "\C-w" 'clipboard-kill-region)
+  (global-set-key "\M-w" 'clipboard-kill-ring-save)
+  (global-set-key "\C-y" 'clipboard-yank)
+  (global-set-key "\C-c," 'scroll-bar-mode)
+  (global-set-key "\C-c." 'tool-bar-mode)
+  (global-set-key "\C-c?" 'menu-bar-mode)
+  (global-set-key "\C-c\\" 'comment-or-uncomment-region)
+  (global-set-key "\C-cs" 'eshell-here)
+  (global-set-key [f12] 'toggle-frame-fullscreen))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; customizable values
