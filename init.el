@@ -231,6 +231,14 @@ Code taken from `hack-dir-local-variables'."
     (add-to-list 'flycheck-gcc-include-path path)
     (add-to-list 'flycheck-cppcheck-include-path path))
 
+  (defun add-c-include-path (path)
+    (when enable-semantic
+      (semantic-add-system-include path))
+    (add-c-flycheck-path path))
+
+  (defun add-c-build-arg (arg)
+    (add-c-flycheck-arg arg))
+  
   (when (and (not enable-semantic) (find-exe "clang"))
     (use-package irony
       :init
