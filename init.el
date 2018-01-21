@@ -194,11 +194,17 @@ Code taken from `hack-dir-local-variables'."
 (with-time-display "company"
   (when-set-and-true enable-company
     (use-package company
+      :bind
+      (:map company-mode-map
+            ("<C-tab>" . company-complete))
+
       :init
       (setq company-tooltip-align-annotations t)
       
       (global-company-mode)
 
+      (set 'company-idle-delay nil)
+      
       (add-to-list 'company-backends 'company-elisp)
 
       (defun my-company-ispell-hook ()
