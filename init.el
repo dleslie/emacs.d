@@ -12,6 +12,41 @@
 (defvar enable-semantic nil)
 (defvar enable-company t)
 
+;; Emacs default scrolling behaviour is the worst
+(setq
+ scroll-step 2
+ scroll-conservatively 10000
+ auto-window-vscroll nil)
+
+;; General Emacs Sanity
+(setq gc-cons-threshold 20000000
+      indent-tabs-mode nil
+      make-backup-files nil
+      debug-on-error nil)
+
+(delete-selection-mode 1)
+
+;; Windows performance tweaks
+(when (boundp 'w32-pipe-read-delay)
+  (setq w32-pipe-read-delay 0))
+
+;; Don't be a dick
+(setq
+ indent-tabs-mode nil
+ truncate-lines t
+ tab-width 2)
+
+;; Useful bindings
+(global-set-key "\C-w" 'clipboard-kill-region)
+(global-set-key "\M-w" 'clipboard-kill-ring-save)
+(global-set-key "\C-y" 'clipboard-yank)
+(global-set-key "\C-c," 'scroll-bar-mode)
+(global-set-key "\C-c." 'tool-bar-mode)
+(global-set-key "\C-c?" 'menu-bar-mode)
+(global-set-key "\C-c\\" 'comment-or-uncomment-region)
+(global-set-key "\C-cs" 'eshell-here)
+(global-set-key [f12] 'toggle-frame-fullscreen)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; custom functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -237,34 +272,19 @@ Code taken from `hack-dir-local-variables'."
     (add-to-list 'flycheck-gcc-include-path path)
     (add-to-list 'flycheck-cppcheck-include-path path))
 
-  (defun add-c-include-path (path)
-    (when enable-semantic
-      (semantic-add-system-include path))
-    (add-c-flycheck-path path))
+  ;;     (use-package irony-eldoc
+  ;;       :init
+  ;;       (add-hook 'irony-mode-hook #'irony-eldoc))
 
-  (defun add-c-build-arg (arg)
-    (add-c-flycheck-arg arg))
-  
-  (when (and (not enable-semantic) (find-exe "clang"))
-    (use-package irony
-      :init
-      (when (boundp 'w32-pipe-buffer-size)
-        (setq irony-server-w32-pipe-buffer-size (* 64 1024)))      
-      (add-hook 'c++-mode-hook 'irony-mode)
-      (add-hook 'c-mode-hook 'irony-mode)
-      (add-hook 'objc-mode-hook 'irony-mode)
-      (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-      (use-package irony-eldoc
-        :init
-        (add-hook 'irony-mode-hook #'irony-eldoc))
-      (with-eval-after-load "flycheck"
-        (use-package flycheck-irony
-          :init
-          (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)))
-      (with-eval-after-load "company"
-        (use-package company-irony
-          :init
-          (add-to-list 'company-backends 'company-irony)))))
+  ;;     (with-eval-after-load "flycheck"
+  ;;       (use-package flycheck-irony
+  ;;         :init
+  ;;         (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)))
+
+  ;;     (with-eval-after-load "company"
+  ;;       (use-package company-irony
+  ;;         :init
+  ;;         (add-to-list 'company-backends 'company-irony)))))
 
   (with-eval-after-load "company"
     (use-package company-c-headers
