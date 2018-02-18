@@ -734,9 +734,6 @@ Code taken from `hack-dir-local-variables'."
   (use-package smex
     :bind (("M-x" . smex)))
 
-  (use-package menu-bar+
-    :init (with-eval-after-load "menu-bar" (require 'menu-bar+)))
-
   (use-package ido
     :init
     (setq
