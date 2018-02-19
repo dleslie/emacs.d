@@ -825,9 +825,9 @@ Code taken from `hack-dir-local-variables'."
     (use-package ox-twiki)
 
     (setq
-     org-default-notes-file "notes.org"
-     org-agenda-files '("todo.org" "agenda.org")
-     org-agenda-diary-file "diary.org"
+     org-default-notes-file (f-join org-directory "notes.org")
+     org-agenda-files `(,(f-join org-directory "todo.org") ,(f-join org-directory "agenda.org"))
+     org-agenda-diary-file (f-join org-directory "diary.org")
      org-todo-keywords
      '((sequence "TODO(t)" "PROG(p)" "BLCK(b)" "STAL(s)" "|" "DONE(d)" "WONT(w)"))
      org-todo-keyword-faces
