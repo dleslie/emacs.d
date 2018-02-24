@@ -143,13 +143,14 @@ Code taken from `hack-dir-local-variables'."
           ("org" . "https://orgmode.org/elpa/")
           ("elpy" . "https://jorgenschaefer.github.io/packages/"))))
 
+(dolist (dir (directory-files  (expand-file-name "lisp" user-emacs-directory) t "[^\\.]"))
+  (add-to-list 'load-path dir))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; use-package
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (with-time-display "use-package"
-  (add-to-list 'load-path (expand-file-name "use-package" (expand-file-name "lisp" user-emacs-directory)))
-
   (require 'use-package)
   (require 'bind-key)
 
@@ -887,6 +888,24 @@ Code taken from `hack-dir-local-variables'."
       (global-ycmd-mode 1)
       (with-eval-after-load "flycheck"
         (use-package flycheck-ycmd :init (flycheck-ycmd-setup))))))
+
+;; toml
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-time-display "toml"
+  (use-package toml-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; gdscript
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-time-display "gdscript"
+  (require 'godot-gdscript)
+  (with-eval-after-load "company"
+    (require 'company-godot-gdscript)
+    (add-to-list 'company-backends 'company-godot-gdscript))
+  (with-eval-after-load "toml-mode"
+    (add-to-list 'auto-mode-alist (cons "\\.tscn\\'" 'toml-mode))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; themes
