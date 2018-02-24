@@ -272,20 +272,6 @@ Code taken from `hack-dir-local-variables'."
     (add-to-list 'flycheck-gcc-include-path path)
     (add-to-list 'flycheck-cppcheck-include-path path))
 
-  ;;     (use-package irony-eldoc
-  ;;       :init
-  ;;       (add-hook 'irony-mode-hook #'irony-eldoc))
-
-  ;;     (with-eval-after-load "flycheck"
-  ;;       (use-package flycheck-irony
-  ;;         :init
-  ;;         (add-hook 'flycheck-mode-hook #'flycheck-irony-setup)))
-
-  ;;     (with-eval-after-load "company"
-  ;;       (use-package company-irony
-  ;;         :init
-  ;;         (add-to-list 'company-backends 'company-irony)))))
-
   (with-eval-after-load "company"
     (use-package company-c-headers
       :init
@@ -415,10 +401,11 @@ Code taken from `hack-dir-local-variables'."
     (defun my-setup-tide-mode ()
       (interactive)
       (tide-setup)
-      (flycheck-mode +1)
-      (setq flycheck-check-syntax-automatically '(save mode-enabled))
       (eldoc-mode +1)
-      (tide-hl-identifier-mode +1))
+      (tide-hl-identifier-mode +1)
+      (with-eval-after-load "flycheck"
+        (flycheck-mode +1)
+        (setq flycheck-check-syntax-automatically '(save mode-enabled))))
 
     ;; formats the buffer before saving
     (add-hook 'before-save-hook 'tide-format-before-save)
@@ -426,10 +413,9 @@ Code taken from `hack-dir-local-variables'."
     (add-hook 'typescript-mode-hook #'my-setup-tide-mode)
 
     ;; format options
-    (setq
-     tide-format-options
+    (setq tide-format-options
      '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t
-                                                             :placeOpenBraceOnNewLineForFunctions nil))))
+       :placeOpenBraceOnNewLineForFunctions nil))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; lisp
@@ -666,11 +652,12 @@ Code taken from `hack-dir-local-variables'."
 ;; fly
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "fly"
+(with-time-display "flycheck"
   (use-package flycheck
     :init
     (add-hook 'after-init-hook #'global-flycheck-mode)
-    (global-flycheck-mode t)))
+    (global-flycheck-mode t)
+    (when (not (display-graphic-p)) (setq flycheck-indication-mode nil))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; tags
@@ -890,12 +877,23 @@ Code taken from `hack-dir-local-variables'."
   (use-package geiser))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ycmd
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-time-display "ycmd"
+  (when-find-exe "ycmd"
+    (use-package ycmd
+      :init
+      (global-ycmd-mode 1)
+      (with-eval-after-load "flycheck"
+        (use-package flycheck-ycmd :init (flycheck-ycmd-setup))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; themes
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (with-time-display "themes"
   (use-package doom-themes))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; basic settings
