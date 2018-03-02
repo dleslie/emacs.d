@@ -239,10 +239,9 @@ Code taken from `hack-dir-local-variables'."
       
       (global-company-mode)
 
-      (set 'company-idle-delay nil)
+      (setq company-idle-delay nil)
+      (setq company-backends (remove-if #'listp company-backends))
       
-      (add-to-list 'company-backends 'company-elisp)
-
       (defun my-company-ispell-hook ()
         (make-local-variable 'company-backends)
         (add-to-list 'company-backends 'company-ispell))
@@ -273,6 +272,13 @@ Code taken from `hack-dir-local-variables'."
     (add-to-list 'flycheck-gcc-include-path path)
     (add-to-list 'flycheck-cppcheck-include-path path))
 
+  (defun add-c-include-path (path)
+    "Add PATH as an include path for various C mode stuff."
+    (add-c-flycheck-path path)
+    (when-set-and-true semantic
+      (with-eval-after-load "semantic"
+        (semantic-add-system-include path))))
+  
   (with-eval-after-load "company"
     (use-package company-c-headers
       :init
@@ -886,6 +892,9 @@ Code taken from `hack-dir-local-variables'."
     (use-package ycmd
       :init
       (global-ycmd-mode 1)
+      (setq ycmd-server-command `("python" ,(find-exe "ycmd")))
+      (with-eval-after-load "company"
+        (use-package company-ycmd))
       (with-eval-after-load "flycheck"
         (use-package flycheck-ycmd :init (flycheck-ycmd-setup))))))
 
