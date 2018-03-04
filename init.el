@@ -11,6 +11,8 @@
 
 (defvar enable-semantic nil)
 (defvar enable-company t)
+(defvar enable-global nil)
+(defvar enable-ycmd t)
 
 ;; Emacs default scrolling behaviour is the worst
 (setq
@@ -73,14 +75,16 @@
   "Execute NAME with ARGS."
   (shell-command (format "%s %s" (find-exe name) args)))
 
-(defmacro with-time-display (name &rest body)
+(defmacro with-perf-metrics (name &rest body)
   "Show time of scope NAME taken to execute BODY."
   (declare (indent 1) (debug t))
-  `(let ((begin-time (float-time)))
-     (message (format "[%s]" ,name))
-     (with-demoted-errors "Error: %S"
-       ,(cons 'progn body))
-     (message (format "[%s : %ss]" ,name (- (float-time) begin-time)))))
+  `(progn
+     (let ((begin-time (float-time))
+           (begin-cells cons-cells-consed))
+       (message (format "[%s]" ,name))
+       (with-demoted-errors "Error: %S"
+         ,(cons 'progn body))
+       (message (format "[%s : %ss, %s cells]" ,name (- (float-time) begin-time) (- cons-cells-consed begin-cells))))))
 
 (defmacro when-set-and-true (sym &rest body)
   "When SYM exists and is t execute BODY."
@@ -134,7 +138,7 @@ Code taken from `hack-dir-local-variables'."
 ;; packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "packages"
+(with-perf-metrics "packages"
   (package-initialize)
   (require 'package)
   (setq package-archives
@@ -150,17 +154,31 @@ Code taken from `hack-dir-local-variables'."
 ;; use-package
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "use-package"
+(with-perf-metrics "use-package"
   (require 'use-package)
   (require 'bind-key)
 
   (setq use-package-always-ensure t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; miscellaneous tools
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "tools"
+  (use-package dictionary
+    :bind (("C-c d" . dictionary-search)))
+  
+  (use-package quiz
+    :bind (("C-c q" . quiz)))
+
+  (use-package f)
+  (use-package dash))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; compilation
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "compilation"
+(with-perf-metrics "compilation"
   (require 'ansi-color)
   
   (defun my-compilation-custom-hook ()
@@ -177,7 +195,7 @@ Code taken from `hack-dir-local-variables'."
 ;; semantic
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "semantic"
+(with-perf-metrics "semantic"
   (when-set-and-true enable-semantic
     (use-package semantic
       :bind
@@ -227,7 +245,7 @@ Code taken from `hack-dir-local-variables'."
 ;; company
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "company"
+(with-perf-metrics "company"
   (when-set-and-true enable-company
     (use-package company
       :bind
@@ -239,8 +257,9 @@ Code taken from `hack-dir-local-variables'."
       
       (global-company-mode)
 
-      (setq company-idle-delay nil)
-      (setq company-backends (remove-if #'listp company-backends))
+      (setq company-idle-delay 0.25)
+      (setq company-backends (-flatten company-backends))
+      (setq company-backends (remove-duplicates company-backends :test #'equal))
       
       (defun my-company-ispell-hook ()
         (make-local-variable 'company-backends)
@@ -258,7 +277,7 @@ Code taken from `hack-dir-local-variables'."
 ;; c and c++
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "c and c++"
+(with-perf-metrics "c and c++"
   (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1)))
   (add-hook 'c-mode-hook (lambda () (eldoc-mode 1)))
 
@@ -288,7 +307,7 @@ Code taken from `hack-dir-local-variables'."
 ;; c-sharp
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "c-sharp"
+(with-perf-metrics "c-sharp"
   (use-package csharp-mode
     :init
     ;; Run omnisharp-install-server
@@ -306,7 +325,7 @@ Code taken from `hack-dir-local-variables'."
 ;; clojure
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "clojure"
+(with-perf-metrics "clojure"
   (when-find-exe "clojure"
     (use-package clojure-mode
       :init
@@ -327,7 +346,7 @@ Code taken from `hack-dir-local-variables'."
 ;; go
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "go"
+(with-perf-metrics "go"
   (when-find-exe "go"
     (use-package go-mode
       :init
@@ -354,7 +373,7 @@ Code taken from `hack-dir-local-variables'."
 ;; haskell
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "haskell"
+(with-perf-metrics "haskell"
   (when-find-exe "stack"
     (use-package haskell-mode
       :init
@@ -376,7 +395,7 @@ Code taken from `hack-dir-local-variables'."
 ;; javascript
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "javascript"
+(with-perf-metrics "javascript"
   (use-package js2-mode
     :init
     (add-to-list 'auto-mode-alist '("\\.js?\\'" . js2-mode)))
@@ -428,7 +447,7 @@ Code taken from `hack-dir-local-variables'."
 ;; lisp
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "lisp"
+(with-perf-metrics "lisp"
   (use-package slime
     :init
     (require 'slime-autoloads)
@@ -458,7 +477,7 @@ Code taken from `hack-dir-local-variables'."
 ;; parenthesis
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "parenthesis"
+(with-perf-metrics "parenthesis"
   (show-paren-mode t)
   (use-package highlight-parentheses
     :init
@@ -497,7 +516,7 @@ Code taken from `hack-dir-local-variables'."
 ;; python
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "python"
+(with-perf-metrics "python"
   (use-package anaconda-mode
     :init
     (add-hook 'python-mode-hook 'anaconda-mode)
@@ -507,7 +526,7 @@ Code taken from `hack-dir-local-variables'."
 ;; ruby
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "ruby"
+(with-perf-metrics "ruby"
   (when-find-exe "gem"
     (use-package inf-ruby
       :init
@@ -550,7 +569,7 @@ Code taken from `hack-dir-local-variables'."
 ;; rust
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "rust"
+(with-perf-metrics "rust"
   (when (and (find-exe "cargo") (find-exe "rustup"))
     (use-package rust-mode
       :init
@@ -572,7 +591,7 @@ Code taken from `hack-dir-local-variables'."
 ;; web-mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "web"
+(with-perf-metrics "web"
   (use-package restclient
     :init
     (with-eval-after-load "company"
@@ -613,7 +632,7 @@ Code taken from `hack-dir-local-variables'."
 ;; markdown
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "markdown"
+(with-perf-metrics "markdown"
   (when-find-exe "markdown"
     (use-package markdown-mode
       :init
@@ -630,7 +649,7 @@ Code taken from `hack-dir-local-variables'."
 ;; text
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "text"
+(with-perf-metrics "text"
   (use-package writegood-mode
     :init
     (defun my-custom-text-mode-hook ()
@@ -644,7 +663,7 @@ Code taken from `hack-dir-local-variables'."
 ;; ace jump
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "ace"
+(with-perf-metrics "ace"
   (use-package ace-jump-mode
     :bind
     (("C-c SPC" . ace-jump-mode)
@@ -659,7 +678,7 @@ Code taken from `hack-dir-local-variables'."
 ;; fly
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "flycheck"
+(with-perf-metrics "flycheck"
   (use-package flycheck
     :init
     (add-hook 'after-init-hook #'global-flycheck-mode)
@@ -670,8 +689,8 @@ Code taken from `hack-dir-local-variables'."
 ;; tags
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "tags"
-  (when (and (not enable-semantic) (find-exe "global"))
+(with-perf-metrics "tags"
+  (when (and (not enable-semantic) enable-global (find-exe "global"))
     (use-package ggtags
       :bind
       (:map ggtags-mode-map
@@ -693,7 +712,7 @@ Code taken from `hack-dir-local-variables'."
 ;; git
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "git"
+(with-perf-metrics "git"
   (when-find-exe "git"
     (use-package gist)
     
@@ -711,7 +730,7 @@ Code taken from `hack-dir-local-variables'."
 ;; projectile
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "projectile"
+(with-perf-metrics "projectile"
   (use-package projectile
     :init
     (setq
@@ -724,7 +743,7 @@ Code taken from `hack-dir-local-variables'."
 ;; look and feel
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "look and feel"
+(with-perf-metrics "look and feel"
   (use-package smex
     :bind (("M-x" . smex)))
 
@@ -761,7 +780,7 @@ Code taken from `hack-dir-local-variables'."
 ;; elfeed
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "elfeed"
+(with-perf-metrics "elfeed"
   (use-package elfeed
     :bind (("C-c f . elfeed"))
     :init
@@ -775,23 +794,10 @@ Code taken from `hack-dir-local-variables'."
        ("http://www.reddit.com/r/canada+canadapolitics+environment+science+worldnews.rss" aggregator news)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; miscellaneous tools
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-time-display "tools"
-  (use-package dictionary
-    :bind (("C-c d" . dictionary-search)))
-  
-  (use-package quiz
-    :bind (("C-c q" . quiz)))
-
-  (use-package f))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "org"
+(with-perf-metrics "org"
   (use-package org
     :bind
     (("C-c t" . org-todo-list)
@@ -880,35 +886,39 @@ Code taken from `hack-dir-local-variables'."
 ;; scheme
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "scheme"
+(with-perf-metrics "scheme"
   (use-package geiser))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; ycmd
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "ycmd"
-  (when-find-exe "ycmd"
+(with-perf-metrics "ycmd"
+  (when (and enable-ycmd (find-exe "ycmd"))
     (use-package ycmd
       :init
       (global-ycmd-mode 1)
       (setq ycmd-server-command `("python" ,(find-exe "ycmd")))
       (with-eval-after-load "company"
-        (use-package company-ycmd))
+        (use-package company-ycmd
+          :init
+          (delete 'company-clang company-backends)))
       (with-eval-after-load "flycheck"
-        (use-package flycheck-ycmd :init (flycheck-ycmd-setup))))))
+        (use-package flycheck-ycmd
+          :init
+          (flycheck-ycmd-setup))))))
 
 ;; toml
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "toml"
+(with-perf-metrics "toml"
   (use-package toml-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; gdscript
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "gdscript"
+(with-perf-metrics "gdscript"
   (require 'godot-gdscript)
   (with-eval-after-load "company"
     (require 'company-godot-gdscript)
@@ -920,53 +930,14 @@ Code taken from `hack-dir-local-variables'."
 ;; themes
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "themes"
+(with-perf-metrics "themes"
   (use-package doom-themes))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; basic settings
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-time-display "settings"
-  ;; Emacs default scrolling behaviour is the worst
-  (setq
-   scroll-step 2
-   scroll-conservatively 10000
-   auto-window-vscroll nil)
-
-  ;; General Emacs Sanity
-  (setq gc-cons-threshold 20000000
-        make-backup-files nil
-        debug-on-error nil)
-
-  (delete-selection-mode t)
-
-  ;; Windows performance tweaks
-  (when (boundp 'w32-pipe-read-delay)
-    (setq w32-pipe-read-delay 0))
-
-  ;; Don't be a dick
-  (setq
-   truncate-lines t
-   tab-width 2
-   indent-tabs-mode nil)
-
-  ;; Useful bindings
-  (global-set-key "\C-w" 'clipboard-kill-region)
-  (global-set-key "\M-w" 'clipboard-kill-ring-save)
-  (global-set-key "\C-y" 'clipboard-yank)
-  (global-set-key "\C-c," 'scroll-bar-mode)
-  (global-set-key "\C-c." 'tool-bar-mode)
-  (global-set-key "\C-c?" 'menu-bar-mode)
-  (global-set-key "\C-c\\" 'comment-or-uncomment-region)
-  (global-set-key "\C-cs" 'eshell-here)
-  (global-set-key [f12] 'toggle-frame-fullscreen))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; customizable values
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-time-display "customizations"
+(with-perf-metrics "customizations"
   (reset-theme)
   (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
   (unless (file-exists-p custom-file)
@@ -976,6 +947,8 @@ Code taken from `hack-dir-local-variables'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(garbage-collect)
 
 (message (format "Init completed in %s seconds." (- (float-time) my-init-start-time)))
 
