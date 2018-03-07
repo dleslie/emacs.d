@@ -91,7 +91,7 @@
        (message (format "[%s]" ,name))
        (with-demoted-errors "Error: %S"
          ,(cons 'progn body))
-       (message (format "[%s : %ss, %s cells]" ,name (- (float-time) begin-time) (- cons-cells-consed begin-cells))))))
+       (message (format "[%s : %sms, %s cells]" ,name (* 1000 (- (float-time) begin-time)) (- cons-cells-consed begin-cells))))))
 
 (defmacro when-set-and-true (sym &rest body)
   "When SYM exists and is t execute BODY."
