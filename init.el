@@ -14,6 +14,14 @@
 (defvar enable-global nil)
 (defvar enable-ycmd t)
 
+;; Disable GC during load
+(setq gc-cons-threshold 402653184
+      gc-cons-percentage 0.6)
+
+;; Disable file handler search during load
+(defvar default-file-name-handler-alist file-name-handler-alist)
+(setq file-name-handler-alist nil)
+
 ;; Emacs default scrolling behaviour is the worst
 (setq
  scroll-step 2
@@ -21,8 +29,7 @@
  auto-window-vscroll nil)
 
 ;; General Emacs Sanity
-(setq gc-cons-threshold 20000000
-      indent-tabs-mode nil
+(setq indent-tabs-mode nil
       make-backup-files nil
       debug-on-error nil)
 
@@ -947,6 +954,13 @@ Code taken from `hack-dir-local-variables'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Enable GC
+(setq gc-cons-threshold 16777216
+      gc-cons-percentage 0.1)
+
+;; Enable file handler
+(setq file-name-handler-alist default-file-name-handler-alist)
 
 (garbage-collect)
 
