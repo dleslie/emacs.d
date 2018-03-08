@@ -14,6 +14,9 @@
 (defvar enable-global nil)
 (defvar enable-ycmd t)
 
+(defvar lisp-implementations
+  '((sbcl "sbcl" run-sbcl)))
+
 ;; Disable GC during load
 (setq gc-cons-threshold 402653184
       gc-cons-percentage 0.6)
@@ -539,24 +542,22 @@ Code taken from `hack-dir-local-variables'."
     :init
     (require 'slime-autoloads)
     
-    (setq
-     slime-contribs
-     '(slime-fancy))
+    (setq slime-contribs '(slime-fancy))
 
-    (setq inferior-lisp-program nil
-          slime-lisp-implementations nil)
+    (dolist (impl lisp-implementations)
+      (let ((sym (first impl))
+            (exe (find-exe (second impl)))
+            (run (third impl)))
+        (when exe
+          (when (or (not (boundp 'inferior-lisp-program)) (not inferior-lisp-program))
+            (setq inferior-lisp-program exe))
 
-    (when-find-exe "sbcl"
-      (setq
-       inferior-lisp-program
-       (find-exe "sbcl")
-
-       slime-lisp-implementations
-       `((sbcl (,(find-exe "sbcl")) :coding-system utf-8-unix)))
-      
-      (defun run-sbcl ()
-        (interactive)
-        (slime 'sbcl)))
+          (when (or (not (boundp 'slime-lisp-implementations))
+                    (not (listp slime-lisp-implementations))))
+          (add-to-list 'slime-lisp-implementations `(,sym (,exe) :coding-system utf-8-unix))
+          (eval `(defun ,run ()
+                   (interactive)
+                   (slime ',sym))))))
 
     (slime-setup)))
 
