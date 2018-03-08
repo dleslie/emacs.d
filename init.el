@@ -553,7 +553,8 @@ Code taken from `hack-dir-local-variables'."
             (setq inferior-lisp-program exe))
 
           (when (or (not (boundp 'slime-lisp-implementations))
-                    (not (listp slime-lisp-implementations))))
+                    (not (listp slime-lisp-implementations)))
+            (setq slime-lisp-implementations '()))
           (add-to-list 'slime-lisp-implementations `(,sym (,exe) :coding-system utf-8-unix))
           (eval `(defun ,run ()
                    (interactive)
