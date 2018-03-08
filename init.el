@@ -44,6 +44,10 @@
  indent-tabs-mode nil
  truncate-lines t
  tab-width 2)
+  
+(show-paren-mode t)
+(global-eldoc-mode t)
+(global-hl-line-mode t)
 
 ;; Useful bindings
 (global-set-key "\C-w" 'clipboard-kill-region)
@@ -172,14 +176,10 @@ Code taken from `hack-dir-local-variables'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (with-perf-metrics "tools"
-  (use-package dictionary
-    :bind (("C-c d" . dictionary-search)))
-  
-  (use-package quiz
-    :bind (("C-c q" . quiz)))
-
   (use-package f)
-  (use-package dash))
+  (use-package dash)
+  (define-key-after global-map [menu-bar tools apps]
+    (cons "Apps" (make-sparse-keymap "applications")) 'games))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; compilation
@@ -247,6 +247,94 @@ Code taken from `hack-dir-local-variables'."
       
       (with-eval-after-load "company"
         (add-to-list 'company-backends 'company-semantic)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; org
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "org"
+  (use-package org
+    :bind
+    (("C-c t" . org-todo-list)
+     ("C-c l" . org-store-link)
+     ("C-c a" . org-agenda)
+     ("C-c b" . org-iswitchb)
+     ("C-c c" . org-capture))
+
+    :init
+    (use-package ox-asciidoc)
+    (use-package ox-epub)
+    (use-package ox-gfm)
+    (use-package ox-html5slide)
+    (use-package ox-impress-js)
+    (use-package ox-jira)
+    (use-package ox-mediawiki)
+    (use-package ox-minutes)
+    (use-package ox-nikola)
+    (use-package ox-reveal)
+    (use-package ox-rst)
+    (use-package ox-textile)
+    (use-package ox-trac)
+    (use-package ox-tufte)
+    (use-package ox-twbs)
+    (use-package ox-twiki)
+
+    (setq
+     org-default-notes-file (f-join org-directory "notes.org")
+     org-agenda-files `(,(f-join org-directory "todo.org") ,(f-join org-directory "agenda.org"))
+     org-agenda-diary-file (f-join org-directory "diary.org")
+     org-todo-keywords
+     '((sequence "TODO(t)" "PROG(p)" "BLCK(b)" "STAL(s)" "|" "DONE(d)" "WONT(w)"))
+     org-todo-keyword-faces
+     '(("TODO" . (:foreground "white" :weight bold))
+       ("DOIN" . (:foreground "green" :weight bold))
+       ("BLCK" . (:foreground "red" :weight bold))
+       ("STAL" . (:foreground "yellow" :weight bold))
+       ("WONT" . (:foreground "grey" :weight bold))
+       ("DONE" . (:foreground "grey" :weight bold)))
+     org-capture-templates
+     '(("n" "Note" entry (file+headline "notes.org" "Notes")
+        "* %^{topic} %T %^g\n   :CATEGORY: %^{category}\n%i%?\n")
+       ("t" "To Do" entry (file+headline "todo.org" "To Do")
+        "* TODO %^{todo} %^g\n   DEADLINE: %^{due}t\n   :CATEGORY: %^{category}\n")
+       ("d" "Daily review" entry (file+headline "diary.org" "Daily Review")
+        "* %T %^g\n   :CATEGORY: Review\n   %?%[~/ownCloud/org/template_daily_review.org]\n")
+       ("i" "Idea" entry (file+headline "ideas.org" "Ideas")
+        "* %^{topic} %T %^g\n   :CATEGORY: Idea\n   %i%?\n")
+       ("j" "Journal" entry (file+headline "diary.org" "Journal")
+        "* %^{topic} %T %^g\n   :CATEGORY: Journal\n   %i%?\n")
+       ("l" "Letter" entry (file+headline "letters.org" "Letter")
+        "* %^{topic} %T %^g\n   :CATEGORY: Letter\n   %i%?\n")
+       ("w" "Work Log" entry (file+headline "work.org" "Work Log")
+        "* %^{topic} %T %^g\n   :CATEGORY: Log\n   %i%?\n")
+       ("a" "Article" entry (file+headline "articles.org" "Article")
+        "* %^{topic} %T %^g\n   :CATEGORY: Article\n   %i%?\n")
+       ("e" "Event" entry (file+headline "agenda.org" "Events")
+        "* %^{title} %^g\n     SCHEDULED: %^{when}t\n   %i%?\n")
+       ("c" "Contact" entry (file+headline "addresses.org" "Addresses")
+        "* %(org-contacts-template-name)\n   :PROPERTIES:\n   :EMAIL: %(org-contacts-template-email)\n   :END:\n   %i%?\n"))
+     org-modules
+     '(org-bbdb org-bibtex org-docview org-gnus org-info org-jsinfo org-habit org-irc org-mew org-mhe org-rmail org-special-blocks org-vm org-wl org-w3m org-mouse org-bookmark org-drill org-eshell org-invoice org-registry org-contacts))
+
+    (let ((gcal-settings (expand-file-name "gcal-settings.el" user-emacs-directory)))
+      (when (file-exists-p gcal-settings)
+        (use-package org-gcal
+          :init
+          (load gcal-settings)
+          (defun update-gcal ()
+            (interactive)
+            (message "Updating Calendar")
+            (org-gcal-fetch))
+          (update-gcal))))
+
+    (defun my-custom-org-hook ()
+      (interactive)
+      (visual-line-mode t)
+      (with-eval-after-load "flyspell"
+        (flyspell-mode t))
+      (with-eval-after-load "writegood"
+        (writegood-mode t)))
+    (add-hook 'org-mode-hook 'my-custom-org-hook)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; company
@@ -485,7 +573,6 @@ Code taken from `hack-dir-local-variables'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (with-perf-metrics "parenthesis"
-  (show-paren-mode t)
   (use-package highlight-parentheses
     :init
     (define-globalized-minor-mode global-highlight-parentheses-mode
@@ -493,6 +580,7 @@ Code taken from `hack-dir-local-variables'."
       (lambda ()
         (highlight-parentheses-mode t)))
     (global-highlight-parentheses-mode t))
+
   (defvar-local paren-modes
     '(emacs-lisp-mode-hook
       eval-expression-minibuffer-setup-hook
@@ -502,12 +590,14 @@ Code taken from `hack-dir-local-variables'."
       scheme-mode-hook
       slime-repl-mode-hook
       clojure-mode-hook))
+  
   (use-package rainbow-delimiters
     :init
     (mapc
      (lambda (mode-hook)
        (add-hook mode-hook #'rainbow-delimiters-mode))
      (append paren-modes '(c-mode-hook c++-mode-hook))))
+  
   (use-package paredit
     :init
     (mapc
@@ -636,6 +726,51 @@ Code taken from `hack-dir-local-variables'."
       (add-hook 'web-mode-hook 'my-web-company-fix))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; scheme
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "scheme"
+  (use-package geiser))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ycmd
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "ycmd"
+  (when (and enable-ycmd (find-exe "ycmd"))
+    (use-package ycmd
+      :init
+      (global-ycmd-mode 1)
+      (setq ycmd-server-command `("python" ,(find-exe "ycmd")))
+      (with-eval-after-load "company"
+        (use-package company-ycmd
+          :init
+          (delete 'company-clang company-backends)))
+      (with-eval-after-load "flycheck"
+        (use-package flycheck-ycmd
+          :init
+          (flycheck-ycmd-setup))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; toml
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "toml"
+  (use-package toml-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; gdscript
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "gdscript"
+  (require 'godot-gdscript)
+  (with-eval-after-load "company"
+    (require 'company-godot-gdscript)
+    (add-to-list 'company-backends 'company-godot-gdscript))
+  (with-eval-after-load "toml-mode"
+    (add-to-list 'auto-mode-alist (cons "\\.tscn\\'" 'toml-mode))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; markdown
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -653,36 +788,7 @@ Code taken from `hack-dir-local-variables'."
       (add-to-list 'auto-mode-alist '("\\.md\\'" . my-custom-markdown-mode)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; text
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "text"
-  (use-package writegood-mode
-    :init
-    (defun my-custom-text-mode-hook ()
-      (visual-line-mode t)
-      (flyspell-mode t)
-      (with-eval-after-load "writegood"
-        (writegood-mode t)))
-    (add-hook 'text-mode-hook 'my-custom-text-mode-hook)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ace jump
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "ace"
-  (use-package ace-jump-mode
-    :bind
-    (("C-c SPC" . ace-jump-mode)
-     ("C-x SPC" . ace-jump-mode-pop-mark))
-    :init
-    (use-package ace-link)
-    (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t)
-    (autoload 'ace-jump-mode-pop-mark "ace-jump-mode" "Ace jump back:-)" t)
-    (ace-link-setup-default)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; fly
+;; flycheck
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (with-perf-metrics "flycheck"
@@ -696,7 +802,7 @@ Code taken from `hack-dir-local-variables'."
 ;; tags
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(with-perf-metrics "tags"
+(with-perf-metrics "gtags"
   (when (and (not enable-semantic) enable-global (find-exe "global"))
     (use-package ggtags
       :bind
@@ -747,10 +853,61 @@ Code taken from `hack-dir-local-variables'."
     (projectile-global-mode t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; elfeed
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "elfeed"
+  (when-find-exe "curl"
+    (use-package elfeed
+      :bind (("C-c f . elfeed"))
+      :init
+      (define-key-after global-map [menu-bar tools apps elfeed]
+        '(menu-item "Elfeed" elfeed :help "Read RSS feeds") t)
+      (setq
+       elfeed-feeds
+       '(("http://news.ycombinator.com/rss" aggregator tech)
+         ("http://rss.cbc.ca/lineup/world.xml" news world)
+         ("http://rss.cbc.ca/lineup/canada.xml" news canada)
+         ("http://rss.cbc.ca/lineup/canada-britishcolumbia.xml" news bc)
+         ("http://www.reddit.com/r/lisp+emacs+scheme.rss" aggregator programming)
+         ("http://www.reddit.com/r/canada+canadapolitics+environment+science+worldnews.rss" aggregator news))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; look and feel
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (with-perf-metrics "look and feel"
+  (define-key-after global-map [menu-bar tools apps eww]
+    '(menu-item "Browse the Web (eww)" eww :help "Browse the web with eww") t)
+  (define-key-after global-map [menu-bar tools apps erc]
+    '(menu-item "IRC (erc)" erc :help "Use IRC via erc") t)
+  (define-key-after global-map [menu-bar tools apps rcirc]
+    '(menu-item "IRC (rcirc)" erc :help "Use IRC via rcirc") t)
+  
+  (use-package olivetti
+    :init
+    (define-key text-mode-map [menu-bar text olivetti-mode]
+      '(menu-item "Olivetti" olivetti-mode
+                  :button (:toggle . (and (boundp 'olivetti-mode) olivetti-mode)))))
+
+  (use-package writeroom-mode
+    :init
+    (define-key text-mode-map [menu-bar text writeroom-mode]
+      '(menu-item "Writeroom" writeroom-mode
+                  :button (:toggle . (and (boundp 'writeroom-mode) writeroom-mode)))))
+
+  (use-package writegood-mode
+    :init
+    (defun my-custom-text-mode-hook ()
+      (visual-line-mode t)
+      (flyspell-mode t)
+      (with-eval-after-load "writegood"
+        (writegood-mode t)))
+    (add-hook 'text-mode-hook 'my-custom-text-mode-hook)
+    (define-key text-mode-map [menu-bar text writeroom-mode]
+      '(menu-item "Writegood" writegood-mode
+                  :button (:toggle . (and (boundp 'writegood-mode) writegood-mode)))))
+  
   (use-package smex
     :bind (("M-x" . smex)))
 
@@ -763,182 +920,68 @@ Code taken from `hack-dir-local-variables'."
 
   (use-package nyan-mode
     :init
-    (nyan-mode t))
+    (nyan-mode t)
+    (setq nyan-animate-nyancat t))
 
   (when-find-exe "ag"
     (use-package ag
-      :bind (("C-c a" . ag))))
+      :bind (("C-c a" . ag))
+      :init
+      (define-key-after global-map [menu-bar tools ag]
+        '(menu-item "Search Files (ag)..." ag :help "Search files for strings or regexps (with ag)...")
+        'grep)))
   
   (use-package dumb-jump
     :bind
     (("C-c j" . dumb-jump-go)
      ("C-c J" . dumb-jump-quick-look)
-     ("C-x j" . dumb-jump-back)))
-  
-  (show-paren-mode t)
-  (global-eldoc-mode t)
-  (global-hl-line-mode t)
+     ("C-x j" . dumb-jump-back))
+    :init
+    (define-key-after global-map [menu-bar edit dj-menu]
+      (cons "Dumb Jump" (make-sparse-keymap "dumb jump")) 'goto)
+    (define-key global-map [menu-bar edit dj-menu go]
+      '(menu-item "Go" dumb-jump-go :help "Jump to definition"))
+    (define-key global-map [menu-bar edit dj-menu quick-look]
+      '(menu-item "Quick Look" dumb-jump-quick-look :help "Look at definition"))
+    (define-key global-map [menu-bar edit dj-menu back]
+      '(menu-item "Back" dumb-jump-back :help "Go back")))
 
+  (use-package ace-jump-mode
+    :bind
+    (("C-c SPC" . ace-jump-mode)
+     ("C-x SPC" . ace-jump-mode-pop-mark))
+    :init
+    (use-package ace-link)
+    
+    (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t)
+    (autoload 'ace-jump-mode-pop-mark "ace-jump-mode" "Ace jump back:-)" t)
+
+    (ace-link-setup-default)
+
+    (define-key-after global-map [menu-bar edit ace-menu]
+      (cons "Ace Jump" (make-sparse-keymap "ace jump")) 'goto)
+    (define-key global-map [menu-bar edit ace-menu jump]
+      '(menu-item "Jump" ace-jump-mode :help "Ace Jump"))
+    (define-key global-map [menu-bar edit ace-menu back]
+      '(menu-item "Back" ace-jump-mode-pop-mark :help "Ace Jump Back")))
+  
+  (use-package dictionary
+    :bind (("C-c d" . dictionary-search))
+    :init
+    (define-key-after global-map [menu-bar tools apps dictionary-search]
+      '(menu-item "Dictionary" dictionary-search :help "Search dictionary") t))
+  
+  (use-package quiz
+    :bind (("C-c q" . quiz))
+    :init
+    (define-key global-map [menu-bar tools games quiz]
+      '(menu-item "Quiz" quiz :help "Be quizzed")))
+  
+  (use-package doom-themes)
+  
   (defun my-try-to-add-imenu ()
     (condition-case nil (imenu-add-to-menubar "Imenu") (error nil)))
   (add-hook 'font-lock-mode-hook 'my-try-to-add-imenu))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; elfeed
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "elfeed"
-  (use-package elfeed
-    :bind (("C-c f . elfeed"))
-    :init
-    (setq
-     elfeed-feeds
-     '(("http://news.ycombinator.com/rss" aggregator tech)
-       ("http://rss.cbc.ca/lineup/world.xml" news world)
-       ("http://rss.cbc.ca/lineup/canada.xml" news canada)
-       ("http://rss.cbc.ca/lineup/canada-britishcolumbia.xml" news bc)
-       ("http://www.reddit.com/r/lisp+emacs+scheme.rss" aggregator programming)
-       ("http://www.reddit.com/r/canada+canadapolitics+environment+science+worldnews.rss" aggregator news)))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; org
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "org"
-  (use-package org
-    :bind
-    (("C-c t" . org-todo-list)
-     ("C-c l" . org-store-link)
-     ("C-c a" . org-agenda)
-     ("C-c b" . org-iswitchb)
-     ("C-c c" . org-capture))
-
-    :init
-    (use-package ox-asciidoc)
-    (use-package ox-epub)
-    (use-package ox-gfm)
-    (use-package ox-html5slide)
-    (use-package ox-impress-js)
-    (use-package ox-jira)
-    (use-package ox-mediawiki)
-    (use-package ox-minutes)
-    (use-package ox-nikola)
-    (use-package ox-reveal)
-    (use-package ox-rst)
-    (use-package ox-textile)
-    (use-package ox-trac)
-    (use-package ox-tufte)
-    (use-package ox-twbs)
-    (use-package ox-twiki)
-
-    (setq
-     org-default-notes-file (f-join org-directory "notes.org")
-     org-agenda-files `(,(f-join org-directory "todo.org") ,(f-join org-directory "agenda.org"))
-     org-agenda-diary-file (f-join org-directory "diary.org")
-     org-todo-keywords
-     '((sequence "TODO(t)" "PROG(p)" "BLCK(b)" "STAL(s)" "|" "DONE(d)" "WONT(w)"))
-     org-todo-keyword-faces
-     '(("TODO" . (:foreground "white" :weight bold))
-       ("DOIN" . (:foreground "green" :weight bold))
-       ("BLCK" . (:foreground "red" :weight bold))
-       ("STAL" . (:foreground "yellow" :weight bold))
-       ("WONT" . (:foreground "grey" :weight bold))
-       ("DONE" . (:foreground "grey" :weight bold)))
-     org-capture-templates
-     '(("n" "Note" entry (file+headline "notes.org" "Notes")
-        "* %^{topic} %T %^g\n   :CATEGORY: %^{category}\n%i%?\n")
-       ("t" "To Do" entry (file+headline "todo.org" "To Do")
-        "* TODO %^{todo} %^g\n   DEADLINE: %^{due}t\n   :CATEGORY: %^{category}\n")
-       ("d" "Daily review" entry (file+headline "diary.org" "Daily Review")
-        "* %T %^g\n   :CATEGORY: Review\n   %?%[~/ownCloud/org/template_daily_review.org]\n")
-       ("i" "Idea" entry (file+headline "ideas.org" "Ideas")
-        "* %^{topic} %T %^g\n   :CATEGORY: Idea\n   %i%?\n")
-       ("j" "Journal" entry (file+headline "diary.org" "Journal")
-        "* %^{topic} %T %^g\n   :CATEGORY: Journal\n   %i%?\n")
-       ("l" "Letter" entry (file+headline "letters.org" "Letter")
-        "* %^{topic} %T %^g\n   :CATEGORY: Letter\n   %i%?\n")
-       ("w" "Work Log" entry (file+headline "work.org" "Work Log")
-        "* %^{topic} %T %^g\n   :CATEGORY: Log\n   %i%?\n")
-       ("a" "Article" entry (file+headline "articles.org" "Article")
-        "* %^{topic} %T %^g\n   :CATEGORY: Article\n   %i%?\n")
-       ("e" "Event" entry (file+headline "agenda.org" "Events")
-        "* %^{title} %^g\n     SCHEDULED: %^{when}t\n   %i%?\n")
-       ("c" "Contact" entry (file+headline "addresses.org" "Addresses")
-        "* %(org-contacts-template-name)\n   :PROPERTIES:\n   :EMAIL: %(org-contacts-template-email)\n   :END:\n   %i%?\n"))
-     org-modules
-     '(org-bbdb org-bibtex org-docview org-gnus org-info org-jsinfo org-habit org-irc org-mew org-mhe org-rmail org-special-blocks org-vm org-wl org-w3m org-mouse org-bookmark org-drill org-eshell org-invoice org-registry org-contacts))
-
-    (let ((gcal-settings (expand-file-name "gcal-settings.el" user-emacs-directory)))
-      (when (file-exists-p gcal-settings)
-        (use-package org-gcal
-          :init
-          (load gcal-settings)
-          (defun update-gcal ()
-            (interactive)
-            (message "Updating Calendar")
-            (org-gcal-fetch))
-          (update-gcal))))
-
-    (defun my-custom-org-hook ()
-      (interactive)
-      (visual-line-mode t)
-      (with-eval-after-load "flyspell"
-        (flyspell-mode t))
-      (with-eval-after-load "writegood"
-        (writegood-mode t)))
-    (add-hook 'org-mode-hook 'my-custom-org-hook)))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; scheme
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "scheme"
-  (use-package geiser))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ycmd
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "ycmd"
-  (when (and enable-ycmd (find-exe "ycmd"))
-    (use-package ycmd
-      :init
-      (global-ycmd-mode 1)
-      (setq ycmd-server-command `("python" ,(find-exe "ycmd")))
-      (with-eval-after-load "company"
-        (use-package company-ycmd
-          :init
-          (delete 'company-clang company-backends)))
-      (with-eval-after-load "flycheck"
-        (use-package flycheck-ycmd
-          :init
-          (flycheck-ycmd-setup))))))
-
-;; toml
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "toml"
-  (use-package toml-mode))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; gdscript
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "gdscript"
-  (require 'godot-gdscript)
-  (with-eval-after-load "company"
-    (require 'company-godot-gdscript)
-    (add-to-list 'company-backends 'company-godot-gdscript))
-  (with-eval-after-load "toml-mode"
-    (add-to-list 'auto-mode-alist (cons "\\.tscn\\'" 'toml-mode))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; themes
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "themes"
-  (use-package doom-themes))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; customizable values
