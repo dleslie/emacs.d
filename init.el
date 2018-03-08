@@ -178,6 +178,8 @@ Code taken from `hack-dir-local-variables'."
 (with-perf-metrics "tools"
   (use-package f)
   (use-package dash)
+  (when (or (find-exe "ispell") (find-exe "aspell"))
+    (add-hook 'text-mode-hook 'flyspell-mode))
   (define-key-after global-map [menu-bar tools apps]
     (cons "Apps" (make-sparse-keymap "applications")) 'games))
 
@@ -329,11 +331,7 @@ Code taken from `hack-dir-local-variables'."
 
     (defun my-custom-org-hook ()
       (interactive)
-      (visual-line-mode t)
-      (with-eval-after-load "flyspell"
-        (flyspell-mode t))
-      (with-eval-after-load "writegood"
-        (writegood-mode t)))
+      (visual-line-mode t))
     (add-hook 'org-mode-hook 'my-custom-org-hook)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -360,13 +358,7 @@ Code taken from `hack-dir-local-variables'."
         (make-local-variable 'company-backends)
         (add-to-list 'company-backends 'company-ispell))
       
-      (add-hook 'text-mode-hook 'my-company-ispell-hook)
-      (with-eval-after-load "org"
-        (add-hook 'org-mode-hook 'my-company-ispell-hook))
-      (with-eval-after-load "markdown-mode"
-        (add-hook 'markdown-mode-hook 'my-company-ispell-hook))
-      (with-eval-after-load "writegood-mode"
-        (add-hook 'writegood-mode-hook 'my-company-ispell-hook)))))
+      (add-hook 'text-mode-hook 'my-company-ispell-hook))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; c and c++
@@ -781,8 +773,6 @@ Code taken from `hack-dir-local-variables'."
       (defun my-custom-markdown-mode ()
         (interactive)
         (visual-line-mode 1)
-        (flyspell-mode 1)
-        (writegood-mode 1)
         (markdown-mode))
       (add-to-list 'auto-mode-alist '("\\.markdown\\'" . my-custom-markdown-mode))
       (add-to-list 'auto-mode-alist '("\\.md\\'" . my-custom-markdown-mode)))))
@@ -898,12 +888,7 @@ Code taken from `hack-dir-local-variables'."
 
   (use-package writegood-mode
     :init
-    (defun my-custom-text-mode-hook ()
-      (visual-line-mode t)
-      (flyspell-mode t)
-      (with-eval-after-load "writegood"
-        (writegood-mode t)))
-    (add-hook 'text-mode-hook 'my-custom-text-mode-hook)
+    (add-hook 'text-mode-hook 'writegood-mode)
     (define-key text-mode-map [menu-bar text writeroom-mode]
       '(menu-item "Writegood" writegood-mode
                   :button (:toggle . (and (boundp 'writegood-mode) writegood-mode)))))
