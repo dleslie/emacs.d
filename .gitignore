@@ -1,3 +1,4 @@
+*.elc
 anaconda-mode/
 server/
 .*
