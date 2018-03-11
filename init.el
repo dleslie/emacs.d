@@ -344,22 +344,22 @@ Code taken from `hack-dir-local-variables'."
           (when (string= (file-truename (expand-file-name (car file)))
                          (file-truename (buffer-file-name)))
             (org-mobile-push)
-            (dolist (gitfile (magit-unstaged-files))
-              (magit-stage-file gitfile))
-            (magit-commit (list "-m" "org auto-commit"))
-            (magit-stage-file (file-truename (buffer-file-name)))
-            
-            (magit-git-push (magit-get-current-branch)
-                            (magit-get-upstream-branch)
-                            (magit-push-arguments))))))
+            (with-eval-after-load "magit"
+              (dolist (gitfile (magit-unstaged-files))
+                (magit-stage-file gitfile))
+              (magit-commit (list "-m" "org auto-commit"))
+              (magit-git-push (magit-get-current-branch)
+                              (magit-get-upstream-branch)
+                              (magit-push-arguments)))))))
 
     (defun my-org-load-hook ()
       (when (eq major-mode 'org-mode)
         (dolist (file (org-mobile-files-alist))
           (when (string= (file-truename (expand-file-name (car file)))
                          (file-truename (buffer-file-name)))
-            (magit-git-pull (magit-get-current-branch)
-                            (magit-pull-arguments))
+            (with-eval-after-load "magit"
+              (magit-git-pull (magit-get-current-branch)
+                              (magit-pull-arguments)))
             (org-mobile-pull)
             (revert-buffer)))))
     
