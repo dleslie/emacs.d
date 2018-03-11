@@ -288,6 +288,7 @@ Code taken from `hack-dir-local-variables'."
       (use-package ox-twiki))
 
     (setq
+     org-mobile-directory org-directory
      org-default-notes-file (f-join org-directory "notes.org")
      org-agenda-files `(,(f-join org-directory "todo.org") ,(f-join org-directory "agenda.org"))
      org-agenda-diary-file (f-join org-directory "diary.org")
@@ -335,10 +336,23 @@ Code taken from `hack-dir-local-variables'."
             (org-gcal-fetch))
           (update-gcal))))
 
+    (defun my-org-save-hook ()
+      (when (and (eq major-mode 'org-mode)
+                 (= 0 (string-match org-mobile-directory buffer-file-name)))
+        (org-mobile-push)))
+
+    (defun my-org-load-hook ()
+      (when (and (eq major-mode 'org-mode)
+                 (= 0 (string-match org-mobile-directory buffer-file-name)))
+        (org-mobile-pull)))
+    
     (defun my-custom-org-hook ()
       (interactive)
       (visual-line-mode t))
-    (add-hook 'org-mode-hook 'my-custom-org-hook)))
+    
+    (add-hook 'org-mode-hook 'my-custom-org-hook)
+    (add-hook 'after-save-hook 'my-org-save-hook)
+    (add-hook 'after-find-file 'my-org-load-hook)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; company
