@@ -288,7 +288,7 @@ Code taken from `hack-dir-local-variables'."
       (use-package ox-twiki))
 
     (setq
-     org-mobile-directory org-directory
+     org-mobile-directory (f-join (file-truename org-directory) "mobile")
      org-default-notes-file (f-join org-directory "notes.org")
      org-agenda-files `(,(f-join org-directory "todo.org") ,(f-join org-directory "agenda.org"))
      org-agenda-diary-file (f-join org-directory "diary.org")
@@ -325,6 +325,8 @@ Code taken from `hack-dir-local-variables'."
      org-modules
      '(org-bbdb org-bibtex org-docview org-gnus org-info org-jsinfo org-habit org-irc org-mew org-mhe org-rmail org-special-blocks org-vm org-wl org-w3m org-mouse org-bookmark org-drill org-eshell org-invoice org-registry org-contacts))
 
+    (mkdir org-mobile-directory t)
+    
     (let ((gcal-settings (expand-file-name "gcal-settings.el" user-emacs-directory)))
       (when (file-exists-p gcal-settings)
         (use-package org-gcal
@@ -337,14 +339,29 @@ Code taken from `hack-dir-local-variables'."
           (update-gcal))))
 
     (defun my-org-save-hook ()
-      (when (and (eq major-mode 'org-mode)
-                 (string-match (file-truename org-mobile-directory) (file-truename buffer-file-name)))
-        (org-mobile-push)))
+      (when (eq major-mode 'org-mode)
+        (dolist (file (org-mobile-files-alist))
+          (when (string= (file-truename (expand-file-name (car file)))
+                         (file-truename (buffer-file-name)))
+            (org-mobile-push)
+            (dolist (gitfile (magit-unstaged-files))
+              (magit-stage-file gitfile))
+            (magit-commit (list "-m" "org auto-commit"))
+            (magit-stage-file (file-truename (buffer-file-name)))
+            
+            (magit-git-push (magit-get-current-branch)
+                            (magit-get-upstream-branch)
+                            (magit-push-arguments))))))
 
     (defun my-org-load-hook ()
-      (when (and (eq major-mode 'org-mode)
-                 (string-match (file-truename org-mobile-directory) (file-truename buffer-file-name)))
-        (org-mobile-pull)))
+      (when (eq major-mode 'org-mode)
+        (dolist (file (org-mobile-files-alist))
+          (when (string= (file-truename (expand-file-name (car file)))
+                         (file-truename (buffer-file-name)))
+            (magit-git-pull (magit-get-current-branch)
+                            (magit-pull-arguments))
+            (org-mobile-pull)
+            (revert-buffer)))))
     
     (defun my-custom-org-hook ()
       (interactive)
