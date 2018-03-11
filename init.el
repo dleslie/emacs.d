@@ -338,12 +338,12 @@ Code taken from `hack-dir-local-variables'."
 
     (defun my-org-save-hook ()
       (when (and (eq major-mode 'org-mode)
-                 (string-match (expand-file-name org-mobile-directory) (expand-file-name buffer-file-name)))
+                 (string-match (file-truename org-mobile-directory) (file-truename buffer-file-name)))
         (org-mobile-push)))
 
     (defun my-org-load-hook ()
       (when (and (eq major-mode 'org-mode)
-                 (string-match (expand-file-name org-mobile-directory) (expand-file-name buffer-file-name)))
+                 (string-match (file-truename org-mobile-directory) (file-truename buffer-file-name)))
         (org-mobile-pull)))
     
     (defun my-custom-org-hook ()
