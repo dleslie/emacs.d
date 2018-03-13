@@ -946,7 +946,6 @@ Code taken from `hack-dir-local-variables'."
 
   (when-find-exe "ag"
     (use-package ag
-      :bind (("C-c a" . ag))
       :init
       (define-key-after global-map [menu-bar tools ag]
         '(menu-item "Search Files (ag)..." ag :help "Search files for strings or regexps (with ag)...")
