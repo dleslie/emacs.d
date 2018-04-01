@@ -428,6 +428,14 @@ Code taken from `hack-dir-local-variables'."
       (add-to-list 'company-backends 'company-c-headers))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; meson
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "meson"
+  (when-find-exe "meson"
+    (use-package meson-mode)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; c-sharp
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
