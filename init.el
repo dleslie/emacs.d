@@ -705,12 +705,17 @@ Code taken from `hack-dir-local-variables'."
           (execute-cmd "cargo" "install racer")
           (execute-cmd "rustup" "component add rust-src"))
 
+        (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
         (add-hook 'rust-mode-hook #'racer-mode)
         (add-hook 'racer-mode-hook #'eldoc-mode)
+
+        (with-eval-after-load "flycheck"
+          (use-package flycheck-rust
+            :init
+            (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
         
         (with-eval-after-load "company"
-          (add-hook 'racer-mode-hook #'company-mode))
-        ))))
+          (add-hook 'racer-mode-hook #'company-mode))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; web-mode
