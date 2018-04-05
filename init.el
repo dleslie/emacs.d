@@ -800,6 +800,14 @@ Code taken from `hack-dir-local-variables'."
   (use-package toml-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; docker
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "docker"
+  (require 'dockerfile-mode)
+  (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; gdscript
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

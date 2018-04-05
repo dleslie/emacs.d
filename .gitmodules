@@ -7,3 +7,6 @@
 [submodule "lisp/godot-gdscript.el"]
 	path = lisp/godot-gdscript.el
 	url = git@github.com:/francogarcia/godot-gdscript.el
+[submodule "lisp/dockerfile-mode"]
+	path = lisp/dockerfile-mode
+	url = git@github.com:spotify/dockerfile-mode.git
