@@ -9,10 +9,8 @@
 
 (defvar my-init-start-time (float-time))
 
-(defvar enable-semantic nil)
 (defvar enable-company t)
-(defvar enable-global nil)
-(defvar enable-ycmd t)
+(defvar enable-global t)
 
 (defvar lisp-implementations
   '((sbcl "sbcl" run-sbcl)))
@@ -149,6 +147,18 @@ Code taken from `hack-dir-local-variables'."
     dir-name))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; semantic
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "semantic"
+  (semantic-mode 1)
+  (global-semantic-idle-scheduler-mode 1)
+  (global-semantic-idle-summary-mode 1)
+  (global-semantic-idle-completions-mode 1)
+  (global-semantic-idle-local-symbol-highlight-mode 1)
+  (global-semantic-show-unmatched-syntax-mode 1))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -202,56 +212,6 @@ Code taken from `hack-dir-local-variables'."
 
   (add-hook 'compilation-mode-hook 'my-compilation-custom-hook)
   (add-hook 'compilation-filter-hook 'my-colorize-compilation-buffer))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; semantic
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "semantic"
-  (when-set-and-true enable-semantic
-    (use-package semantic
-      :bind
-      (:map semantic-mode-map
-            ("M-." . semantic-ia-fast-jump))
-      
-      :init
-      (require 'semantic/bovine)
-      (require 'semantic/bovine/c)
-      (require 'semantic/bovine/el)
-      (require 'semantic/bovine/gcc)
-      (require 'semantic/bovine/make)
-      (require 'semantic/ia)
-      (require 'semantic/senator)
-      (require 'semantic/analyze)
-      (require 'srecode)
-
-      (setq semantic-default-submods '())
-      (add-to-list 'semantic-default-submodes 'global-semantic-decoration-mode t)
-      (add-to-list 'semantic-default-submodes 'global-semantic-highlight-edits-mode t)
-      (add-to-list 'semantic-default-submodes 'global-semantic-highlight-func-mode t)
-      (add-to-list 'semantic-default-submodes 'global-semantic-idle-breadcrumbs-mode t)
-      (add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode t)
-      (add-to-list 'semantic-default-submodes 'global-semantic-idle-local-symbol-highlight-mode t)
-      (add-to-list 'semantic-default-submodes 'global-semantic-idle-scheduler-mode t)
-      (add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode t)
-      (add-to-list 'semantic-default-submodes 'global-semantic-show-parser-state-mode t)
-      (add-to-list 'semantic-default-submodes 'global-semantic-show-unmatched-syntax-mode nil)
-
-      (global-ede-mode t)
-      (global-semanticdb-minor-mode t)
-      (semantic-mode t)
-
-      (setq semanticdb-find-default-throttle '(local file project system recursive omniscience unloaded))
-
-      (let ((semantic-system-include-paths
-             (append
-              (when (file-exists-p "/usr/include/c++/")
-                (directory-files "/usr/include/c++/" t "[^.][0-9.]+"))
-              '("/usr/local/include" "/usr/include"))))
-        (mapc #'(lambda (s) (semantic-add-system-include s)) semantic-system-include-paths))
-      
-      (with-eval-after-load "company"
-        (add-to-list 'company-backends 'company-semantic)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org
@@ -388,9 +348,8 @@ Code taken from `hack-dir-local-variables'."
       (global-company-mode)
 
       (setq company-idle-delay 0.25)
-      (setq company-backends (-flatten company-backends))
-      (setq company-backends (remove-duplicates company-backends :test #'equal))
-      
+      (setq company-backends (remove 'company-clang company-backends))
+      (setq company-backends (remove 'company-semantic company-backends))
       (defun my-company-ispell-hook ()
         (make-local-variable 'company-backends)
         (add-to-list 'company-backends 'company-ispell))
@@ -420,12 +379,7 @@ Code taken from `hack-dir-local-variables'."
     (add-c-flycheck-path path)
     (when-set-and-true semantic
       (with-eval-after-load "semantic"
-        (semantic-add-system-include path))))
-  
-  (with-eval-after-load "company"
-    (use-package company-c-headers
-      :init
-      (add-to-list 'company-backends 'company-c-headers))))
+        (semantic-add-system-include path)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; meson
@@ -450,29 +404,8 @@ Code taken from `hack-dir-local-variables'."
             ("C-c C-c" . recompile))
       :init
       (add-hook 'csharp-mode-hook 'omnisharp-mode)
-      (with-eval-after-load "company"
-        (add-to-list 'company-backends 'company-omnisharp)))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; clojure
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "clojure"
-  (when-find-exe "clojure"
-    (use-package clojure-mode
-      :init
-      (add-to-list 'auto-mode-alist '("\\.clj\\'" . clojure-mode))
-
-      :config
-      (use-package cider
-        :init
-        (add-hook 'clojure-mode-hook 'cider-mode)
-        (add-hook 'cider-mode-hook 'eldoc-mode))
-
-      (with-eval-after-load "flycheck"
-        (use-package flycheck-clojure
-          :init
-          (add-hook 'clojure-mode-hook 'flycheck-clojure-setup))))))
+      (with-eval-after-load 'company
+        (push 'company-backends 'company-omnisharp)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; go
@@ -498,7 +431,7 @@ Code taken from `hack-dir-local-variables'."
           :init
           (defun my-go-company-hook ()
             (make-local-variable 'company-backends)
-            (setq company-backends (list 'company-go)))
+            (setq company-backends '(company-go)))
           (add-hook 'go-mode-hook #'my-go-company-hook))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -520,7 +453,7 @@ Code taken from `hack-dir-local-variables'."
           :init
           (defun my-ghc-company-fix ()
             (make-local-variable 'company-backends)
-            (setq company-backends (list 'company-haskell)))
+            (setq company-backends '(company-haskell)))
           (add-hook 'haskell-mode-hook #'my-ghc-company-fix))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -774,25 +707,6 @@ Code taken from `hack-dir-local-variables'."
   (use-package geiser))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ycmd
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "ycmd"
-  (when (and enable-ycmd (find-exe "ycmd"))
-    (use-package ycmd
-      :init
-      (global-ycmd-mode 1)
-      (setq ycmd-server-command `("python" ,(find-exe "ycmd")))
-      (with-eval-after-load "company"
-        (use-package company-ycmd
-          :init
-          (delete 'company-clang company-backends)))
-      (with-eval-after-load "flycheck"
-        (use-package flycheck-ycmd
-          :init
-          (flycheck-ycmd-setup))))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; toml
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -806,18 +720,6 @@ Code taken from `hack-dir-local-variables'."
 (with-perf-metrics "docker"
   (require 'dockerfile-mode)
   (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; gdscript
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "gdscript"
-  (require 'godot-gdscript)
-  (with-eval-after-load "company"
-    (require 'company-godot-gdscript)
-    (add-to-list 'company-backends 'company-godot-gdscript))
-  (with-eval-after-load "toml-mode"
-    (add-to-list 'auto-mode-alist (cons "\\.tscn\\'" 'toml-mode))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; markdown
@@ -850,7 +752,7 @@ Code taken from `hack-dir-local-variables'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (with-perf-metrics "gtags"
-  (when (and (not enable-semantic) enable-global (find-exe "global"))
+  (when (and enable-global (find-exe "global"))
     (use-package ggtags
       :bind
       (:map ggtags-mode-map
@@ -866,7 +768,7 @@ Code taken from `hack-dir-local-variables'."
       (add-hook 'c++-mode-hook #'ggtags-mode)
 
       (with-eval-after-load "company"
-        (add-to-list 'company-backends 'company-gtags)))))
+        (push 'company-backends 'company-gtags)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; git
