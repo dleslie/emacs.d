@@ -405,7 +405,7 @@ Code taken from `hack-dir-local-variables'."
       :init
       (add-hook 'csharp-mode-hook 'omnisharp-mode)
       (with-eval-after-load 'company
-        (push 'company-backends 'company-omnisharp)))))
+        (add-to-list 'company-backends 'company-omnisharp)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; go
@@ -768,7 +768,7 @@ Code taken from `hack-dir-local-variables'."
       (add-hook 'c++-mode-hook #'ggtags-mode)
 
       (with-eval-after-load "company"
-        (push 'company-backends 'company-gtags)))))
+        (add-to-list 'company-backends 'company-gtags)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; git
