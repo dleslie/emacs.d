@@ -147,18 +147,6 @@ Code taken from `hack-dir-local-variables'."
     dir-name))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; semantic
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "semantic"
-  (semantic-mode 1)
-  (global-semantic-idle-scheduler-mode 1)
-  (global-semantic-idle-summary-mode 1)
-  (global-semantic-idle-completions-mode 1)
-  (global-semantic-idle-local-symbol-highlight-mode 1)
-  (global-semantic-show-unmatched-syntax-mode 1))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -364,6 +352,9 @@ Code taken from `hack-dir-local-variables'."
   (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1)))
   (add-hook 'c-mode-hook (lambda () (eldoc-mode 1)))
 
+  (use-package function-args
+    :init (fa-config-default))
+  
   (defun add-c-flycheck-arg (arg)
     (add-to-list 'flycheck-clang-args arg)
     (add-to-list 'flycheck-gcc-args arg))
