@@ -202,124 +202,6 @@ Code taken from `hack-dir-local-variables'."
   (add-hook 'compilation-filter-hook 'my-colorize-compilation-buffer))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; org
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "org"
-  (use-package org
-    :bind
-    (("C-c t" . org-todo-list)
-     ("C-c l" . org-store-link)
-     ("C-c a" . org-agenda)
-     ("C-c b" . org-iswitchb)
-     ("C-c c" . org-capture))
-
-    :init
-    (require 'org)
-    
-    (with-perf-metrics "org addons"
-      (use-package ox-asciidoc)
-      (use-package ox-epub)
-      (use-package ox-gfm)
-      (use-package ox-html5slide)
-      (use-package ox-impress-js)
-      (use-package ox-jira)
-      (use-package ox-mediawiki)
-      (use-package ox-minutes)
-      (use-package ox-nikola)
-      (use-package ox-reveal)
-      (use-package ox-rst)
-      (use-package ox-textile)
-      (use-package ox-trac)
-      (use-package ox-tufte)
-      (use-package ox-twbs)
-      (use-package ox-twiki))
-
-    (setq
-     org-mobile-directory (f-join (file-truename org-directory) "mobile")
-     org-default-notes-file (f-join org-directory "notes.org")
-     org-agenda-files `(,(f-join org-directory "todo.org") ,(f-join org-directory "agenda.org"))
-     org-agenda-diary-file (f-join org-directory "diary.org")
-     org-todo-keywords
-     '((sequence "TODO(t)" "PROG(p)" "BLCK(b)" "STAL(s)" "|" "DONE(d)" "WONT(w)"))
-     org-todo-keyword-faces
-     '(("TODO" . (:foreground "white" :weight bold))
-       ("DOIN" . (:foreground "green" :weight bold))
-       ("BLCK" . (:foreground "red" :weight bold))
-       ("STAL" . (:foreground "yellow" :weight bold))
-       ("WONT" . (:foreground "grey" :weight bold))
-       ("DONE" . (:foreground "grey" :weight bold)))
-     org-capture-templates
-     '(("n" "Note" entry (file+headline "notes.org" "Notes")
-        "* %^{topic} %T %^g\n   :CATEGORY: %^{category}\n%i%?\n")
-       ("t" "To Do" entry (file+headline "todo.org" "To Do")
-        "* TODO %^{todo} %^g\n   DEADLINE: %^{due}t\n   :CATEGORY: %^{category}\n")
-       ("d" "Daily review" entry (file+headline "diary.org" "Daily Review")
-        "* %T %^g\n   :CATEGORY: Review\n   %?%[~/ownCloud/org/template_daily_review.org]\n")
-       ("i" "Idea" entry (file+headline "ideas.org" "Ideas")
-        "* %^{topic} %T %^g\n   :CATEGORY: Idea\n   %i%?\n")
-       ("j" "Journal" entry (file+headline "diary.org" "Journal")
-        "* %^{topic} %T %^g\n   :CATEGORY: Journal\n   %i%?\n")
-       ("l" "Letter" entry (file+headline "letters.org" "Letter")
-        "* %^{topic} %T %^g\n   :CATEGORY: Letter\n   %i%?\n")
-       ("w" "Work Log" entry (file+headline "work.org" "Work Log")
-        "* %^{topic} %T %^g\n   :CATEGORY: Log\n   %i%?\n")
-       ("a" "Article" entry (file+headline "articles.org" "Article")
-        "* %^{topic} %T %^g\n   :CATEGORY: Article\n   %i%?\n")
-       ("e" "Event" entry (file+headline "agenda.org" "Events")
-        "* %^{title} %^g\n     SCHEDULED: %^{when}t\n   %i%?\n")
-       ("c" "Contact" entry (file+headline "addresses.org" "Addresses")
-        "* %(org-contacts-template-name)\n   :PROPERTIES:\n   :EMAIL: %(org-contacts-template-email)\n   :END:\n   %i%?\n"))
-     org-modules
-     '(org-bbdb org-bibtex org-docview org-gnus org-info org-jsinfo org-habit org-irc org-mew org-mhe org-rmail org-special-blocks org-vm org-wl org-w3m org-mouse org-bookmark org-drill org-eshell org-invoice org-registry org-contacts))
-
-    (mkdir org-mobile-directory t)
-    
-    (let ((gcal-settings (expand-file-name "gcal-settings.el" user-emacs-directory)))
-      (when (file-exists-p gcal-settings)
-        (use-package org-gcal
-          :init
-          (load gcal-settings)
-          (defun update-gcal ()
-            (interactive)
-            (message "Updating Calendar")
-            (org-gcal-fetch))
-          (update-gcal))))
-
-    (defun my-org-save-hook ()
-      (when (eq major-mode 'org-mode)
-        (dolist (file (org-mobile-files-alist))
-          (when (string= (file-truename (expand-file-name (car file)))
-                         (file-truename (buffer-file-name)))
-            (org-mobile-push)
-            (with-eval-after-load "magit"
-              (dolist (gitfile (magit-unstaged-files))
-                (magit-stage-file gitfile))
-              (magit-commit (list "-m" "org auto-commit"))
-              (magit-git-push (magit-get-current-branch)
-                              (magit-get-upstream-branch)
-                              (magit-push-arguments)))))))
-
-    (defun my-org-load-hook ()
-      (when (eq major-mode 'org-mode)
-        (dolist (file (org-mobile-files-alist))
-          (when (string= (file-truename (expand-file-name (car file)))
-                         (file-truename (buffer-file-name)))
-            (with-eval-after-load "magit"
-              (magit-git-pull (magit-get-current-branch)
-                              (magit-pull-arguments)))
-            (org-mobile-pull)
-            (revert-buffer)))))
-    
-    (defun my-custom-org-hook ()
-      (interactive)
-      (visual-line-mode t))
-    
-    (add-hook 'org-mode-hook 'my-custom-org-hook)
-    (add-hook 'after-save-hook 'my-org-save-hook)
-    (add-hook 'after-find-file 'my-org-load-hook)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; company
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -327,9 +209,7 @@ Code taken from `hack-dir-local-variables'."
   (when-set-and-true enable-company
     (use-package company
       :bind
-      (:map company-mode-map
-            ("<C-tab>" . company-complete))
-
+      (:map company-mode-map ("<C-tab>" . company-complete))
       :init
       (setq company-tooltip-align-annotations t)
       
@@ -338,11 +218,58 @@ Code taken from `hack-dir-local-variables'."
       (setq company-idle-delay 0.25)
       (setq company-backends (remove 'company-clang company-backends))
       (setq company-backends (remove 'company-semantic company-backends))
+
       (defun my-company-ispell-hook ()
         (make-local-variable 'company-backends)
-        (add-to-list 'company-backends 'company-ispell))
+        (push 'company-ispell company-backends))
       
       (add-hook 'text-mode-hook 'my-company-ispell-hook))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; git
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "git"
+  (when-find-exe "git"
+    (use-package gist)
+    
+    (use-package magit
+      :bind (("C-c g" . magit-status))
+      :init
+      (setq magit-last-seen-setup-instructions "1.4.0"))
+
+    (use-package git-gutter
+      :init
+      (global-git-gutter-mode t)
+      (setq git-gutter:visual-line t))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; projectile
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "projectile"
+  (use-package projectile
+    :init
+    (setq
+     projectile-switch-project-action 'projectile-find-dir
+     projectile-find-dir-includes-top-level t)
+
+    (projectile-global-mode t)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; lsp
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "lsp"
+  (use-package lsp-mode
+    :init
+    (use-package lsp-ui
+      :init
+      (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+    (with-eval-after-load "company"
+      (use-package company-lsp
+        :init
+        (push 'company-lsp company-backends)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; c and c++
@@ -352,25 +279,11 @@ Code taken from `hack-dir-local-variables'."
   (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1)))
   (add-hook 'c-mode-hook (lambda () (eldoc-mode 1)))
 
-  (use-package function-args
-    :init (fa-config-default))
-  
-  (defun add-c-flycheck-arg (arg)
-    (add-to-list 'flycheck-clang-args arg)
-    (add-to-list 'flycheck-gcc-args arg))
-  
-  (defun add-c-flycheck-path (path)
-    "Add PATH as a flycheck search path in C modes."
-    (add-to-list 'flycheck-clang-include-path path)
-    (add-to-list 'flycheck-gcc-include-path path)
-    (add-to-list 'flycheck-cppcheck-include-path path))
-
-  (defun add-c-include-path (path)
-    "Add PATH as an include path for various C mode stuff."
-    (add-c-flycheck-path path)
-    (when-set-and-true semantic
-      (with-eval-after-load "semantic"
-        (semantic-add-system-include path)))))
+  (setq cquery-executable (find-exe "cquery"))
+  (when cquery-executable
+    (require 'cquery)
+    (add-hook 'c++-mode-hook 'lsp-cquery-enable)
+    (add-hook 'c-mode-hook 'lsp-cquery-enable)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; meson
@@ -396,7 +309,7 @@ Code taken from `hack-dir-local-variables'."
       :init
       (add-hook 'csharp-mode-hook 'omnisharp-mode)
       (with-eval-after-load 'company
-        (add-to-list 'company-backends 'company-omnisharp)))))
+        (push 'company-omnisharp company-backends)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; go
@@ -420,10 +333,7 @@ Code taken from `hack-dir-local-variables'."
       (with-eval-after-load "company"
         (use-package company-go
           :init
-          (defun my-go-company-hook ()
-            (make-local-variable 'company-backends)
-            (setq company-backends '(company-go)))
-          (add-hook 'go-mode-hook #'my-go-company-hook))))))
+          (push 'company-go company-backends))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; haskell
@@ -442,10 +352,7 @@ Code taken from `hack-dir-local-variables'."
       (with-eval-after-load "company"
         (use-package company-ghc
           :init
-          (defun my-ghc-company-fix ()
-            (make-local-variable 'company-backends)
-            (setq company-backends '(company-haskell)))
-          (add-hook 'haskell-mode-hook #'my-ghc-company-fix))))))
+          (push 'company-haskell company-backends))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; javascript
@@ -617,10 +524,7 @@ Code taken from `hack-dir-local-variables'."
       (with-eval-after-load "company"
         (use-package company-inf-ruby
           :init
-          (defun my-inf-ruby-company-fix ()
-            (make-local-variable 'company-backends)
-            (setq company-backends '(company-jedi)))
-          (add-hook 'inf-ruby-mode-hook 'my-inf-ruby-company-fix))))))
+          (push 'company-jedi company-backends))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; rust
@@ -657,7 +561,9 @@ Code taken from `hack-dir-local-variables'."
   (use-package restclient
     :init
     (with-eval-after-load "company"
-      (use-package company-restclient)))
+      (use-package company-restclient
+        :init
+        (push 'company-restclient company-backends))))
 
   (use-package web-mode
     :init
@@ -684,11 +590,11 @@ Code taken from `hack-dir-local-variables'."
     (add-hook 'web-mode-hook #'my-jsx-web-mode-hook)
 
     (with-eval-after-load "company"
-      (use-package company-web)
-      (defun my-web-company-fix ()
-        (make-local-variable 'company-backends)
-        (setq company-backends '(company-web-html company-web-jade company-web-slim company-restclient)))
-      (add-hook 'web-mode-hook 'my-web-company-fix))))
+      (use-package company-web
+        :init
+        (push 'company-web-html company-backends)
+        (push 'company-web-jade company-backends)
+        (push 'company-web-slim company-backends)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; scheme
@@ -727,70 +633,6 @@ Code taken from `hack-dir-local-variables'."
       (add-to-list 'auto-mode-alist '("\\.markdown\\'" . my-custom-markdown-mode))
       (add-to-list 'auto-mode-alist '("\\.md\\'" . my-custom-markdown-mode)))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; flycheck
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "flycheck"
-  (use-package flycheck
-    :init
-    (add-hook 'after-init-hook #'global-flycheck-mode)
-    (global-flycheck-mode t)
-    (when (not (display-graphic-p)) (setq flycheck-indication-mode nil))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; tags
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "gtags"
-  (when (and enable-global (find-exe "global"))
-    (use-package ggtags
-      :bind
-      (:map ggtags-mode-map
-            ("C-c g s" . ggtags-find-other-symbol)
-            ("C-c g h" . ggtags-view-tag-history)
-            ("C-c g r" . ggtags-find-reference)
-            ("C-c g f" . ggtags-find-file)
-            ("C-c g c" . ggtags-create-tags)
-            ("C-c g u" . ggtags-update-tags)
-            ("M-," . pop-tag-mark))
-      :init
-      (add-hook 'c-mode-hook #'ggtags-mode)
-      (add-hook 'c++-mode-hook #'ggtags-mode)
-
-      (with-eval-after-load "company"
-        (add-to-list 'company-backends 'company-gtags)))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; git
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "git"
-  (when-find-exe "git"
-    (use-package gist)
-    
-    (use-package magit
-      :bind (("C-c g" . magit-status))
-      :init
-      (setq magit-last-seen-setup-instructions "1.4.0"))
-
-    (use-package git-gutter
-      :init
-      (global-git-gutter-mode t)
-      (setq git-gutter:visual-line t))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; projectile
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "projectile"
-  (use-package projectile
-    :init
-    (setq
-     projectile-switch-project-action 'projectile-find-dir
-     projectile-find-dir-includes-top-level t)
-
-    (projectile-global-mode t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; elfeed
@@ -811,6 +653,124 @@ Code taken from `hack-dir-local-variables'."
          ("http://rss.cbc.ca/lineup/canada-britishcolumbia.xml" news bc)
          ("http://www.reddit.com/r/lisp+emacs+scheme.rss" aggregator programming)
          ("http://www.reddit.com/r/canada+canadapolitics+environment+science+worldnews.rss" aggregator news))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; org
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "org"
+  (use-package org
+    :bind
+    (("C-c t" . org-todo-list)
+     ("C-c l" . org-store-link)
+     ("C-c a" . org-agenda)
+     ("C-c b" . org-iswitchb)
+     ("C-c c" . org-capture))
+
+    :init
+    (require 'org)
+    
+    (with-perf-metrics "org addons"
+      (use-package ox-asciidoc)
+      (use-package ox-epub)
+      (use-package ox-gfm)
+      (use-package ox-html5slide)
+      (use-package ox-impress-js)
+      (use-package ox-jira)
+      (use-package ox-mediawiki)
+      (use-package ox-minutes)
+      (use-package ox-nikola)
+      (use-package ox-reveal)
+      (use-package ox-rst)
+      (use-package ox-textile)
+      (use-package ox-trac)
+      (use-package ox-tufte)
+      (use-package ox-twbs)
+      (use-package ox-twiki))
+
+    (setq
+     org-mobile-directory (f-join (file-truename org-directory) "mobile")
+     org-default-notes-file (f-join org-directory "notes.org")
+     org-agenda-files `(,(f-join org-directory "todo.org") ,(f-join org-directory "agenda.org"))
+     org-agenda-diary-file (f-join org-directory "diary.org")
+     org-todo-keywords
+     '((sequence "TODO(t)" "PROG(p)" "BLCK(b)" "STAL(s)" "|" "DONE(d)" "WONT(w)"))
+     org-todo-keyword-faces
+     '(("TODO" . (:foreground "white" :weight bold))
+       ("DOIN" . (:foreground "green" :weight bold))
+       ("BLCK" . (:foreground "red" :weight bold))
+       ("STAL" . (:foreground "yellow" :weight bold))
+       ("WONT" . (:foreground "grey" :weight bold))
+       ("DONE" . (:foreground "grey" :weight bold)))
+     org-capture-templates
+     '(("n" "Note" entry (file+headline "notes.org" "Notes")
+        "* %^{topic} %T %^g\n   :CATEGORY: %^{category}\n%i%?\n")
+       ("t" "To Do" entry (file+headline "todo.org" "To Do")
+        "* TODO %^{todo} %^g\n   DEADLINE: %^{due}t\n   :CATEGORY: %^{category}\n")
+       ("d" "Daily review" entry (file+headline "diary.org" "Daily Review")
+        "* %T %^g\n   :CATEGORY: Review\n   %?%[~/ownCloud/org/template_daily_review.org]\n")
+       ("i" "Idea" entry (file+headline "ideas.org" "Ideas")
+        "* %^{topic} %T %^g\n   :CATEGORY: Idea\n   %i%?\n")
+       ("j" "Journal" entry (file+headline "diary.org" "Journal")
+        "* %^{topic} %T %^g\n   :CATEGORY: Journal\n   %i%?\n")
+       ("l" "Letter" entry (file+headline "letters.org" "Letter")
+        "* %^{topic} %T %^g\n   :CATEGORY: Letter\n   %i%?\n")
+       ("w" "Work Log" entry (file+headline "work.org" "Work Log")
+        "* %^{topic} %T %^g\n   :CATEGORY: Log\n   %i%?\n")
+       ("a" "Article" entry (file+headline "articles.org" "Article")
+        "* %^{topic} %T %^g\n   :CATEGORY: Article\n   %i%?\n")
+       ("e" "Event" entry (file+headline "agenda.org" "Events")
+        "* %^{title} %^g\n     SCHEDULED: %^{when}t\n   %i%?\n")
+       ("c" "Contact" entry (file+headline "addresses.org" "Addresses")
+        "* %(org-contacts-template-name)\n   :PROPERTIES:\n   :EMAIL: %(org-contacts-template-email)\n   :END:\n   %i%?\n"))
+     org-modules
+     '(org-bbdb org-bibtex org-docview org-gnus org-info org-jsinfo org-habit org-irc org-mew org-mhe org-rmail org-special-blocks org-vm org-wl org-w3m org-mouse org-bookmark org-drill org-eshell org-invoice org-registry org-contacts))
+
+    (mkdir org-mobile-directory t)
+    
+    (let ((gcal-settings (expand-file-name "gcal-settings.el" user-emacs-directory)))
+      (when (file-exists-p gcal-settings)
+        (use-package org-gcal
+          :init
+          (load gcal-settings)
+          (defun update-gcal ()
+            (interactive)
+            (message "Updating Calendar")
+            (org-gcal-fetch))
+          (update-gcal))))
+
+    (defun my-org-save-hook ()
+      (when (eq major-mode 'org-mode)
+        (dolist (file (org-mobile-files-alist))
+          (when (string= (file-truename (expand-file-name (car file)))
+                         (file-truename (buffer-file-name)))
+            (org-mobile-push)
+            (with-eval-after-load "magit"
+              (dolist (gitfile (magit-unstaged-files))
+                (magit-stage-file gitfile))
+              (magit-commit (list "-m" "org auto-commit"))
+              (magit-git-push (magit-get-current-branch)
+                              (magit-get-upstream-branch)
+                              (magit-push-arguments)))))))
+
+    (defun my-org-load-hook ()
+      (when (eq major-mode 'org-mode)
+        (dolist (file (org-mobile-files-alist))
+          (when (string= (file-truename (expand-file-name (car file)))
+                         (file-truename (buffer-file-name)))
+            (with-eval-after-load "magit"
+              (magit-git-pull (magit-get-current-branch)
+                              (magit-pull-arguments)))
+            (org-mobile-pull)
+            (revert-buffer)))))
+    
+    (defun my-custom-org-hook ()
+      (interactive)
+      (visual-line-mode t))
+    
+    (add-hook 'org-mode-hook 'my-custom-org-hook)
+    (add-hook 'after-save-hook 'my-org-save-hook)
+    (add-hook 'after-find-file 'my-org-load-hook)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; look and feel

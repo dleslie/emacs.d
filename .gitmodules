@@ -10,3 +10,6 @@
 [submodule "lisp/dockerfile-mode"]
 	path = lisp/dockerfile-mode
 	url = git@github.com:spotify/dockerfile-mode.git
+[submodule "lisp/emacs-cquery"]
+	path = lisp/emacs-cquery
+	url = https://github.com/cquery-project/emacs-cquery
