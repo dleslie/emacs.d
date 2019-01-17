@@ -257,184 +257,6 @@ Code taken from `hack-dir-local-variables'."
     (projectile-global-mode t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; lsp
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "lsp"
-  (use-package lsp-mode
-    :init
-    (use-package lsp-ui
-      :init
-      (add-hook 'lsp-mode-hook 'lsp-ui-mode))
-    (with-eval-after-load "company"
-      (use-package company-lsp
-        :init
-        (push 'company-lsp company-backends)))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; c and c++
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "c and c++"
-  (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1)))
-  (add-hook 'c-mode-hook (lambda () (eldoc-mode 1)))
-
-  (when (find-exe "cquery")
-    (require 'cquery)
-    (setq cquery-executable (find-exe "cquery"))
-    (setq cquery-extra-init-params '(:index (:comments 2) :cacheFormat "msgpack")))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; meson
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "meson"
-  (when-find-exe "meson"
-    (use-package meson-mode)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; c-sharp
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "c-sharp"
-  (use-package csharp-mode
-    :init
-    ;; Run omnisharp-install-server
-    (use-package omnisharp
-      :bind
-      (:map csharp-mode-map
-            ("M-." . omnisharp-go-to-definition)
-            ("C-c C-c" . recompile))
-      :init
-      (add-hook 'csharp-mode-hook 'omnisharp-mode)
-      (with-eval-after-load 'company
-        (push 'company-omnisharp company-backends)))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; go
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "go"
-  (when-find-exe "go"
-    (use-package go-mode
-      :init
-      (when (not (find-exe "gometalinter"))
-        (execute-cmd "go" "get -u github.com/alecthomas/gometalinter")
-        (execute-cmd "gometalinter" "--install --update"))
-
-      (when (not (find-exe "gocode"))
-        (execute-cmd "go" "get -u github.com/nsf/gocode"))
-      
-      (use-package go-eldoc
-        :init
-        (add-hook 'go-mode-hook 'go-eldoc-setup))
-
-      (with-eval-after-load "company"
-        (use-package company-go
-          :init
-          (push 'company-go company-backends))))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; haskell
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "haskell"
-  (when-find-exe "stack"
-    (use-package haskell-mode
-      :init
-      (use-package ghc
-        :init
-        (autoload 'ghc-init "ghc" nil t)
-        (autoload 'ghc-debug "ghc" nil t)
-        (add-hook 'haskell-mode-hook #'ghc-init))
-
-      (with-eval-after-load "company"
-        (use-package company-ghc
-          :init
-          (push 'company-haskell company-backends))))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; javascript
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "javascript"
-  (use-package js2-mode
-    :init
-    (add-to-list 'auto-mode-alist '("\\.js?\\'" . js2-mode)))
-  (when-find-exe "npm"
-    (defun npm-ensure (exe package)
-      (when (not (find-exe exe))
-        (execute-cmd (find-exe "npm") (format "install -g %s" package))))
-    
-    (use-package tern
-      :init
-      (npm-ensure "tern" "tern")
-
-      (setq tern-command (find-exe "tern"))
-
-      (defun my-js2-mode-custom-hook ()
-        (tern-mode t))
-
-      (add-hook 'js2-mode-hook 'my-js2-mode-custom-hook)
-
-      (with-eval-after-load "company"
-        (use-package company-tern)))
-    
-    (use-package typescript-mode
-      :init
-      (npm-ensure "tsc" "typescript")))
-  
-  (use-package tide
-    :init
-    (defun my-setup-tide-mode ()
-      (interactive)
-      (tide-setup)
-      (eldoc-mode +1)
-      (tide-hl-identifier-mode +1)
-      (with-eval-after-load "flycheck"
-        (flycheck-mode +1)
-        (setq flycheck-check-syntax-automatically '(save mode-enabled))))
-
-    ;; formats the buffer before saving
-    (add-hook 'before-save-hook 'tide-format-before-save)
-    (add-hook 'js2-mode-hook #'my-setup-tide-mode)
-    (add-hook 'typescript-mode-hook #'my-setup-tide-mode)
-
-    ;; format options
-    (setq tide-format-options
-     '(:insertSpaceAfterFunctionKeywordForAnonymousFunctions t
-       :placeOpenBraceOnNewLineForFunctions nil))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; lisp
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "lisp"
-  (use-package slime
-    :init
-    (require 'slime-autoloads)
-    
-    (setq slime-contribs '(slime-fancy))
-
-    (dolist (impl lisp-implementations)
-      (let ((sym (first impl))
-            (exe (find-exe (second impl)))
-            (run (third impl)))
-        (when exe
-          (when (or (not (boundp 'inferior-lisp-program)) (not inferior-lisp-program))
-            (setq inferior-lisp-program exe))
-
-          (when (or (not (boundp 'slime-lisp-implementations))
-                    (not (listp slime-lisp-implementations)))
-            (setq slime-lisp-implementations '()))
-          (add-to-list 'slime-lisp-implementations `(,sym (,exe) :coding-system utf-8-unix))
-          (eval `(defun ,run ()
-                   (interactive)
-                   (slime ',sym))))))
-
-    (slime-setup)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; parenthesis
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -476,140 +298,6 @@ Code taken from `hack-dir-local-variables'."
        'paredit-close-round))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; python
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "python"
-  (use-package anaconda-mode
-    :init
-    (add-hook 'python-mode-hook 'anaconda-mode)
-    (add-hook 'python-mode-hook 'anaconda-eldoc-mode)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; ruby
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "ruby"
-  (when-find-exe "gem"
-    (use-package inf-ruby
-      :init
-      (use-package enh-ruby-mode)
-      
-      (defun launch-ruby ()
-        (interactive)
-        (unless (get-buffer "*ruby*")
-          (let ((buf (current-buffer)))
-            (inf-ruby)
-            (set-buffer buf))))
-      
-      (defun kill-ruby ()
-        (interactive)
-        (when (get-buffer "*ruby*")
-          (kill-buffer "*ruby*")))
-
-      (with-eval-after-load "projectile"
-        (use-package projectile-rails
-          :init
-          (advice-add 'projectile-rails-console :before #'kill-ruby)
-          (advice-add 'launch-ruby :after #'projectile-rails-on)
-          (advice-add 'kill-ruby :after #'projectile-rails-off)))
-
-      (use-package robe
-        :init
-        (when (not (find-exe "pry"))
-          (execute-cmd "gem" "install pry pry-doc"))
-        (advice-add 'launch-ruby :after #'robe-start))
-      
-      (with-eval-after-load "company"
-        (use-package company-inf-ruby
-          :init
-          (push 'company-jedi company-backends))))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; rust
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "rust"
-  (when (and (find-exe "cargo") (find-exe "rustup"))
-    (use-package rust-mode
-      :init
-      (use-package toml-mode)
-      (use-package racer
-        :init
-        (when (not (find-exe "racer"))
-          (execute-cmd "cargo" "install racer")
-          (execute-cmd "rustup" "component add rust-src"))
-
-        (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
-        (add-hook 'rust-mode-hook #'racer-mode)
-        (add-hook 'racer-mode-hook #'eldoc-mode)
-
-        (with-eval-after-load "flycheck"
-          (use-package flycheck-rust
-            :init
-            (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
-        
-        (with-eval-after-load "company"
-          (add-hook 'racer-mode-hook #'company-mode))))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; web-mode
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "web"
-  (use-package restclient
-    :init
-    (with-eval-after-load "company"
-      (use-package company-restclient
-        :init
-        (push 'company-restclient company-backends))))
-
-  (use-package web-mode
-    :init
-    (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
-
-    (defun my-tsx-web-mode-hook ()
-      (when (string-equal "tsx" (file-name-extension buffer-file-name))
-        (setup-tide-mode)))
-
-    (defun my-jsx-web-mode-hook ()
-      (when (string-equal "jsx" (file-name-extension buffer-file-name))
-        (setup-tide-mode)))
-
-    (add-hook 'web-mode-hook #'my-tsx-web-mode-hook)
-    (add-hook 'web-mode-hook #'my-jsx-web-mode-hook)
-
-    (with-eval-after-load "company"
-      (use-package company-web
-        :init
-        (push 'company-web-html company-backends)
-        (push 'company-web-jade company-backends)
-        (push 'company-web-slim company-backends)))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; scheme
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "scheme"
-  (use-package geiser))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; toml
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "toml"
-  (use-package toml-mode))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; docker
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -632,30 +320,9 @@ Code taken from `hack-dir-local-variables'."
       (add-to-list 'auto-mode-alist '("\\.markdown\\'" . my-custom-markdown-mode))
       (add-to-list 'auto-mode-alist '("\\.md\\'" . my-custom-markdown-mode)))))
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; elfeed
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "elfeed"
-  (when-find-exe "curl"
-    (use-package elfeed
-      :bind (("C-c f . elfeed"))
-      :init
-      (define-key-after global-map [menu-bar tools apps elfeed]
-        '(menu-item "Elfeed" elfeed :help "Read RSS feeds") t)
-      (setq
-       elfeed-feeds
-       '(("http://news.ycombinator.com/rss" aggregator tech)
-         ("http://rss.cbc.ca/lineup/world.xml" news world)
-         ("http://rss.cbc.ca/lineup/canada.xml" news canada)
-         ("http://rss.cbc.ca/lineup/canada-britishcolumbia.xml" news bc)
-         ("http://www.reddit.com/r/lisp+emacs+scheme.rss" aggregator programming)
-         ("http://www.reddit.com/r/canada+canadapolitics+environment+science+worldnews.rss" aggregator news))))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; org
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (with-perf-metrics "org"
   (use-package org
@@ -771,9 +438,313 @@ Code taken from `hack-dir-local-variables'."
     (add-hook 'after-save-hook 'my-org-save-hook)
     (add-hook 'after-find-file 'my-org-load-hook)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; LSP Languages
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; lsp
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "lsp"
+  (use-package lsp-mode
+    :init
+    (use-package lsp-ui
+      :init
+      (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+    (with-eval-after-load "company"
+      (use-package company-lsp
+        :init
+        (push 'company-lsp company-backends)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; c and c++
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "c and c++"
+  (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1)))
+  (add-hook 'c-mode-hook (lambda () (eldoc-mode 1)))
+  (add-to-list 'auto-mode-alist '("\\.ino?\\'" . c++-mode))
+
+  (when (find-exe "cquery")
+    (use-package cquery
+      :init
+      (setq cquery-executable (find-exe "cquery"))
+      (setq cquery-extra-init-params '(:index (:comments 2) :cacheFormat "msgpack"))))
+  (with-eval-after-load "lsp"
+    (add-hook 'c++-mode-hook #'lsp)
+    (add-hook 'c-mode-hook #'lsp)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; javascript
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "javascript"
+  (use-package typescript-mode
+    :init
+    (when (not (find-exe "tsc"))
+      (execute-cmd (find-exe "npm") "install -g typescript")))
+  (use-package js2-mode
+    :init
+    (add-to-list 'auto-mode-alist '("\\.js?\\'" . js2-mode)))
+  (with-eval-after-load "lsp"
+    (when (not (find-exe "html-languageserver"))
+      (execute-cmd (find-exe "npm") "install -g vscode-html-languageserver-bin"))
+    (add-hook 'js2-mode-hook #'lsp)
+    (add-hook 'typescript-mode-hook #'lsp)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; css
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "css"
+  (with-eval-after-load "lsp"
+    (when (find-exe "npm")
+      (when (not (find-exe "css-languageserver"))
+        (execute-cmd (find-exe "npm") "install -g vscode-css-languageserver-bin")))
+    (add-hook 'css-mode-hook #'lsp)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; bash
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "bash"
+  (with-eval-after-load "lsp"
+    (when (find-exe "npm")
+      (when (not (find-exe "bash-language-server"))
+        (execute-cmd (find-exe "npm") "install -g bash-language-server")))
+    (add-hook 'sh-mode-hook #'lsp)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; rust
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "rust"
+  (when (and (find-exe "cargo") (find-exe "rustup"))
+    (use-package rust-mode
+      :init
+
+      (use-package toml-mode)
+      (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
+      (with-eval-after-load "lsp"
+        (when (not (find-exe "rls"))
+          (execute-cmd "rustup" "component add rls"))
+        (add-hook 'rust-mode-hook #'lsp)))))
+    
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; non-LSP Languages
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; go
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "go"
+  (when-find-exe "go"
+    (use-package go-mode
+      :init
+      (when (not (find-exe "gometalinter"))
+        (execute-cmd "go" "get -u github.com/alecthomas/gometalinter")
+        (execute-cmd "gometalinter" "--install --update"))
+
+      (when (not (find-exe "gocode"))
+        (execute-cmd "go" "get -u github.com/nsf/gocode"))
+      
+      (use-package go-eldoc
+        :init
+        (add-hook 'go-mode-hook 'go-eldoc-setup))
+
+      (with-eval-after-load "company"
+        (use-package company-go
+          :init
+          (push 'company-go company-backends))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; meson
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "meson"
+  (when-find-exe "meson"
+    (use-package meson-mode)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; c-sharp
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "c-sharp"
+  (use-package csharp-mode
+    :init
+    ;; Run omnisharp-install-server
+    (use-package omnisharp
+      :bind
+      (:map csharp-mode-map
+            ("M-." . omnisharp-go-to-definition)
+            ("C-c C-c" . recompile))
+      :init
+      (add-hook 'csharp-mode-hook 'omnisharp-mode)
+      (with-eval-after-load 'company
+        (push 'company-omnisharp company-backends)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; haskell
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "haskell"
+  (when-find-exe "stack"
+    (use-package haskell-mode
+      :init
+      (use-package ghc
+        :init
+        (autoload 'ghc-init "ghc" nil t)
+        (autoload 'ghc-debug "ghc" nil t)
+        (add-hook 'haskell-mode-hook #'ghc-init))
+
+      (with-eval-after-load "company"
+        (use-package company-ghc
+          :init
+          (push 'company-haskell company-backends))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; lisp
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "lisp"
+  (use-package slime
+    :init
+    (require 'slime-autoloads)
+    
+    (setq slime-contribs '(slime-fancy))
+
+    (dolist (impl lisp-implementations)
+      (let ((sym (first impl))
+            (exe (find-exe (second impl)))
+            (run (third impl)))
+        (when exe
+          (when (or (not (boundp 'inferior-lisp-program)) (not inferior-lisp-program))
+            (setq inferior-lisp-program exe))
+
+          (when (or (not (boundp 'slime-lisp-implementations))
+                    (not (listp slime-lisp-implementations)))
+            (setq slime-lisp-implementations '()))
+          (add-to-list 'slime-lisp-implementations `(,sym (,exe) :coding-system utf-8-unix))
+          (eval `(defun ,run ()
+                   (interactive)
+                   (slime ',sym))))))
+
+    (slime-setup)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; python
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "python"
+  (use-package anaconda-mode
+    :init
+    (add-hook 'python-mode-hook 'anaconda-mode)
+    (add-hook 'python-mode-hook 'anaconda-eldoc-mode)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ruby
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "ruby"
+  (when-find-exe "gem"
+    (use-package inf-ruby
+      :init
+      (use-package enh-ruby-mode)
+      
+      (defun launch-ruby ()
+        (interactive)
+        (unless (get-buffer "*ruby*")
+          (let ((buf (current-buffer)))
+            (inf-ruby)
+            (set-buffer buf))))
+      
+      (defun kill-ruby ()
+        (interactive)
+        (when (get-buffer "*ruby*")
+          (kill-buffer "*ruby*")))
+
+      (with-eval-after-load "projectile"
+        (use-package projectile-rails
+          :init
+          (advice-add 'projectile-rails-console :before #'kill-ruby)
+          (advice-add 'launch-ruby :after #'projectile-rails-on)
+          (advice-add 'kill-ruby :after #'projectile-rails-off)))
+
+      (use-package robe
+        :init
+        (when (not (find-exe "pry"))
+          (execute-cmd "gem" "install pry pry-doc"))
+        (advice-add 'launch-ruby :after #'robe-start))
+      
+      (with-eval-after-load "company"
+        (use-package company-inf-ruby
+          :init
+          (push 'company-jedi company-backends))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; web-mode
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "web"
+  (use-package restclient
+    :init
+    (with-eval-after-load "company"
+      (use-package company-restclient
+        :init
+        (push 'company-restclient company-backends))))
+
+  (use-package web-mode
+    :init
+    (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.jsx\\'" . web-mode))
+
+    (defun my-tsx-web-mode-hook ()
+      (when (string-equal "tsx" (file-name-extension buffer-file-name))
+        (setup-tide-mode)))
+
+    (defun my-jsx-web-mode-hook ()
+      (when (string-equal "jsx" (file-name-extension buffer-file-name))
+        (setup-tide-mode)))
+
+    (add-hook 'web-mode-hook #'my-tsx-web-mode-hook)
+    (add-hook 'web-mode-hook #'my-jsx-web-mode-hook)
+
+    (with-eval-after-load "company"
+      (use-package company-web
+        :init
+        (push 'company-web-html company-backends)
+        (push 'company-web-jade company-backends)
+        (push 'company-web-slim company-backends)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; scheme
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "scheme"
+  (use-package geiser))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; toml
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "toml"
+  (use-package toml-mode))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; look and feel
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (with-perf-metrics "look and feel"
   (define-key-after global-map [menu-bar tools apps eww]
