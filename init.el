@@ -279,11 +279,10 @@ Code taken from `hack-dir-local-variables'."
   (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1)))
   (add-hook 'c-mode-hook (lambda () (eldoc-mode 1)))
 
-  (setq cquery-executable (find-exe "cquery"))
-  (when cquery-executable
+  (when (find-exe "cquery")
     (require 'cquery)
-    (add-hook 'c++-mode-hook 'lsp-cquery-enable)
-    (add-hook 'c-mode-hook 'lsp-cquery-enable)))
+    (setq cquery-executable (find-exe "cquery"))
+    (setq cquery-extra-init-params '(:index (:comments 2) :cacheFormat "msgpack")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; meson
