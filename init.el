@@ -458,24 +458,6 @@ Code taken from `hack-dir-local-variables'."
         (push 'company-lsp company-backends)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; c and c++
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(with-perf-metrics "c and c++"
-  (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1)))
-  (add-hook 'c-mode-hook (lambda () (eldoc-mode 1)))
-  (add-to-list 'auto-mode-alist '("\\.ino?\\'" . c++-mode))
-
-  (when (find-exe "cquery")
-    (use-package cquery
-      :init
-      (setq cquery-executable (find-exe "cquery"))
-      (setq cquery-extra-init-params '(:index (:comments 2) :cacheFormat "msgpack"))))
-  (with-eval-after-load "lsp"
-    (add-hook 'c++-mode-hook #'lsp)
-    (add-hook 'c-mode-hook #'lsp)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; javascript
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -741,6 +723,33 @@ Code taken from `hack-dir-local-variables'."
 (with-perf-metrics "toml"
   (use-package toml-mode))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; c and c++
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(with-perf-metrics "c and c++"
+  (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1)))
+  (add-hook 'c-mode-hook (lambda () (eldoc-mode 1)))
+  (add-to-list 'auto-mode-alist '("\\.ino?\\'" . c++-mode))
+
+  (when (find-exe "global")
+    (use-package ggtags
+      :init
+      (add-hook 'c-mode-common-hook
+                (lambda ()
+                  (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
+                    (ggtags-mode 1))))
+
+      (push 'company-gtags company-backends )
+      
+      (define-key ggtags-mode-map (kbd "C-c g s") 'ggtags-find-other-symbol)
+      (define-key ggtags-mode-map (kbd "C-c g h") 'ggtags-view-tag-history)
+      (define-key ggtags-mode-map (kbd "C-c g r") 'ggtags-find-reference)
+      (define-key ggtags-mode-map (kbd "C-c g f") 'ggtags-find-file)
+      (define-key ggtags-mode-map (kbd "C-c g c") 'ggtags-create-tags)
+      (define-key ggtags-mode-map (kbd "C-c g u") 'ggtags-update-tags)
+
+      (define-key ggtags-mode-map (kbd "M-,") 'pop-tag-mark))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; look and feel
