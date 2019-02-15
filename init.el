@@ -462,18 +462,19 @@ Code taken from `hack-dir-local-variables'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (with-perf-metrics "javascript"
-  (use-package typescript-mode
-    :init
-    (when (not (find-exe "tsc"))
-      (execute-cmd (find-exe "npm") "install -g typescript")))
-  (use-package js2-mode
-    :init
-    (add-to-list 'auto-mode-alist '("\\.js?\\'" . js2-mode)))
-  (with-eval-after-load "lsp"
-    (when (not (find-exe "html-languageserver"))
-      (execute-cmd (find-exe "npm") "install -g vscode-html-languageserver-bin"))
-    (add-hook 'js2-mode-hook #'lsp)
-    (add-hook 'typescript-mode-hook #'lsp)))
+  (when (find-exe "npm")
+    (use-package typescript-mode
+      :init
+      (when (not (find-exe "tsc")) 
+        (execute-cmd (find-exe "npm") "install -g typescript")))
+    (use-package js2-mode
+      :init
+      (add-to-list 'auto-mode-alist '("\\.js?\\'" . js2-mode)))
+    (with-eval-after-load "lsp"
+      (when (not (find-exe "html-languageserver"))
+        (execute-cmd (find-exe "npm") "install -g vscode-html-languageserver-bin"))
+      (add-hook 'js2-mode-hook #'lsp)
+      (add-hook 'typescript-mode-hook #'lsp))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; css
@@ -664,7 +665,7 @@ Code taken from `hack-dir-local-variables'."
       (with-eval-after-load "company"
         (use-package company-inf-ruby
           :init
-          (push 'company-jedi company-backends))))))
+          (push 'company-inf-ruby company-backends))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; web-mode
