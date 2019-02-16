@@ -742,7 +742,8 @@ Code taken from `hack-dir-local-variables'."
                     (ggtags-mode 1))))
 
       (push 'company-gtags company-backends )
-      
+
+      :config
       (define-key ggtags-mode-map (kbd "C-c g s") 'ggtags-find-other-symbol)
       (define-key ggtags-mode-map (kbd "C-c g h") 'ggtags-view-tag-history)
       (define-key ggtags-mode-map (kbd "C-c g r") 'ggtags-find-reference)
