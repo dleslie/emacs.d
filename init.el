@@ -325,13 +325,17 @@ Code taken from `hack-dir-local-variables'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (with-perf-metrics "org"
+  (defun open-org-directory ()
+    (interactive)
+    (find-file org-directory))
   (use-package org
     :bind
     (("C-c t" . org-todo-list)
      ("C-c l" . org-store-link)
      ("C-c a" . org-agenda)
      ("C-c b" . org-iswitchb)
-     ("C-c c" . org-capture))
+     ("C-c c" . org-capture)
+     ("C-c o" . open-org-directory))
 
     :init
     (require 'org)
@@ -345,9 +349,7 @@ Code taken from `hack-dir-local-variables'."
       (use-package ox-jira)
       (use-package ox-mediawiki)
       (use-package ox-minutes)
-      (use-package ox-nikola)
       (use-package ox-reveal)
-      (use-package ox-rst)
       (use-package ox-textile)
       (use-package ox-trac)
       (use-package ox-tufte)
@@ -355,7 +357,6 @@ Code taken from `hack-dir-local-variables'."
       (use-package ox-twiki))
 
     (setq
-     org-mobile-directory (f-join (file-truename org-directory) "mobile")
      org-default-notes-file (f-join org-directory "notes.org")
      org-agenda-files `(,(f-join org-directory "todo.org") ,(f-join org-directory "agenda.org"))
      org-agenda-diary-file (f-join org-directory "diary.org")
@@ -374,7 +375,9 @@ Code taken from `hack-dir-local-variables'."
        ("t" "To Do" entry (file+headline "todo.org" "To Do")
         "* TODO %^{todo} %^g\n   DEADLINE: %^{due}t\n   :CATEGORY: %^{category}\n")
        ("d" "Daily review" entry (file+headline "diary.org" "Daily Review")
-        "* %T %^g\n   :CATEGORY: Review\n   %?%[~/ownCloud/org/template_daily_review.org]\n")
+        (format
+         "* %%T %%^g\n   :CATEGORY: Review\n   %%?%%[%s/template_daily_review.org]\n"
+         org-directory))
        ("i" "Idea" entry (file+headline "ideas.org" "Ideas")
         "* %^{topic} %T %^g\n   :CATEGORY: Idea\n   %i%?\n")
        ("j" "Journal" entry (file+headline "diary.org" "Journal")
@@ -391,52 +394,12 @@ Code taken from `hack-dir-local-variables'."
         "* %(org-contacts-template-name)\n   :PROPERTIES:\n   :EMAIL: %(org-contacts-template-email)\n   :END:\n   %i%?\n"))
      org-modules
      '(org-bbdb org-bibtex org-docview org-gnus org-info org-jsinfo org-habit org-irc org-mew org-mhe org-rmail org-special-blocks org-vm org-wl org-w3m org-mouse org-bookmark org-drill org-eshell org-invoice org-registry org-contacts))
-
-    (mkdir org-mobile-directory t)
-    
-    (let ((gcal-settings (expand-file-name "gcal-settings.el" user-emacs-directory)))
-      (when (file-exists-p gcal-settings)
-        (use-package org-gcal
-          :init
-          (load gcal-settings)
-          (defun update-gcal ()
-            (interactive)
-            (message "Updating Calendar")
-            (org-gcal-fetch))
-          (update-gcal))))
-
-    (defun my-org-save-hook ()
-      (when (eq major-mode 'org-mode)
-        (dolist (file (org-mobile-files-alist))
-          (when (string= (file-truename (expand-file-name (car file)))
-                         (file-truename (buffer-file-name)))
-            (org-mobile-push)
-            (with-eval-after-load "magit"
-              (dolist (gitfile (magit-unstaged-files))
-                (magit-stage-file gitfile))
-              (magit-commit (list "-m" "org auto-commit"))
-              (magit-git-push (magit-get-current-branch)
-                              (magit-get-upstream-branch)
-                              (magit-push-arguments)))))))
-
-    (defun my-org-load-hook ()
-      (when (eq major-mode 'org-mode)
-        (dolist (file (org-mobile-files-alist))
-          (when (string= (file-truename (expand-file-name (car file)))
-                         (file-truename (buffer-file-name)))
-            (with-eval-after-load "magit"
-              (magit-git-pull (magit-get-current-branch)
-                              (magit-pull-arguments)))
-            (org-mobile-pull)
-            (revert-buffer)))))
-    
+        
     (defun my-custom-org-hook ()
       (interactive)
       (visual-line-mode t))
     
-    (add-hook 'org-mode-hook 'my-custom-org-hook)
-    (add-hook 'after-save-hook 'my-org-save-hook)
-    (add-hook 'after-find-file 'my-org-load-hook)))
+    (add-hook 'org-mode-hook 'my-custom-org-hook)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; LSP Languages
