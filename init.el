@@ -15,6 +15,9 @@
 (defvar default-file-name-handler-alist file-name-handler-alist)
 (setq file-name-handler-alist nil)
 
+;; org-directory
+(defvar org-directory "~/org")
+
 ;; Emacs default scrolling behaviour is the worst
 (setq
  scroll-step 2
@@ -53,33 +56,18 @@
 (global-set-key "\C-cs" 'eshell-here)
 (global-set-key [f12] 'toggle-frame-fullscreen)
 
+;; eldoc in C/C++
+(add-hook 'c++-mode-hook (lambda () (eldoc-mode 1)))
+(add-hook 'c-mode-hook (lambda () (eldoc-mode 1)))
+
 ;; Where are we finding things?
+(package-initialize)
+(require 'package)
 (setq package-archives
       '(("gnu" . "https://elpa.gnu.org/packages/")
         ("melpa" . "https://melpa.org/packages/")
         ("org" . "https://orgmode.org/elpa/")
         ("elpy" . "https://jorgenschaefer.github.io/packages/")))
-
-;; Sane defaults for company
-(setq company-tooltip-align-annotations t
-      company-idle-delay 0.25
-      company-backends (remove 'company-semantic company-backends))
-
-;; Disable magit instructions
-(setq magit-last-seen-setup-instructions "1.4.0")
-
-;; Sane defaults for projectile
-(setq
- projectile-switch-project-action 'projectile-find-dir
- projectile-find-dir-includes-top-level t)
-
-;; Package updator configuration
-(setq auto-package-update-delete-old-versions t
-      auto-package-update-hide-results t)
-
-;; eldoc in C/C++
-(add-hook 'c++-mode-hook (lambda () (eldoc-mode 1)))
-(add-hook 'c-mode-hook (lambda () (eldoc-mode 1)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; custom functions
@@ -162,6 +150,8 @@ Code taken from `hack-dir-local-variables'."
   (add-to-list 'load-path dir))
 
 (require 'use-package)
+(require 'use-package-ensure)
+(setq use-package-always-ensure t)
 (require 'bind-key)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -169,24 +159,23 @@ Code taken from `hack-dir-local-variables'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package auto-package-update
-  :ensure t
   :config
+  (setq auto-package-update-delete-old-versions t
+	auto-package-update-hide-results t)
   (auto-package-update-maybe))
 
-(use-package use-package-ensure-system-package
-  :ensure t)
-
-(use-package f
-  :ensure t)
-
-(use-package dash
-  :ensure t)
+(use-package use-package-ensure-system-package)
+(use-package f)
+(use-package dash)
 
 (use-package company
-  :ensure t
   :bind
   (:map company-mode-map ("<C-tab>" . company-complete))
   :config
+  (setq company-tooltip-align-annotations t
+	company-idle-delay 0.25
+	company-backends (remove 'company-semantic company-backends))
+
   (global-company-mode)
 
   (defun my-company-ispell-hook ()
@@ -196,41 +185,41 @@ Code taken from `hack-dir-local-variables'."
   (add-hook 'text-mode-hook 'my-company-ispell-hook))
 
 (use-package magit
-  :ensure t
   :ensure-system-package git
-  :bind (("C-c g" . magit-status)))
+  :bind (("C-c g" . magit-status))
+  :config
+  (setq magit-last-seen-setup-instructions "1.4.0"))
 
 (use-package projectile
-  :ensure t
   :config
+  (setq projectile-switch-project-action 'projectile-find-dir
+	projectile-find-dir-includes-top-level t)
   (projectile-global-mode t))
 
 (use-package lsp-mode
-  :ensure t)
+  :config  
+  (require 'lsp-imenu)
+  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu))
 
 (use-package lsp-ui
   :after (lsp-mode)
-  :ensure t
   :config
+  (setq lsp-ui-sideline-ignore-duplicate t)
   (add-hook 'lsp-mode-hook 'lsp-ui-mode))
 
 (use-package company-lsp
   :after (lsp-mode company)
-  :ensure t
   :config
   (push 'company-lsp company-backends))
 
 (use-package cquery
   :after (lsp)
-  :ensure t
   :ensure-system-package cquery)
 
 (use-package meson-mode
-  :ensure t
   :ensure-system-package meson)
 
-(use-package csharp-mode 
-  :ensure t)
+(use-package csharp-mode)
 
 (use-package omnisharp
   :after (csharp-mode company)
@@ -244,20 +233,244 @@ Code taken from `hack-dir-local-variables'."
     (push 'company-omnisharp company-backends)))
 
 (use-package go-mode
-  :ensure t
   :ensure-system-package
-  ((go)
+  ((go . golang)
    (gometalinter . "go get -u github.com/alecthomas/gometalinter; gometalinter --install --update")
    (gocode . "go get -u github.com/nsf/gocode")))
 
 (use-package go-eldoc
   :after (go-mode)
-  :ensure t
   :config
   (add-hook 'go-mode-hook 'go-eldoc-setup))
 
 (use-package company-go
   :after (go-mode company)
-  :ensure t
   :config
   (push 'company-go company-backends))
+
+(use-package haskell-mode
+  :ensure-system-package
+  ((stack . haskell-stack)
+   (ghc . "stack ghc")))
+
+(use-package ghc
+  :after (haskell-mode)
+  :config
+  (autoload 'ghc-init "ghc" nil t)
+  (autoload 'ghc-debug "ghc" nil t)
+  (add-hook 'haskell-mode-hook #'ghc-init))
+
+(use-package company-ghc
+  :after (haskell-mode company-mode)
+  :config
+  (push 'company-haskell company-backends))
+
+(use-package slime
+  :ensure-system-package (sbcl)
+  :config
+  (require 'slime-autoloads)
+  (setq slime-contribs '(slime-fancy))
+  (add-to-list 'slime-lisp-implementations '(sbcl ("sbcl") :coding-system utf-8-unix))
+  (slime-setup))
+
+(use-package highlight-parentheses
+  :config  
+  (define-globalized-minor-mode global-highlight-parentheses-mode
+    highlight-parentheses-mode
+    (lambda ()
+      (highlight-parentheses-mode t)))
+  (global-highlight-parentheses-mode t))
+
+(use-package paredit
+  :config
+  (mapc
+   (lambda (mode-hook)
+     (add-hook mode-hook #'paredit-mode))
+   '(emacs-lisp-mode-hook
+      eval-expression-minibuffer-setup-hook
+      ielm-mode-hook
+      lisp-mode-hook
+      lisp-interaction-mode-hook
+      scheme-mode-hook
+      slime-repl-mode-hook
+      clojure-mode-hook)))
+
+(use-package markdown-mode
+  :ensure-system-package (markdown . discount)
+  :mode ("\\.markdown\\'" "\\.md\\'")
+  :config
+  (defun my-custom-markdown-mode ()
+    (interactive)
+    (visual-line-mode 1))
+  (advice-add 'markdown-mode :after #'my-custom-markdown-mode))
+
+(use-package org
+  :after (f)
+  :bind
+  (("C-c t" . org-todo-list)
+   ("C-c l" . org-store-link)
+   ("C-c a" . org-agenda)
+   ("C-c b" . org-iswitchb)
+   ("C-c c" . org-capture))
+  :config
+  (require 'org)
+  (setq
+   org-default-notes-file (f-join org-directory "notes.org")
+   org-agenda-files `(,(f-join org-directory "todo.org") ,(f-join org-directory "agenda.org"))
+   org-agenda-diary-file (f-join org-directory "diary.org")
+   org-todo-keywords
+   '((sequence "TODO(t)" "PROG(p)" "BLCK(b)" "STAL(s)" "|" "DONE(d)" "WONT(w)"))
+   org-todo-keyword-faces
+   '(("TODO" . (:foreground "white" :weight bold))
+     ("DOIN" . (:foreground "green" :weight bold))
+     ("BLCK" . (:foreground "red" :weight bold))
+     ("STAL" . (:foreground "yellow" :weight bold))
+     ("WONT" . (:foreground "grey" :weight bold))
+     ("DONE" . (:foreground "grey" :weight bold)))
+   org-capture-templates
+   '(("n" "Note" entry (file+headline "notes.org" "Notes")
+      "* %^{topic} %T %^g\n   :CATEGORY: %^{category}\n%i%?\n")
+     ("t" "To Do" entry (file+headline "todo.org" "To Do")
+      "* TODO %^{todo} %^g\n   DEADLINE: %^{due}t\n   :CATEGORY: %^{category}\n")
+     ("d" "Daily review" entry (file+headline "diary.org" "Daily Review")
+      (format
+       "* %%T %%^g\n   :CATEGORY: Review\n   %%?%%[%s/template_daily_review.org]\n"
+       org-directory))
+     ("i" "Idea" entry (file+headline "ideas.org" "Ideas")
+      "* %^{topic} %T %^g\n   :CATEGORY: Idea\n   %i%?\n")
+     ("j" "Journal" entry (file+headline "diary.org" "Journal")
+      "* %^{topic} %T %^g\n   :CATEGORY: Journal\n   %i%?\n")
+     ("l" "Letter" entry (file+headline "letters.org" "Letter")
+      "* %^{topic} %T %^g\n   :CATEGORY: Letter\n   %i%?\n")
+     ("w" "Work Log" entry (file+headline "work.org" "Work Log")
+      "* %^{topic} %T %^g\n   :CATEGORY: Log\n   %i%?\n")
+     ("a" "Article" entry (file+headline "articles.org" "Article")
+      "* %^{topic} %T %^g\n   :CATEGORY: Article\n   %i%?\n")
+     ("e" "Event" entry (file+headline "agenda.org" "Events")
+      "* %^{title} %^g\n     SCHEDULED: %^{when}t\n   %i%?\n")
+     ("c" "Contact" entry (file+headline "addresses.org" "Addresses")
+      "* %(org-contacts-template-name)\n   :PROPERTIES:\n   :EMAIL: %(org-contacts-template-email)\n   :END:\n   %i%?\n"))
+   org-modules
+   '(org-bbdb org-bibtex org-docview org-gnus org-info org-jsinfo org-habit org-irc org-mew org-mhe org-rmail org-special-blocks org-vm org-wl org-w3m org-mouse org-bookmark org-drill org-eshell org-invoice org-registry org-contacts))  
+  (defun my-custom-org-hook ()
+    (interactive)
+    (visual-line-mode t))
+  (add-hook 'org-mode-hook 'my-custom-org-hook))
+
+(use-package js2-mode
+  :after (lsp-mode)
+  :ensure-system-package
+  ((npm)
+   (html-languageserver . "npm install -g vscode-html-languageserver-bin")
+   (css-languageserver . "npm install -g vrcode-css-languageserver-bin"))
+  :config
+  (add-hook 'js2-mode-hook #'lsp)
+  (add-hook 'typescript-mode-hook #'lsp)
+  (add-hook 'css-mode-hook #'lsp))
+
+(use-package typescript-mode
+  :after (js2-mode)
+  :ensure-system-package
+  ((npm)
+   (tsc . "npm install -g typescript")))
+
+(use-package bash-mode
+  :after (lsp-mode)
+  :ensure-system-package
+  (bash-language-server . "npm install -g bash-language-server")
+  :config
+  (add-hook 'sh-mode-hook #'lsp))
+
+(use-package rust-mode
+  :after (lsp-mode)
+  :ensure-system-package
+  ((cargo) (rustup) (rls . "rustup component add rls"))
+  :config
+  (add-hook 'rust-mode-hook #'lsp))
+
+(use-package python-mode
+  :after (projectile lsp-mode)
+  :ensure-system-package
+  ((pip) (python) (pyls . "pip install 'python-language-server[all]'"))
+  :config
+  (lsp-define-stdio-client
+   lsp-python "python"
+   #'projectile-project-root
+   '("pyls"))  
+  (add-hook 'python-mode-hook #'lsp-python-enable))
+
+(use-package ruby-mode
+  :ensure-system-package
+  ((gem)
+   (rubocop     . "gem install rubocop")
+   (ruby-lint   . "gem install ruby-lint")
+   (ripper-tags . "gem install ripper-tags")
+   (pry         . "gem install pry"))
+  :mode "\\.rb\\'"
+  :interpreter "ruby"
+  :functions (inf-ruby-keys launch-ruby kill-ruby)
+  :config
+  (defun my-ruby-mode-hook ()
+    (require 'inf-ruby)
+    (inf-ruby-keys))
+  (defun launch-ruby ()
+    (interactive)
+    (unless (get-buffer "*ruby*")
+      (let ((buf (current-buffer)))
+        (inf-ruby)
+        (set-buffer buf))))      
+  (defun kill-ruby ()
+    (interactive)
+    (when (get-buffer "*ruby*")
+      (kill-buffer "*ruby*")))
+  (add-hook 'ruby-mode-hook 'my-ruby-mode-hook))
+
+(use-package inf-ruby
+  :after ruby-mode)
+
+(use-package enh-ruby-mode
+  :after ruby-mode)
+
+(use-package projectile-rails
+  :after (projectile ruby-mode)
+  :config
+  (advice-add 'projectile-rails-console :before #'kill-ruby)
+  (advice-add 'launch-ruby :after #'projectile-rails-on)
+  (advice-add 'kill-ruby :after #'projectile-rails-off))
+
+(use-package robe
+  :after ruby-mode
+  :config
+  (advice-add 'launch-ruby :after #'robe-start))
+
+(use-package company-inf-ruby
+  :after (company ruby-mode)
+  :config
+  (push 'company-inf-ruby company-backends))
+  
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Finish
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Enable GC
+(setq gc-cons-threshold 16777216
+      gc-cons-percentage 0.1)
+
+;; Enable file handler
+(setq file-name-handler-alist default-file-name-handler-alist)
+
+(garbage-collect)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (company-go go-eldoc go-mode csharp-mode meson-mode cquery company-lsp lsp-ui lsp-mode projectile magit company f use-package-ensure-system-package auto-package-update))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
