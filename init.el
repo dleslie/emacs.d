@@ -11,6 +11,9 @@
 (setq gc-cons-threshold 402653184
       gc-cons-percentage 0.6)
 
+;; Make custom file not this one
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+
 ;; Disable file handler search during load
 (defvar default-file-name-handler-alist file-name-handler-alist)
 (setq file-name-handler-alist nil)
@@ -60,6 +63,9 @@
 (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1)))
 (add-hook 'c-mode-hook (lambda () (eldoc-mode 1)))
 
+;; Arduino ino files
+(add-to-list 'auto-mode-alist '("\\.ino?\\'" . c++-mode))
+
 ;; Where are we finding things?
 (package-initialize)
 (require 'package)
@@ -68,6 +74,11 @@
         ("melpa" . "https://melpa.org/packages/")
         ("org" . "https://orgmode.org/elpa/")
         ("elpy" . "https://jorgenschaefer.github.io/packages/")))
+
+;; Always show imenu
+(defun my-try-to-add-imenu ()
+  (condition-case nil (imenu-add-to-menubar "Imenu") (error nil)))
+(add-hook 'font-lock-mode-hook 'my-try-to-add-imenu)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; custom functions
@@ -131,7 +142,7 @@ Code taken from `hack-dir-local-variables'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'ansi-color)
-  
+
 (defun my-compilation-custom-hook ()
   (visual-line-mode 1))
 (defun my-colorize-compilation-buffer ()
@@ -150,9 +161,9 @@ Code taken from `hack-dir-local-variables'."
   (add-to-list 'load-path dir))
 
 (require 'use-package)
+(require 'bind-key)
 (require 'use-package-ensure)
 (setq use-package-always-ensure t)
-(require 'bind-key)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; packages
@@ -164,24 +175,31 @@ Code taken from `hack-dir-local-variables'."
 	auto-package-update-hide-results t)
   (auto-package-update-maybe))
 
-(use-package use-package-ensure-system-package)
-(use-package f)
+(use-package use-package-ensure-system-package
+  :functions (use-package-ensure-system-package-exists?))
+
+(use-package f
+  :functions (f-join))
+
 (use-package dash)
+(use-package geiser)
+(use-package toml)
+(use-package csharp-mode)
+(use-package restclient)
+(use-package doom-themes)
 
 (use-package company
+  :functions (global-company-mode)
   :bind
   (:map company-mode-map ("<C-tab>" . company-complete))
   :config
   (setq company-tooltip-align-annotations t
 	company-idle-delay 0.25
 	company-backends (remove 'company-semantic company-backends))
-
   (global-company-mode)
-
   (defun my-company-ispell-hook ()
     (make-local-variable 'company-backends)
     (push 'company-ispell company-backends))
-      
   (add-hook 'text-mode-hook 'my-company-ispell-hook))
 
 (use-package magit
@@ -191,21 +209,22 @@ Code taken from `hack-dir-local-variables'."
   (setq magit-last-seen-setup-instructions "1.4.0"))
 
 (use-package projectile
+  :functions (projectile-mode)
   :config
   (setq projectile-switch-project-action 'projectile-find-dir
 	projectile-find-dir-includes-top-level t)
-  (projectile-global-mode t))
+  (projectile-mode t))
 
-(use-package lsp-mode
-  :config  
-  (require 'lsp-imenu)
-  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu))
+(use-package lsp-mode)
 
 (use-package lsp-ui
   :after (lsp-mode)
   :config
+  (require 'lsp-ui-imenu)
   (setq lsp-ui-sideline-ignore-duplicate t)
-  (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
 
 (use-package company-lsp
   :after (lsp-mode company)
@@ -218,8 +237,6 @@ Code taken from `hack-dir-local-variables'."
 
 (use-package meson-mode
   :ensure-system-package meson)
-
-(use-package csharp-mode)
 
 (use-package omnisharp
   :after (csharp-mode company)
@@ -254,6 +271,7 @@ Code taken from `hack-dir-local-variables'."
    (ghc . "stack ghc")))
 
 (use-package ghc
+  :functions (ghc-init)
   :after (haskell-mode)
   :config
   (autoload 'ghc-init "ghc" nil t)
@@ -267,33 +285,27 @@ Code taken from `hack-dir-local-variables'."
 
 (use-package slime
   :ensure-system-package (sbcl)
+  :functions (slime-setup)
   :config
   (require 'slime-autoloads)
   (setq slime-contribs '(slime-fancy))
   (add-to-list 'slime-lisp-implementations '(sbcl ("sbcl") :coding-system utf-8-unix))
   (slime-setup))
 
-(use-package highlight-parentheses
-  :config  
-  (define-globalized-minor-mode global-highlight-parentheses-mode
-    highlight-parentheses-mode
-    (lambda ()
-      (highlight-parentheses-mode t)))
-  (global-highlight-parentheses-mode t))
-
 (use-package paredit
+  :functions (paredit-mode)
   :config
   (mapc
    (lambda (mode-hook)
      (add-hook mode-hook #'paredit-mode))
    '(emacs-lisp-mode-hook
-      eval-expression-minibuffer-setup-hook
-      ielm-mode-hook
-      lisp-mode-hook
-      lisp-interaction-mode-hook
-      scheme-mode-hook
-      slime-repl-mode-hook
-      clojure-mode-hook)))
+     eval-expression-minibuffer-setup-hook
+     ielm-mode-hook
+     lisp-mode-hook
+     lisp-interaction-mode-hook
+     scheme-mode-hook
+     slime-repl-mode-hook
+     clojure-mode-hook)))
 
 (use-package markdown-mode
   :ensure-system-package (markdown . discount)
@@ -303,6 +315,193 @@ Code taken from `hack-dir-local-variables'."
     (interactive)
     (visual-line-mode 1))
   (advice-add 'markdown-mode :after #'my-custom-markdown-mode))
+
+(use-package js2-mode
+  :after (lsp-mode)
+  :ensure-system-package
+  ((npm)
+   (html-languageserver . "npm install -g vscode-html-languageserver-bin")
+   (css-languageserver . "npm install -g vrcode-css-languageserver-bin"))
+  :config
+  (add-hook 'js2-mode-hook #'lsp)
+  (add-hook 'typescript-mode-hook #'lsp)
+  (add-hook 'css-mode-hook #'lsp))
+
+(use-package typescript-mode
+  :after (js2-mode)
+  :ensure-system-package
+  ((npm)
+   (tsc . "npm install -g typescript")))
+
+(use-package rust-mode
+  :after (lsp-mode)
+  :ensure-system-package
+  ((cargo) (rustup) (rls . "rustup component add rls"))
+  :config
+  (add-hook 'rust-mode-hook #'lsp))
+
+(use-package python-mode
+  :after (projectile lsp-mode)
+  :functions (lsp-python-enable)
+  :ensure-system-package
+  ((pip) (python) (pyls . "pip install 'python-language-server[all]'"))
+  :config
+  (require 'lsp-python)
+  (add-hook 'python-mode-hook #'lsp-python-enable))
+
+(use-package ruby-mode
+  :ensure-system-package
+  ((gem)
+   (rubocop     . "gem install rubocop")
+   (ruby-lint   . "gem install ruby-lint")
+   (ripper-tags . "gem install ripper-tags")
+   (pry         . "gem install pry"))
+  :mode "\\.rb\\'"
+  :interpreter "ruby"
+  :functions (inf-ruby-keys launch-ruby kill-ruby)
+  :config
+  (defun my-ruby-mode-hook ()
+    (require 'inf-ruby)
+    (inf-ruby-keys))
+  (defun launch-ruby ()
+    (interactive)
+    (unless (get-buffer "*ruby*")
+      (let ((buf (current-buffer)))
+        (inf-ruby)
+        (set-buffer buf))))      
+  (defun kill-ruby ()
+    (interactive)
+    (when (get-buffer "*ruby*")
+      (kill-buffer "*ruby*")))
+  (add-hook 'ruby-mode-hook 'my-ruby-mode-hook))
+
+(use-package inf-ruby
+  :after ruby-mode)
+
+(use-package enh-ruby-mode
+  :after ruby-mode)
+
+(use-package projectile-rails
+  :functions (projectile-rails-on projectile-rails-off)
+  :after (projectile ruby-mode)
+  :config
+  (advice-add 'projectile-rails-console :before #'kill-ruby)
+  (advice-add 'launch-ruby :after #'projectile-rails-on)
+  (advice-add 'kill-ruby :after #'projectile-rails-off))
+
+(use-package robe
+  :after ruby-mode
+  :functions (robe-start)
+  :config
+  (advice-add 'launch-ruby :after #'robe-start))
+
+(use-package company-inf-ruby
+  :after (company ruby-mode)
+  :config
+  (push 'company-inf-ruby company-backends))
+
+(use-package company-restclient
+  :after (restclient company)
+  :config
+  (push 'company-restclient company-backends))
+
+(use-package web-mode
+  :mode ("\\.phtml\\'" "\\.tpl\\.php\\'" "\\.[agj]sp\\'" "\\.as[cp]x\\'" "\\.erb\\'" "\\.mustache\\'" "\\.djhtml\\'" "\\.html?\\'" "\\.tsx\\'" "\\.jsx\\'"))
+
+(use-package company-web
+  :after (company web-mode)
+  :config
+  (push 'company-web-html company-backends)
+  (push 'company-web-jade company-backends)
+  (push 'company-web-slim company-backends))
+
+(use-package ggtags
+  :functions (ggtags-mode)
+  :ensure-system-package (global)
+  :bind
+  (:map ggtags-mode-map
+	("C-c g s" . ggtags-find-other-symbol)
+	("C-c g h" . ggtags-view-tag-history)
+	("C-c g r" . ggtags-find-reference)
+	("C-c g f" . ggtags-find-file)
+	("C-c g c" . ggtags-create-tags)
+	("C-c g u" . ggtags-update-tags)
+	("M-," . pop-tag-mark))
+  :config
+  (add-hook 'c-mode-common-hook
+            (lambda ()
+              (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
+                (ggtags-mode 1))))  
+  (push 'company-gtags company-backends ))
+
+(use-package olivetti
+  :config
+  (define-key text-mode-map [menu-bar text olivetti-mode]
+    '(menu-item "Olivetti" olivetti-mode
+                :button (:toggle . (and (boundp 'olivetti-mode) olivetti-mode)))))
+
+(use-package writeroom-mode
+  :config
+  (define-key text-mode-map [menu-bar text writeroom-mode]
+    '(menu-item "Writeroom" writeroom-mode
+                :button (:toggle . (and (boundp 'writeroom-mode) writeroom-mode)))))
+
+(use-package writegood-mode
+  :config
+  (define-key text-mode-map [menu-bar text writeroom-mode]
+    '(menu-item "Writegood" writegood-mode
+                :button (:toggle . (and (boundp 'writegood-mode) writegood-mode))))
+  :config
+  (add-hook 'text-mode-hook 'writegood-mode))
+
+(use-package smex
+  :bind (("M-x" . smex)))
+
+(use-package ido
+  :config
+  (setq
+   ido-create-new-buffer 'always
+   ido-enable-flex-matching t
+   ido-everywhere t))
+
+(use-package nyan-mode
+  :functions (nyan-mode)
+  :config
+  (nyan-mode t))
+
+(use-package ag
+  :ensure-system-package (ag)
+  :config
+  (define-key-after global-map [menu-bar tools ag]
+    '(menu-item "Search Files (ag)..." ag :help "Search files for strings or regexps (with ag)...")
+    'grep))
+
+(use-package dumb-jump
+  :bind
+  (("C-c j" . dumb-jump-go)
+   ("C-c J" . dumb-jump-quick-look)
+   ("C-x j" . dumb-jump-back))
+  :config
+  (define-key-after global-map [menu-bar edit dj-menu]
+    (cons "Dumb Jump" (make-sparse-keymap "dumb jump")) 'goto)
+  (define-key global-map [menu-bar edit dj-menu go]
+    '(menu-item "Go" dumb-jump-go :help "Jump to definition"))
+  (define-key global-map [menu-bar edit dj-menu quick-look]
+    '(menu-item "Quick Look" dumb-jump-quick-look :help "Look at definition"))
+  (define-key global-map [menu-bar edit dj-menu back]
+    '(menu-item "Back" dumb-jump-back :help "Go back")))
+
+(use-package dictionary
+  :bind (("C-c d" . dictionary-search))
+  :config
+  (define-key-after global-map [menu-bar tools apps dictionary-search]
+    '(menu-item "Dictionary" dictionary-search :help "Search dictionary") t))
+
+(use-package quiz
+  :bind (("C-c q" . quiz))
+  :config
+  (define-key global-map [menu-bar tools games quiz]
+    '(menu-item "Quiz" quiz :help "Be quizzed")))
 
 (use-package org
   :after (f)
@@ -357,97 +556,6 @@ Code taken from `hack-dir-local-variables'."
     (visual-line-mode t))
   (add-hook 'org-mode-hook 'my-custom-org-hook))
 
-(use-package js2-mode
-  :after (lsp-mode)
-  :ensure-system-package
-  ((npm)
-   (html-languageserver . "npm install -g vscode-html-languageserver-bin")
-   (css-languageserver . "npm install -g vrcode-css-languageserver-bin"))
-  :config
-  (add-hook 'js2-mode-hook #'lsp)
-  (add-hook 'typescript-mode-hook #'lsp)
-  (add-hook 'css-mode-hook #'lsp))
-
-(use-package typescript-mode
-  :after (js2-mode)
-  :ensure-system-package
-  ((npm)
-   (tsc . "npm install -g typescript")))
-
-(use-package bash-mode
-  :after (lsp-mode)
-  :ensure-system-package
-  (bash-language-server . "npm install -g bash-language-server")
-  :config
-  (add-hook 'sh-mode-hook #'lsp))
-
-(use-package rust-mode
-  :after (lsp-mode)
-  :ensure-system-package
-  ((cargo) (rustup) (rls . "rustup component add rls"))
-  :config
-  (add-hook 'rust-mode-hook #'lsp))
-
-(use-package python-mode
-  :after (projectile lsp-mode)
-  :ensure-system-package
-  ((pip) (python) (pyls . "pip install 'python-language-server[all]'"))
-  :config
-  (lsp-define-stdio-client
-   lsp-python "python"
-   #'projectile-project-root
-   '("pyls"))  
-  (add-hook 'python-mode-hook #'lsp-python-enable))
-
-(use-package ruby-mode
-  :ensure-system-package
-  ((gem)
-   (rubocop     . "gem install rubocop")
-   (ruby-lint   . "gem install ruby-lint")
-   (ripper-tags . "gem install ripper-tags")
-   (pry         . "gem install pry"))
-  :mode "\\.rb\\'"
-  :interpreter "ruby"
-  :functions (inf-ruby-keys launch-ruby kill-ruby)
-  :config
-  (defun my-ruby-mode-hook ()
-    (require 'inf-ruby)
-    (inf-ruby-keys))
-  (defun launch-ruby ()
-    (interactive)
-    (unless (get-buffer "*ruby*")
-      (let ((buf (current-buffer)))
-        (inf-ruby)
-        (set-buffer buf))))      
-  (defun kill-ruby ()
-    (interactive)
-    (when (get-buffer "*ruby*")
-      (kill-buffer "*ruby*")))
-  (add-hook 'ruby-mode-hook 'my-ruby-mode-hook))
-
-(use-package inf-ruby
-  :after ruby-mode)
-
-(use-package enh-ruby-mode
-  :after ruby-mode)
-
-(use-package projectile-rails
-  :after (projectile ruby-mode)
-  :config
-  (advice-add 'projectile-rails-console :before #'kill-ruby)
-  (advice-add 'launch-ruby :after #'projectile-rails-on)
-  (advice-add 'kill-ruby :after #'projectile-rails-off))
-
-(use-package robe
-  :after ruby-mode
-  :config
-  (advice-add 'launch-ruby :after #'robe-start))
-
-(use-package company-inf-ruby
-  :after (company ruby-mode)
-  :config
-  (push 'company-inf-ruby company-backends))
-  
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Finish
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -460,17 +568,6 @@ Code taken from `hack-dir-local-variables'."
 (setq file-name-handler-alist default-file-name-handler-alist)
 
 (garbage-collect)
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (company-go go-eldoc go-mode csharp-mode meson-mode cquery company-lsp lsp-ui lsp-mode projectile magit company f use-package-ensure-system-package auto-package-update))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+
+(when (file-exists-p custom-file)
+  (load custom-file))

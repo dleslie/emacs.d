@@ -1,3 +1,5 @@
+tramp
+transient/
 *.elc
 anaconda-mode/
 server/
