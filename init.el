@@ -342,12 +342,11 @@ Code taken from `hack-dir-local-variables'."
 
 (use-package python-mode
   :after (projectile lsp-mode)
-  :functions (lsp-python-enable)
   :ensure-system-package
   ((pip) (python) (pyls . "pip install 'python-language-server[all]'"))
   :config
-  (require 'lsp-python)
-  (add-hook 'python-mode-hook #'lsp-python-enable))
+  (require 'lsp-pyls)
+  (add-hook 'python-mode-hook #'lsp-pyls-enable))
 
 (use-package ruby-mode
   :ensure-system-package
