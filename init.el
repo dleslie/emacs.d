@@ -579,5 +579,4 @@ Code taken from `hack-dir-local-variables'."
                              (float-time
                               (time-subtract after-init-time before-init-time)))
                      gcs-done)
-	    (delete-other-windows)
-	    (switch-to-buffer "*scratch*")))
+	    (delete-other-windows)))
