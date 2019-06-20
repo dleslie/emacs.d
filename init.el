@@ -28,7 +28,8 @@
  auto-window-vscroll nil)
 
 ;; General Emacs Sanity
-(setq indent-tabs-mode nil
+(setq inhibit-startup-screen t
+      indent-tabs-mode nil
       make-backup-files nil
       debug-on-error nil)
 (delete-selection-mode 1)
@@ -175,10 +176,7 @@ Code taken from `hack-dir-local-variables'."
 	auto-package-update-hide-results t)
   (auto-package-update-maybe))
 
-(use-package use-package-ensure-system-package
-  :functions (use-package-ensure-system-package-exists?)
-  :init
-  (setq system-packages-use-sudo nil))
+(use-package use-package-ensure-system-package)
 
 (use-package f
   :functions (f-join))
@@ -573,3 +571,13 @@ Code taken from `hack-dir-local-variables'."
 
 (when (file-exists-p custom-file)
   (load custom-file))
+
+(add-hook 'emacs-startup-hook
+	  (lambda ()
+	    (message "Emacs ready in %s with %d garbage collections."
+                     (format "%.2f seconds"
+                             (float-time
+                              (time-subtract after-init-time before-init-time)))
+                     gcs-done)
+	    (delete-other-windows)
+	    (switch-to-buffer "*scratch*")))
