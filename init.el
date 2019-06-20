@@ -46,7 +46,7 @@
 ;; Some pretty visual indicators
 (show-paren-mode t)
 (global-eldoc-mode t)
-(global-hl-line-mode t)
+;;(global-hl-line-mode t)
 
 ;; Useful bindings
 (global-set-key "\C-w" 'clipboard-kill-region)
@@ -170,13 +170,15 @@ Code taken from `hack-dir-local-variables'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package auto-package-update
-  :config
+  :init
   (setq auto-package-update-delete-old-versions t
 	auto-package-update-hide-results t)
   (auto-package-update-maybe))
 
 (use-package use-package-ensure-system-package
-  :functions (use-package-ensure-system-package-exists?))
+  :functions (use-package-ensure-system-package-exists?)
+  :init
+  (setq system-packages-use-sudo nil))
 
 (use-package f
   :functions (f-join))
@@ -189,14 +191,14 @@ Code taken from `hack-dir-local-variables'."
 (use-package doom-themes)
 
 (use-package company
-  :functions (global-company-mode)
   :bind
   (:map company-mode-map ("<C-tab>" . company-complete))
+  :init
+  (global-company-mode)
   :config
   (setq company-tooltip-align-annotations t
 	company-idle-delay 0.25
 	company-backends (remove 'company-semantic company-backends))
-  (global-company-mode)
   (defun my-company-ispell-hook ()
     (make-local-variable 'company-backends)
     (push 'company-ispell company-backends))
@@ -205,12 +207,12 @@ Code taken from `hack-dir-local-variables'."
 (use-package magit
   :ensure-system-package git
   :bind (("C-c g" . magit-status))
-  :config
+  :init
   (setq magit-last-seen-setup-instructions "1.4.0"))
 
 (use-package projectile
   :functions (projectile-mode)
-  :config
+  :init
   (setq projectile-switch-project-action 'projectile-find-dir
 	projectile-find-dir-includes-top-level t)
   (projectile-mode t))
@@ -228,7 +230,7 @@ Code taken from `hack-dir-local-variables'."
 
 (use-package company-lsp
   :after (lsp-mode company)
-  :config
+  :init
   (push 'company-lsp company-backends))
 
 (use-package cquery
@@ -244,57 +246,57 @@ Code taken from `hack-dir-local-variables'."
   (:map csharp-mode-map
         ("M-." . omnisharp-go-to-definition)
         ("C-c C-c" . recompile))
-  :config
+  :init
   (add-hook 'csharp-mode-hook 'omnisharp-mode)
   (with-eval-after-load 'company
     (push 'company-omnisharp company-backends)))
 
 (use-package go-mode
   :ensure-system-package
-  ((go . golang)
+  ((go)
    (gometalinter . "go get -u github.com/alecthomas/gometalinter; gometalinter --install --update")
    (gocode . "go get -u github.com/nsf/gocode")))
 
 (use-package go-eldoc
   :after (go-mode)
-  :config
+  :init
   (add-hook 'go-mode-hook 'go-eldoc-setup))
 
 (use-package company-go
   :after (go-mode company)
-  :config
+  :init
   (push 'company-go company-backends))
 
 (use-package haskell-mode
   :ensure-system-package
-  ((stack . haskell-stack)
-   (ghc . "stack ghc")))
+  (stack))
 
 (use-package ghc
   :functions (ghc-init)
   :after (haskell-mode)
-  :config
+  :init
   (autoload 'ghc-init "ghc" nil t)
   (autoload 'ghc-debug "ghc" nil t)
   (add-hook 'haskell-mode-hook #'ghc-init))
 
 (use-package company-ghc
   :after (haskell-mode company-mode)
-  :config
+  :init
   (push 'company-haskell company-backends))
 
 (use-package slime
   :ensure-system-package (sbcl)
   :functions (slime-setup)
-  :config
+  :init
   (require 'slime-autoloads)
   (setq slime-contribs '(slime-fancy))
-  (add-to-list 'slime-lisp-implementations '(sbcl ("sbcl") :coding-system utf-8-unix))
-  (slime-setup))
+  (slime-setup)
+  :config
+  (add-to-list 'slime-lisp-implementations '(sbcl ("sbcl") :coding-system utf-8-unix)))
 
 (use-package paredit
   :functions (paredit-mode)
-  :config
+  :init
   (mapc
    (lambda (mode-hook)
      (add-hook mode-hook #'paredit-mode))
@@ -310,7 +312,7 @@ Code taken from `hack-dir-local-variables'."
 (use-package markdown-mode
   :ensure-system-package (markdown . discount)
   :mode ("\\.markdown\\'" "\\.md\\'")
-  :config
+  :init
   (defun my-custom-markdown-mode ()
     (interactive)
     (visual-line-mode 1))
@@ -322,7 +324,7 @@ Code taken from `hack-dir-local-variables'."
   ((npm)
    (html-languageserver . "npm install -g vscode-html-languageserver-bin")
    (css-languageserver . "npm install -g vrcode-css-languageserver-bin"))
-  :config
+  :init
   (add-hook 'js2-mode-hook #'lsp)
   (add-hook 'typescript-mode-hook #'lsp)
   (add-hook 'css-mode-hook #'lsp))
@@ -337,14 +339,14 @@ Code taken from `hack-dir-local-variables'."
   :after (lsp-mode)
   :ensure-system-package
   ((cargo) (rustup) (rls . "rustup component add rls"))
-  :config
+  :init
   (add-hook 'rust-mode-hook #'lsp))
 
 (use-package python-mode
   :after (projectile lsp-mode)
   :ensure-system-package
   ((pip) (python) (pyls . "pip install --user 'python-language-server[all]'"))
-  :config
+  :init
   (require 'lsp-pyls)
   (add-hook 'python-mode-hook #'lsp-pyls-enable))
 
@@ -358,7 +360,7 @@ Code taken from `hack-dir-local-variables'."
   :mode "\\.rb\\'"
   :interpreter "ruby"
   :functions (inf-ruby-keys launch-ruby kill-ruby)
-  :config
+  :init
   (defun my-ruby-mode-hook ()
     (require 'inf-ruby)
     (inf-ruby-keys))
@@ -383,7 +385,7 @@ Code taken from `hack-dir-local-variables'."
 (use-package projectile-rails
   :functions (projectile-rails-on projectile-rails-off)
   :after (projectile ruby-mode)
-  :config
+  :init
   (advice-add 'projectile-rails-console :before #'kill-ruby)
   (advice-add 'launch-ruby :after #'projectile-rails-on)
   (advice-add 'kill-ruby :after #'projectile-rails-off))
@@ -391,17 +393,17 @@ Code taken from `hack-dir-local-variables'."
 (use-package robe
   :after ruby-mode
   :functions (robe-start)
-  :config
+  :init
   (advice-add 'launch-ruby :after #'robe-start))
 
 (use-package company-inf-ruby
   :after (company ruby-mode)
-  :config
+  :init
   (push 'company-inf-ruby company-backends))
 
 (use-package company-restclient
   :after (restclient company)
-  :config
+  :init
   (push 'company-restclient company-backends))
 
 (use-package web-mode
@@ -409,13 +411,13 @@ Code taken from `hack-dir-local-variables'."
 
 (use-package company-web
   :after (company web-mode)
-  :config
+  :init
   (push 'company-web-html company-backends)
   (push 'company-web-jade company-backends)
   (push 'company-web-slim company-backends))
 
 (use-package ggtags
-  :functions (ggtags-mode)
+  :after (company)
   :ensure-system-package (global)
   :bind
   (:map ggtags-mode-map
@@ -426,38 +428,39 @@ Code taken from `hack-dir-local-variables'."
 	("C-c g c" . ggtags-create-tags)
 	("C-c g u" . ggtags-update-tags)
 	("M-," . pop-tag-mark))
-  :config
+  :init
   (add-hook 'c-mode-common-hook
             (lambda ()
               (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
-                (ggtags-mode 1))))  
-  (push 'company-gtags company-backends ))
+                (ggtags-mode 1))))
+  :config
+  (push 'company-gtags company-backends))
 
 (use-package olivetti
-  :config
+  :init
   (define-key text-mode-map [menu-bar text olivetti-mode]
     '(menu-item "Olivetti" olivetti-mode
                 :button (:toggle . (and (boundp 'olivetti-mode) olivetti-mode)))))
 
 (use-package writeroom-mode
-  :config
+  :init
   (define-key text-mode-map [menu-bar text writeroom-mode]
     '(menu-item "Writeroom" writeroom-mode
                 :button (:toggle . (and (boundp 'writeroom-mode) writeroom-mode)))))
 
 (use-package writegood-mode
-  :config
+  :init
   (define-key text-mode-map [menu-bar text writeroom-mode]
     '(menu-item "Writegood" writegood-mode
                 :button (:toggle . (and (boundp 'writegood-mode) writegood-mode))))
-  :config
+  :init
   (add-hook 'text-mode-hook 'writegood-mode))
 
 (use-package smex
   :bind (("M-x" . smex)))
 
 (use-package ido
-  :config
+  :init
   (setq
    ido-create-new-buffer 'always
    ido-enable-flex-matching t
@@ -465,12 +468,12 @@ Code taken from `hack-dir-local-variables'."
 
 (use-package nyan-mode
   :functions (nyan-mode)
-  :config
+  :init
   (nyan-mode t))
 
 (use-package ag
   :ensure-system-package (ag)
-  :config
+  :init
   (define-key-after global-map [menu-bar tools ag]
     '(menu-item "Search Files (ag)..." ag :help "Search files for strings or regexps (with ag)...")
     'grep))
@@ -480,7 +483,7 @@ Code taken from `hack-dir-local-variables'."
   (("C-c j" . dumb-jump-go)
    ("C-c J" . dumb-jump-quick-look)
    ("C-x j" . dumb-jump-back))
-  :config
+  :init
   (define-key-after global-map [menu-bar edit dj-menu]
     (cons "Dumb Jump" (make-sparse-keymap "dumb jump")) 'goto)
   (define-key global-map [menu-bar edit dj-menu go]
@@ -492,13 +495,13 @@ Code taken from `hack-dir-local-variables'."
 
 (use-package dictionary
   :bind (("C-c d" . dictionary-search))
-  :config
+  :init
   (define-key-after global-map [menu-bar tools apps dictionary-search]
     '(menu-item "Dictionary" dictionary-search :help "Search dictionary") t))
 
 (use-package quiz
   :bind (("C-c q" . quiz))
-  :config
+  :init
   (define-key global-map [menu-bar tools games quiz]
     '(menu-item "Quiz" quiz :help "Be quizzed")))
 
@@ -510,7 +513,7 @@ Code taken from `hack-dir-local-variables'."
    ("C-c a" . org-agenda)
    ("C-c b" . org-iswitchb)
    ("C-c c" . org-capture))
-  :config
+  :init
   (require 'org)
   (setq
    org-default-notes-file (f-join org-directory "notes.org")
