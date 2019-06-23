@@ -195,7 +195,7 @@ Code taken from `hack-dir-local-variables'."
   (global-company-mode)
   :config
   (setq company-tooltip-align-annotations t
-	company-idle-delay 0.25
+	company-idle-delay nil
 	company-backends (remove 'company-semantic company-backends))
   (defun my-company-ispell-hook ()
     (make-local-variable 'company-backends)
