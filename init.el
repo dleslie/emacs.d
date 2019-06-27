@@ -30,8 +30,10 @@
 ;; General Emacs Sanity
 (setq inhibit-startup-screen t
       indent-tabs-mode nil
+      tab-width 2
       make-backup-files nil
-      debug-on-error nil)
+      debug-on-error nil
+      tab-stop-list (number-sequence 2 120 2))
 (delete-selection-mode 1)
 
 ;; Windows performance tweaks
@@ -60,9 +62,8 @@
 (global-set-key "\C-cs" 'eshell-here)
 (global-set-key [f12] 'toggle-frame-fullscreen)
 
-;; eldoc in C/C++
-(add-hook 'c++-mode-hook (lambda () (eldoc-mode 1)))
-(add-hook 'c-mode-hook (lambda () (eldoc-mode 1)))
+(add-hook 'c++-mode-hook (lambda () (eldoc-mode 1) (c-set-style "java")))
+(add-hook 'c-mode-hook (lambda () (eldoc-mode 1) (c-set-style "java")))
 
 ;; Arduino ino files
 (add-to-list 'auto-mode-alist '("\\.ino?\\'" . c++-mode))
@@ -195,8 +196,7 @@ Code taken from `hack-dir-local-variables'."
   (global-company-mode)
   :config
   (setq company-tooltip-align-annotations t
-	company-idle-delay nil
-	company-backends (remove 'company-semantic company-backends))
+	company-idle-delay nil)
   (defun my-company-ispell-hook ()
     (make-local-variable 'company-backends)
     (push 'company-ispell company-backends))
@@ -246,8 +246,7 @@ Code taken from `hack-dir-local-variables'."
         ("C-c C-c" . recompile))
   :init
   (add-hook 'csharp-mode-hook 'omnisharp-mode)
-  (with-eval-after-load 'company
-    (push 'company-omnisharp company-backends)))
+  (push 'company-omnisharp company-backends))
 
 (use-package go-mode
   :ensure-system-package
