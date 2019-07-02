@@ -187,7 +187,9 @@ Code taken from `hack-dir-local-variables'."
 (use-package toml)
 (use-package csharp-mode)
 (use-package restclient)
+(use-package constant-theme)
 (use-package doom-themes)
+(use-package sexy-monochrome-theme)
 (use-package meson-mode)
 
 (use-package company
