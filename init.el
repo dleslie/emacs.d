@@ -167,6 +167,8 @@ Code taken from `hack-dir-local-variables'."
 (require 'use-package-ensure)
 (setq use-package-always-ensure t)
 
+(use-package use-package-ensure-system-package)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -177,8 +179,6 @@ Code taken from `hack-dir-local-variables'."
 	auto-package-update-hide-results t)
   (auto-package-update-maybe))
 
-(use-package use-package-ensure-system-package)
-
 (use-package f
   :functions (f-join))
 
@@ -188,6 +188,7 @@ Code taken from `hack-dir-local-variables'."
 (use-package csharp-mode)
 (use-package restclient)
 (use-package doom-themes)
+(use-package meson-mode)
 
 (use-package company
   :bind
@@ -202,11 +203,11 @@ Code taken from `hack-dir-local-variables'."
     (push 'company-ispell company-backends))
   (add-hook 'text-mode-hook 'my-company-ispell-hook))
 
-(use-package magit
-  :ensure-system-package git
-  :bind (("C-c g" . magit-status))
-  :init
-  (setq magit-last-seen-setup-instructions "1.4.0"))
+(when (executable-find "git")
+  (use-package magit
+    :bind (("C-c g" . magit-status))
+    :init
+    (setq magit-last-seen-setup-instructions "1.4.0")))
 
 (use-package projectile
   :functions (projectile-mode)
@@ -231,13 +232,6 @@ Code taken from `hack-dir-local-variables'."
   :init
   (push 'company-lsp company-backends))
 
-(use-package cquery
-  :after (lsp)
-  :ensure-system-package cquery)
-
-(use-package meson-mode
-  :ensure-system-package meson)
-
 (use-package omnisharp
   :after (csharp-mode company)
   :bind
@@ -248,11 +242,12 @@ Code taken from `hack-dir-local-variables'."
   (add-hook 'csharp-mode-hook 'omnisharp-mode)
   (push 'company-omnisharp company-backends))
 
-(use-package go-mode
-  :ensure-system-package
-  ((go)
-   (gometalinter . "go get -u github.com/alecthomas/gometalinter; gometalinter --install --update")
-   (gocode . "go get -u github.com/nsf/gocode")))
+(when (executable-find "go")
+  (use-package go-mode
+    :ensure-system-package
+    ((go)
+     (gometalinter . "go get -u github.com/alecthomas/gometalinter; gometalinter --install --update")
+     (gocode . "go get -u github.com/nsf/gocode"))))
 
 (use-package go-eldoc
   :after (go-mode)
@@ -264,9 +259,8 @@ Code taken from `hack-dir-local-variables'."
   :init
   (push 'company-go company-backends))
 
-(use-package haskell-mode
-  :ensure-system-package
-  (stack))
+(when (executable-find "stack")
+  (use-package haskell-mode))
 
 (use-package ghc
   :functions (ghc-init)
@@ -281,15 +275,15 @@ Code taken from `hack-dir-local-variables'."
   :init
   (push 'company-haskell company-backends))
 
-(use-package slime
-  :ensure-system-package (sbcl)
-  :functions (slime-setup)
-  :init
-  (require 'slime-autoloads)
-  (setq slime-contribs '(slime-fancy))
-  (slime-setup)
-  :config
-  (add-to-list 'slime-lisp-implementations '(sbcl ("sbcl") :coding-system utf-8-unix)))
+(when (executable-find "sbcl")
+  (use-package slime
+    :functions (slime-setup)
+    :init
+    (require 'slime-autoloads)
+    (setq slime-contribs '(slime-fancy))
+    (slime-setup)
+    :config
+    (add-to-list 'slime-lisp-implementations '(sbcl ("sbcl") :coding-system utf-8-unix))))
 
 (use-package paredit
   :functions (paredit-mode)
@@ -307,7 +301,6 @@ Code taken from `hack-dir-local-variables'."
      clojure-mode-hook)))
 
 (use-package markdown-mode
-  :ensure-system-package (markdown . discount)
   :mode ("\\.markdown\\'" "\\.md\\'")
   :init
   (defun my-custom-markdown-mode ()
@@ -315,16 +308,17 @@ Code taken from `hack-dir-local-variables'."
     (visual-line-mode 1))
   (advice-add 'markdown-mode :after #'my-custom-markdown-mode))
 
-(use-package js2-mode
-  :after (lsp-mode)
-  :ensure-system-package
-  ((npm)
-   (html-languageserver . "npm install -g vscode-html-languageserver-bin")
-   (css-languageserver . "npm install -g vrcode-css-languageserver-bin"))
-  :init
-  (add-hook 'js2-mode-hook #'lsp)
-  (add-hook 'typescript-mode-hook #'lsp)
-  (add-hook 'css-mode-hook #'lsp))
+(when (executable-find "npm")
+  (use-package js2-mode
+    :after (lsp-mode)
+    :ensure-system-package
+    ((npm)
+     (html-languageserver . "npm install -g vscode-html-languageserver-bin")
+     (css-languageserver . "npm install -g vrcode-css-languageserver-bin"))
+    :init
+    (add-hook 'js2-mode-hook #'lsp)
+    (add-hook 'typescript-mode-hook #'lsp)
+    (add-hook 'css-mode-hook #'lsp)))
 
 (use-package typescript-mode
   :after (js2-mode)
@@ -332,46 +326,49 @@ Code taken from `hack-dir-local-variables'."
   ((npm)
    (tsc . "npm install -g typescript")))
 
-(use-package rust-mode
-  :after (lsp-mode)
-  :ensure-system-package
-  ((cargo) (rustup) (rls . "rustup component add rls"))
-  :init
-  (add-hook 'rust-mode-hook #'lsp))
+(when (executable-find "cargo")
+  (use-package rust-mode
+    :after (lsp-mode)
+    :ensure-system-package
+    ((cargo) (rustup) (rls . "rustup component add rls"))
+    :init
+    (add-hook 'rust-mode-hook #'lsp)))
 
-(use-package python-mode
-  :after (projectile lsp-mode)
-  :ensure-system-package
-  ((pip) (python) (pyls . "pip install --user 'python-language-server[all]'"))
-  :init
-  (require 'lsp-pyls)
-  (add-hook 'python-mode-hook #'lsp-pyls-enable))
+(when (executable-find "pip")
+  (use-package python-mode
+    :after (projectile lsp-mode)
+    :ensure-system-package
+    ((pip) (python) (pyls . "pip install --user 'python-language-server[all]'"))
+    :init
+    (require 'lsp-pyls)
+    (add-hook 'python-mode-hook #'lsp-pyls-enable)))
 
-(use-package ruby-mode
-  :ensure-system-package
-  ((gem)
-   (rubocop     . "gem install rubocop")
-   (ruby-lint   . "gem install ruby-lint")
-   (ripper-tags . "gem install ripper-tags")
-   (pry         . "gem install pry"))
-  :mode "\\.rb\\'"
-  :interpreter "ruby"
-  :functions (inf-ruby-keys launch-ruby kill-ruby)
-  :init
-  (defun my-ruby-mode-hook ()
-    (require 'inf-ruby)
-    (inf-ruby-keys))
-  (defun launch-ruby ()
-    (interactive)
-    (unless (get-buffer "*ruby*")
-      (let ((buf (current-buffer)))
-        (inf-ruby)
-        (set-buffer buf))))      
-  (defun kill-ruby ()
-    (interactive)
-    (when (get-buffer "*ruby*")
-      (kill-buffer "*ruby*")))
-  (add-hook 'ruby-mode-hook 'my-ruby-mode-hook))
+(when (executable-find "gem")
+  (use-package ruby-mode
+    :ensure-system-package
+    ((gem)
+     (rubocop     . "gem install rubocop")
+     (ruby-lint   . "gem install ruby-lint")
+     (ripper-tags . "gem install ripper-tags")
+     (pry         . "gem install pry"))
+    :mode "\\.rb\\'"
+    :interpreter "ruby"
+    :functions (inf-ruby-keys launch-ruby kill-ruby)
+    :init
+    (defun my-ruby-mode-hook ()
+      (require 'inf-ruby)
+      (inf-ruby-keys))
+    (defun launch-ruby ()
+      (interactive)
+      (unless (get-buffer "*ruby*")
+	(let ((buf (current-buffer)))
+	  (inf-ruby)
+	  (set-buffer buf))))      
+    (defun kill-ruby ()
+      (interactive)
+      (when (get-buffer "*ruby*")
+	(kill-buffer "*ruby*")))
+    (add-hook 'ruby-mode-hook 'my-ruby-mode-hook)))
 
 (use-package inf-ruby
   :after ruby-mode)
@@ -413,25 +410,25 @@ Code taken from `hack-dir-local-variables'."
   (push 'company-web-jade company-backends)
   (push 'company-web-slim company-backends))
 
-(use-package ggtags
-  :after (company)
-  :ensure-system-package (global)
-  :bind
-  (:map ggtags-mode-map
-	("C-c g s" . ggtags-find-other-symbol)
-	("C-c g h" . ggtags-view-tag-history)
-	("C-c g r" . ggtags-find-reference)
-	("C-c g f" . ggtags-find-file)
-	("C-c g c" . ggtags-create-tags)
-	("C-c g u" . ggtags-update-tags)
-	("M-," . pop-tag-mark))
-  :init
-  (add-hook 'c-mode-common-hook
-            (lambda ()
-              (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
-                (ggtags-mode 1))))
-  :config
-  (push 'company-gtags company-backends))
+(when (executable-find "global")
+  (use-package ggtags
+    :after (company)
+    :bind
+    (:map ggtags-mode-map
+	  ("C-c g s" . ggtags-find-other-symbol)
+	  ("C-c g h" . ggtags-view-tag-history)
+	  ("C-c g r" . ggtags-find-reference)
+	  ("C-c g f" . ggtags-find-file)
+	  ("C-c g c" . ggtags-create-tags)
+	  ("C-c g u" . ggtags-update-tags)
+	  ("M-," . pop-tag-mark))
+    :init
+    (add-hook 'c-mode-common-hook
+	      (lambda ()
+		(when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
+		  (ggtags-mode 1))))
+    :config
+    (push 'company-gtags company-backends)))
 
 (use-package olivetti
   :init
@@ -468,12 +465,12 @@ Code taken from `hack-dir-local-variables'."
   :init
   (nyan-mode t))
 
-(use-package ag
-  :ensure-system-package (ag)
-  :init
-  (define-key-after global-map [menu-bar tools ag]
-    '(menu-item "Search Files (ag)..." ag :help "Search files for strings or regexps (with ag)...")
-    'grep))
+(when (executable-find "ag")
+  (use-package ag
+    :init
+    (define-key-after global-map [menu-bar tools ag]
+      '(menu-item "Search Files (ag)..." ag :help "Search files for strings or regexps (with ag)...")
+      'grep)))
 
 (use-package dumb-jump
   :bind
