@@ -320,11 +320,12 @@ Code taken from `hack-dir-local-variables'."
     (add-hook 'typescript-mode-hook #'lsp)
     (add-hook 'css-mode-hook #'lsp)))
 
-(use-package typescript-mode
-  :after (js2-mode)
-  :ensure-system-package
-  ((npm)
-   (tsc . "npm install -g typescript")))
+(when (executable-find "npm")
+  (use-package typescript-mode
+    :after (js2-mode)
+    :ensure-system-package
+    ((npm)
+     (tsc . "npm install -g typescript"))))
 
 (when (executable-find "cargo")
   (use-package rust-mode
