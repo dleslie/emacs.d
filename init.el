@@ -33,7 +33,8 @@
       tab-width 2
       make-backup-files nil
       debug-on-error nil
-      tab-stop-list (number-sequence 2 120 2))
+      tab-stop-list (number-sequence 2 120 2)
+      pop-up-windows nil)
 (delete-selection-mode 1)
 
 ;; Windows performance tweaks
@@ -49,7 +50,7 @@
 ;; Some pretty visual indicators
 (show-paren-mode t)
 (global-eldoc-mode t)
-;;(global-hl-line-mode t)
+(global-hl-line-mode t)
 
 ;; Useful bindings
 (global-set-key "\C-w" 'clipboard-kill-region)
@@ -193,13 +194,11 @@ Code taken from `hack-dir-local-variables'."
 (use-package meson-mode)
 
 (use-package company
-  :bind
-  (:map company-mode-map ("<C-tab>" . company-complete))
   :init
   (global-company-mode)
   :config
   (setq company-tooltip-align-annotations t
-	company-idle-delay nil)
+	company-idle-delay 0.25)
   (defun my-company-ispell-hook ()
     (make-local-variable 'company-backends)
     (push 'company-ispell company-backends))
