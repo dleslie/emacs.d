@@ -21,36 +21,27 @@
 ;; org-directory
 (defvar org-directory "~/org")
 
-;; Emacs default scrolling behaviour is the worst
-(setq
+;; General Emacs Sanity
+(setq-default
+ debug-on-error nil
+ indent-tabs-mode nil
+ make-backup-files nil
+ pop-up-windows nil
+ tab-stop-list (number-sequence 2 120 2)
+ tab-width 2
+ truncate-lines t
+ inhibit-startup-screen t
  scroll-step 2
  scroll-conservatively 10000
- auto-window-vscroll nil)
-
-;; General Emacs Sanity
-(setq inhibit-startup-screen t
-      indent-tabs-mode nil
-      tab-width 2
-      make-backup-files nil
-      debug-on-error nil
-      tab-stop-list (number-sequence 2 120 2)
-      pop-up-windows nil)
-(delete-selection-mode 1)
+ auto-window-vscroll nil
+ delete-selection-mode t
+ show-paren-mode t)
+(global-eldoc-mode t)
+(global-hl-line-mode t)
 
 ;; Windows performance tweaks
 (when (boundp 'w32-pipe-read-delay)
   (setq w32-pipe-read-delay 0))
-
-;; Don't be a dick
-(setq
- indent-tabs-mode nil
- truncate-lines t
- tab-width 2)
-
-;; Some pretty visual indicators
-(show-paren-mode t)
-(global-eldoc-mode t)
-(global-hl-line-mode t)
 
 ;; Useful bindings
 (global-set-key "\C-w" 'clipboard-kill-region)
@@ -139,6 +130,14 @@ Code taken from `hack-dir-local-variables'."
        (with-demoted-errors "Error: %S"
          ,(cons 'progn body))
        (message (format "[%s : %sms, %s cells]" ,name (truncate (* 1000 (- (float-time) begin-time))) (- cons-cells-consed begin-cells))))))
+
+(defun dos2unix (buffer)
+  "Remove carriage returns"
+  (interactive "*b")
+  (save-excursion
+    (goto-char (point-min))
+    (while (search-forward (string ?\C-m) nil t)
+      (replace-match "" nil t))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Fix compilation colours
@@ -294,7 +293,10 @@ Code taken from `hack-dir-local-variables'."
     (add-to-list 'slime-lisp-implementations '(sbcl ("sbcl") :coding-system utf-8-unix))))
 
 (use-package paredit
-  :functions (paredit-mode)
+  :bind
+  (:map paredit-mode-map
+        ("{" . paredit-open-curly)
+        ("}" . paredit-close-curly))
   :init
   (mapc
    (lambda (mode-hook)
@@ -304,6 +306,9 @@ Code taken from `hack-dir-local-variables'."
      ielm-mode-hook
      lisp-mode-hook
      lisp-interaction-mode-hook
+     c-mode-hook
+     c++-mode-hook
+     csharp-mode-hook
      scheme-mode-hook
      slime-repl-mode-hook
      clojure-mode-hook)))
@@ -424,13 +429,13 @@ Code taken from `hack-dir-local-variables'."
     :after (company)
     :bind
     (:map ggtags-mode-map
-	  ("C-c g s" . ggtags-find-other-symbol)
-	  ("C-c g h" . ggtags-view-tag-history)
-	  ("C-c g r" . ggtags-find-reference)
-	  ("C-c g f" . ggtags-find-file)
-	  ("C-c g c" . ggtags-create-tags)
-	  ("C-c g u" . ggtags-update-tags)
-	  ("M-," . pop-tag-mark))
+          ("C-c g s" . ggtags-find-other-symbol)
+          ("C-c g h" . ggtags-view-tag-history)
+          ("C-c g r" . ggtags-find-reference)
+          ("C-c g f" . ggtags-find-file)
+          ("C-c g c" . ggtags-create-tags)
+          ("C-c g u" . ggtags-update-tags)
+          ("M-," . pop-tag-mark))
     :init
     (add-hook 'c-mode-common-hook
 	      (lambda ()
