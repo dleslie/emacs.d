@@ -192,6 +192,7 @@ Code taken from `hack-dir-local-variables'."
 (use-package doom-themes)
 (use-package sexy-monochrome-theme)
 (use-package meson-mode)
+(use-package flycheck)
 
 (use-package company
   :init
@@ -239,13 +240,14 @@ Code taken from `hack-dir-local-variables'."
   (push 'company-lsp company-backends))
 
 (use-package omnisharp
-  :after (csharp-mode company)
+  :after (csharp-mode company flycheck)
   :bind
   (:map csharp-mode-map
         ("M-." . omnisharp-go-to-definition)
         ("C-c C-c" . recompile))
   :init
   (add-hook 'csharp-mode-hook 'omnisharp-mode)
+  (add-hook 'csharp-mode-hook 'flycheck-mode)
   (push 'company-omnisharp company-backends))
 
 (when (executable-find "go")
