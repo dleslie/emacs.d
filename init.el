@@ -211,7 +211,12 @@ Code taken from `hack-dir-local-variables'."
     (setq magit-last-seen-setup-instructions "1.4.0")))
 
 (use-package projectile
-  :functions (projectile-mode)
+  :bind
+  (:map projectile-mode-map
+	("C-c p f" . projectile-find-file)
+	("C-c p p" . projectile-switch-project)
+	("C-c p d" . projectile-find-dir)
+	("C-c p g" . projectile-grep))
   :init
   (setq projectile-switch-project-action 'projectile-find-dir
 	projectile-find-dir-includes-top-level t)
