@@ -236,7 +236,11 @@ Code taken from `hack-dir-local-variables'."
 (use-package company-lsp
   :after (lsp-mode company)
   :init
-  (push 'company-lsp company-backends))
+  (push 'company-lsp company-backends)
+  (setq
+   company-transformers nil
+   company-lsp-async t
+   company-lsp-cache-candidates nil))
 
 (use-package omnisharp
   :after (csharp-mode company flycheck)
@@ -512,6 +516,17 @@ Code taken from `hack-dir-local-variables'."
   :init
   (define-key global-map [menu-bar tools games quiz]
     '(menu-item "Quiz" quiz :help "Be quizzed")))
+
+(when (executable-find "cquery")
+  (use-package cquery
+    :after (lsp-mode lsp-ui)
+    :init
+    (add-hook 'c-mode-hook 'lsp-cquery-enable)
+    (add-hook 'c++-mode-hook 'lsp-cquery-enable)
+    (setq cquery-extra-init-params '(:completion (:detailedLabel t)))
+    (lsp-ui-peek-find-custom 'base "$cquery/base")
+    (lsp-ui-peek-find-custom 'callers "$cquery/callers")
+    (lsp-ui-peek-find-custom 'random "$cquery/random")))
 
 (use-package org
   :after (f)
