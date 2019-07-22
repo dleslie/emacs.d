@@ -61,13 +61,13 @@
 (add-to-list 'auto-mode-alist '("\\.ino?\\'" . c++-mode))
 
 ;; Where are we finding things?
-(package-initialize)
 (require 'package)
 (setq package-archives
       '(("gnu" . "https://elpa.gnu.org/packages/")
         ("melpa" . "https://melpa.org/packages/")
         ("org" . "https://orgmode.org/elpa/")
         ("elpy" . "https://jorgenschaefer.github.io/packages/")))
+(package-initialize)
 
 ;; Always show imenu
 (defun my-try-to-add-imenu ()
@@ -77,6 +77,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; custom functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun flatten(x)
+  "Flattens a list"
+  (cond ((null x) nil)
+    ((listp x) (append (flatten (car x)) (flatten (cdr x))))
+    (t (list x))))
 
 (defun reset-theme ()
   "Disable all active themes."
@@ -198,7 +204,7 @@ Code taken from `hack-dir-local-variables'."
   (global-company-mode)
   :config
   (setq company-tooltip-align-annotations t
-	company-idle-delay 0.25)
+	      company-idle-delay 0.25)
   (defun my-company-ispell-hook ()
     (make-local-variable 'company-backends)
     (push 'company-ispell company-backends))
@@ -239,7 +245,7 @@ Code taken from `hack-dir-local-variables'."
   (push 'company-lsp company-backends)
   (setq
    company-transformers nil
-   company-lsp-async t
+   company-lsp-async to
    company-lsp-cache-candidates nil))
 
 (use-package omnisharp
@@ -585,23 +591,30 @@ Code taken from `hack-dir-local-variables'."
 ;; Finish
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Enable GC
-(setq gc-cons-threshold 16777216
-      gc-cons-percentage 0.1)
-
-;; Enable file handler
-(setq file-name-handler-alist default-file-name-handler-alist)
-
-(garbage-collect)
-
-(when (file-exists-p custom-file)
-  (load custom-file))
-
 (add-hook 'emacs-startup-hook
 	  (lambda ()
-	    (message "Emacs ready in %s with %d garbage collections."
+      ;; Sanitize company-backends
+      (setq company-backends
+            (delq nil
+                  (delete-dups
+                   (remove 'company-semantic (flatten company-backends)))))
+
+      ;; Enable GC
+      (setq gc-cons-threshold 16777216
+            gc-cons-percentage 0.1)
+
+      ;; Enable file handler
+      (setq file-name-handler-alist default-file-name-handler-alist)
+
+      (when (file-exists-p custom-file)
+        (load custom-file))
+
+      (garbage-collect)
+
+      (message "Emacs ready in %s with %d garbage collections."
                      (format "%.2f seconds"
                              (float-time
                               (time-subtract after-init-time before-init-time)))
                      gcs-done)
-	    (delete-other-windows)))
+
+      (delete-other-windows)))
