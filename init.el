@@ -298,6 +298,26 @@ Code taken from `hack-dir-local-variables'."
         ("{" . paredit-open-curly)
         ("}" . paredit-close-curly))
   :init
+
+  ;; From: https://truongtx.me/2014/02/22/emacs-using-paredit-with-non-lisp-mode
+  (defun my-paredit-nonlisp ()
+    "Turn on paredit mode for non-lisps."
+    (interactive)
+    (set (make-local-variable 'paredit-space-for-delimiter-predicates)
+         '((lambda (endp delimiter) nil)))
+    (paredit-mode 1))
+  
+  (mapc
+   (lambda (mode-hook)
+     (add-hook mode-hook #'my-paredit-nonlisp))
+   '(c-mode-hook
+     c++-mode-hook
+     csharp-mode-hook
+     js-mode-hook
+     java-mode-hook
+     rust-mode-hook
+     go-mode-hook))
+  
   (mapc
    (lambda (mode-hook)
      (add-hook mode-hook #'paredit-mode))
@@ -306,9 +326,6 @@ Code taken from `hack-dir-local-variables'."
      ielm-mode-hook
      lisp-mode-hook
      lisp-interaction-mode-hook
-     c-mode-hook
-     c++-mode-hook
-     csharp-mode-hook
      scheme-mode-hook
      slime-repl-mode-hook
      clojure-mode-hook)))
