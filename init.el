@@ -67,6 +67,7 @@
         ("melpa" . "https://melpa.org/packages/")
         ("org" . "https://orgmode.org/elpa/")
         ("elpy" . "https://jorgenschaefer.github.io/packages/")))
+(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 (package-initialize)
 
 ;; Always show imenu
@@ -228,13 +229,17 @@ Code taken from `hack-dir-local-variables'."
 	projectile-find-dir-includes-top-level t)
   (projectile-mode t))
 
-(use-package lsp-mode)
+(use-package lsp-mode
+  :config
+  (setq lsp-enable-snippet nil))
 
 (use-package lsp-ui
   :after (lsp-mode)
-  :config
+  :init
   (require 'lsp-ui-imenu)
-  (setq lsp-ui-sideline-ignore-duplicate t)
+  (setq lsp-ui-sideline-ignore-duplicate t
+        lsp-ui-flycheck-enable t
+        lsp-ui-sideline-enable nil)
   (add-hook 'lsp-mode-hook 'lsp-ui-mode)
   (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
   (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
@@ -245,7 +250,7 @@ Code taken from `hack-dir-local-variables'."
   (push 'company-lsp company-backends)
   (setq
    company-transformers nil
-   company-lsp-async to
+   company-lsp-async t
    company-lsp-cache-candidates nil))
 
 (use-package omnisharp
@@ -466,8 +471,8 @@ Code taken from `hack-dir-local-variables'."
     :init
     (add-hook 'c-mode-common-hook
 	      (lambda ()
-		(when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
-		  (ggtags-mode 1))))
+		      (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
+		        (ggtags-mode 1))))
     :config
     (push 'company-gtags company-backends)))
 
@@ -544,12 +549,7 @@ Code taken from `hack-dir-local-variables'."
   (use-package cquery
     :after (lsp-mode lsp-ui)
     :init
-    (add-hook 'c-mode-hook 'lsp-cquery-enable)
-    (add-hook 'c++-mode-hook 'lsp-cquery-enable)
-    (setq cquery-extra-init-params '(:completion (:detailedLabel t)))
-    (lsp-ui-peek-find-custom 'base "$cquery/base")
-    (lsp-ui-peek-find-custom 'callers "$cquery/callers")
-    (lsp-ui-peek-find-custom 'random "$cquery/random")))
+    (setq cquery-extra-init-params '(:completion (:detailedLabel t)))))
 
 (use-package org
   :after (f)
