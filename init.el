@@ -26,7 +26,6 @@
  debug-on-error nil
  indent-tabs-mode nil
  make-backup-files nil
- pop-up-windows nil
  tab-stop-list (number-sequence 2 120 2)
  tab-width 2
  truncate-lines t
