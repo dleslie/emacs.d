@@ -571,6 +571,7 @@ Code taken from `hack-dir-local-variables'."
 
 ;; General Emacs Sanity
 (setq-default
+ c-basic-offset 2
  debug-on-error nil
  indent-tabs-mode nil
  make-backup-files nil
