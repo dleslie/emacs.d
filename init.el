@@ -11,6 +11,10 @@
 (setq gc-cons-threshold 402653184
       gc-cons-percentage 0.6)
 
+;; Windows performance tweaks
+(when (boundp 'w32-pipe-read-delay)
+  (setq w32-pipe-read-delay 0))
+
 ;; Make custom file not this one
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
@@ -20,38 +24,6 @@
 
 ;; org-directory
 (defvar org-directory "~/org")
-
-;; General Emacs Sanity
-(setq-default
- debug-on-error nil
- indent-tabs-mode nil
- make-backup-files nil
- tab-stop-list (number-sequence 2 120 2)
- tab-width 2
- truncate-lines t
- inhibit-startup-screen t
- scroll-step 2
- scroll-conservatively 10000
- auto-window-vscroll nil
- delete-selection-mode t
- show-paren-mode t)
-(global-eldoc-mode t)
-(global-hl-line-mode t)
-
-;; Windows performance tweaks
-(when (boundp 'w32-pipe-read-delay)
-  (setq w32-pipe-read-delay 0))
-
-;; Useful bindings
-(global-set-key "\C-w" 'clipboard-kill-region)
-(global-set-key "\M-w" 'clipboard-kill-ring-save)
-(global-set-key "\C-y" 'clipboard-yank)
-(global-set-key "\C-c," 'scroll-bar-mode)
-(global-set-key "\C-c." 'tool-bar-mode)
-(global-set-key "\C-c?" 'menu-bar-mode)
-(global-set-key "\C-c\\" 'comment-or-uncomment-region)
-(global-set-key "\C-cs" 'eshell-here)
-(global-set-key [f12] 'toggle-frame-fullscreen)
 
 (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1) (c-set-style "java")))
 (add-hook 'c-mode-hook (lambda () (eldoc-mode 1) (c-set-style "java")))
@@ -525,6 +497,14 @@ Code taken from `hack-dir-local-variables'."
   (define-key global-map [menu-bar tools games quiz]
     '(menu-item "Quiz" quiz :help "Be quizzed")))
 
+(when (executable-find "clang-format")
+  (use-package clang-format
+    :init
+    (defun my-clang-format-on-save ()
+      (make-local-variable 'before-save-hook)
+      (add-hook 'before-save-hook 'clang-format-buffer))
+    (add-hook 'c-mode-hook 'my-clang-format-on-save)))
+
 (when (executable-find "cquery")
   (use-package cquery
     :after (lsp-mode lsp-ui)
@@ -587,6 +567,35 @@ Code taken from `hack-dir-local-variables'."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Finish
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;; General Emacs Sanity
+(setq-default
+ debug-on-error nil
+ indent-tabs-mode nil
+ make-backup-files nil
+ tab-stop-list (number-sequence 2 120 2)
+ tab-width 2
+ truncate-lines t
+ inhibit-startup-screen t
+ scroll-step 2
+ scroll-conservatively 10000
+ auto-window-vscroll nil
+ delete-selection-mode t
+ show-paren-mode t)
+(global-eldoc-mode t)
+(global-hl-line-mode t)
+
+;; Useful bindings
+(global-set-key "\C-w" 'clipboard-kill-region)
+(global-set-key "\M-w" 'clipboard-kill-ring-save)
+(global-set-key "\C-y" 'clipboard-yank)
+(global-set-key "\C-c," 'scroll-bar-mode)
+(global-set-key "\C-c." 'tool-bar-mode)
+(global-set-key "\C-c?" 'menu-bar-mode)
+(global-set-key "\C-c\\" 'comment-or-uncomment-region)
+(global-set-key "\C-cs" 'eshell-here)
+(global-set-key [f12] 'toggle-frame-fullscreen)
 
 (add-hook 'emacs-startup-hook
 	  (lambda ()
