@@ -625,3 +625,6 @@ Code taken from `hack-dir-local-variables'."
                      gcs-done)
 
       (delete-other-windows)))
+
+(load "server")
+(unless (server-running-p) (server-start))
