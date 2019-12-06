@@ -38,7 +38,7 @@
         ("melpa" . "https://melpa.org/packages/")
         ("org" . "https://orgmode.org/elpa/")
         ("elpy" . "https://jorgenschaefer.github.io/packages/")))
-(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+;(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 (package-initialize)
 
 ;; Always show imenu
@@ -310,8 +310,7 @@ Code taken from `hack-dir-local-variables'."
     :after (lsp-mode)
     :ensure-system-package
     ((npm)
-     (html-languageserver . "npm install -g vscode-html-languageserver-bin")
-     (css-languageserver . "npm install -g vrcode-css-languageserver-bin"))
+     (html-languageserver . "npm install -g vscode-html-languageserver-bin"))
     :init
     (add-hook 'js2-mode-hook #'lsp)
     (add-hook 'typescript-mode-hook #'lsp)
@@ -332,11 +331,11 @@ Code taken from `hack-dir-local-variables'."
     :init
     (add-hook 'rust-mode-hook #'lsp)))
 
-(when (executable-find "pip")
+(when (executable-find "pip3")
   (use-package python-mode
     :after (projectile lsp-mode)
     :ensure-system-package
-    ((pip) (python) (pyls . "pip install --user 'python-language-server[all]'"))
+    ((pip) (python) (pyls . "pip3 install --user 'python-language-server'"))
     :init
     (require 'lsp-pyls)
     (add-hook 'python-mode-hook #'lsp-pyls-enable)))
