@@ -38,13 +38,37 @@
         ("melpa" . "https://melpa.org/packages/")
         ("org" . "https://orgmode.org/elpa/")
         ("elpy" . "https://jorgenschaefer.github.io/packages/")))
-;(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+                                        ;(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 (package-initialize)
 
 ;; Always show imenu
 (defun my-try-to-add-imenu ()
   (condition-case nil (imenu-add-to-menubar "Imenu") (error nil)))
 (add-hook 'font-lock-mode-hook 'my-try-to-add-imenu)
+
+;; Dired Omit Mode
+(require 'dired-x)
+(setq-default dired-omit-files-p t) ; Buffer-local variable
+(setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
+(defvar v-dired-omit t
+  "If dired-omit-mode enabled by default. Don't setq me.")
+(defun dired-omit-switch ()
+  "This function is a small enhancement for `dired-omit-mode', which will
+   \"remember\" omit state across Dired buffers."
+  (interactive)
+  (if (eq v-dired-omit t)
+      (setq v-dired-omit nil)
+    (setq v-dired-omit t))
+  (dired-omit-caller)
+  (revert-buffer))
+
+(defun dired-omit-caller ()
+  (if v-dired-omit
+      (setq dired-omit-mode t)
+    (setq dired-omit-mode nil)))
+
+(define-key dired-mode-map (kbd "C-x M-o") 'dired-omit-switch)
+(add-hook 'dired-mode-hook 'dired-omit-caller)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; custom functions
@@ -53,8 +77,8 @@
 (defun flatten(x)
   "Flattens a list"
   (cond ((null x) nil)
-    ((listp x) (append (flatten (car x)) (flatten (cdr x))))
-    (t (list x))))
+        ((listp x) (append (flatten (car x)) (flatten (cdr x))))
+        (t (list x))))
 
 (defun reset-theme ()
   "Disable all active themes."
@@ -154,7 +178,7 @@ Code taken from `hack-dir-local-variables'."
 (use-package auto-package-update
   :init
   (setq auto-package-update-delete-old-versions t
-	auto-package-update-hide-results t)
+        auto-package-update-hide-results t)
   (auto-package-update-maybe))
 
 (use-package f
@@ -191,13 +215,13 @@ Code taken from `hack-dir-local-variables'."
 (use-package projectile
   :bind
   (:map projectile-mode-map
-	("C-c p f" . projectile-find-file)
-	("C-c p p" . projectile-switch-project)
-	("C-c p d" . projectile-find-dir)
-	("C-c p g" . projectile-grep))
+        ("C-c p f" . projectile-find-file)
+        ("C-c p p" . projectile-switch-project)
+        ("C-c p d" . projectile-find-dir)
+        ("C-c p g" . projectile-grep))
   :init
   (setq projectile-switch-project-action 'projectile-find-dir
-	projectile-find-dir-includes-top-level t)
+        projectile-find-dir-includes-top-level t)
   (projectile-mode t))
 
 (use-package lsp-mode
@@ -358,13 +382,13 @@ Code taken from `hack-dir-local-variables'."
     (defun launch-ruby ()
       (interactive)
       (unless (get-buffer "*ruby*")
-	(let ((buf (current-buffer)))
-	  (inf-ruby)
-	  (set-buffer buf))))      
+        (let ((buf (current-buffer)))
+          (inf-ruby)
+          (set-buffer buf))))      
     (defun kill-ruby ()
       (interactive)
       (when (get-buffer "*ruby*")
-	(kill-buffer "*ruby*")))
+        (kill-buffer "*ruby*")))
     (add-hook 'ruby-mode-hook 'my-ruby-mode-hook)))
 
 (use-package inf-ruby
@@ -421,9 +445,9 @@ Code taken from `hack-dir-local-variables'."
           ("M-," . pop-tag-mark))
     :init
     (add-hook 'c-mode-common-hook
-	      (lambda ()
-		      (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
-		        (ggtags-mode 1))))
+              (lambda ()
+                (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
+                  (ggtags-mode 1))))
     :config
     (push 'company-gtags company-backends)))
 
@@ -598,32 +622,32 @@ Code taken from `hack-dir-local-variables'."
 (global-set-key [f12] 'toggle-frame-fullscreen)
 
 (add-hook 'emacs-startup-hook
-	  (lambda ()
-      ;; Sanitize company-backends
-      (setq company-backends
-            (delq nil
-                  (delete-dups
-                   (remove 'company-semantic (flatten company-backends)))))
+          (lambda ()
+            ;; Sanitize company-backends
+            (setq company-backends
+                  (delq nil
+                        (delete-dups
+                         (remove 'company-semantic (flatten company-backends)))))
 
-      ;; Enable GC
-      (setq gc-cons-threshold 16777216
-            gc-cons-percentage 0.1)
+            ;; Enable GC
+            (setq gc-cons-threshold 16777216
+                  gc-cons-percentage 0.1)
 
-      ;; Enable file handler
-      (setq file-name-handler-alist default-file-name-handler-alist)
+            ;; Enable file handler
+            (setq file-name-handler-alist default-file-name-handler-alist)
 
-      (when (file-exists-p custom-file)
-        (load custom-file))
+            (when (file-exists-p custom-file)
+              (load custom-file))
 
-      (garbage-collect)
+            (garbage-collect)
 
-      (message "Emacs ready in %s with %d garbage collections."
+            (message "Emacs ready in %s with %d garbage collections."
                      (format "%.2f seconds"
                              (float-time
                               (time-subtract after-init-time before-init-time)))
                      gcs-done)
 
-      (delete-other-windows)))
+            (delete-other-windows)))
 
 (load "server")
 (unless (server-running-p) (server-start))
