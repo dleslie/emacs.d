@@ -301,7 +301,11 @@ Code taken from `hack-dir-local-variables'."
     (setq slime-contribs '(slime-fancy))
     (slime-setup)
     :config
-    (add-to-list 'slime-lisp-implementations '(sbcl ("sbcl") :coding-system utf-8-unix))))
+    (add-to-list 'slime-lisp-implementations '(sbcl ("sbcl") :coding-system utf-8-unix)))
+  (use-package slime-company
+    :after (company-mode slime)
+    :init
+    (push 'company-slime company-backends)))
 
 (use-package paredit
   :bind
@@ -593,7 +597,7 @@ Code taken from `hack-dir-local-variables'."
 
 
 ;; General Emacs Sanity
-(setq-default
+(setq
  c-basic-offset 2
  debug-on-error nil
  indent-tabs-mode nil
