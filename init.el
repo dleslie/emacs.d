@@ -352,12 +352,23 @@ Code taken from `hack-dir-local-variables'."
      (tsc . "npm install -g typescript"))))
 
 (when (executable-find "cargo")
-  (use-package rust-mode
-    :after (lsp-mode)
+  ;; (use-package rust-mode
+  ;;   :after (lsp-mode)
+  ;;   :ensure-system-package
+  ;;   ((cargo) (rustup) (rls . "rustup component add rls"))
+  ;;   :init
+  ;;   (add-hook 'rust-mode-hook #'lsp))
+  (use-package rust-mode)
+  (use-package racer
+    :after (rust-mode company-mode)
+    :bind
+    (:map rust-mode-map ("TAB" . #'company-indent-or-complete-common))
     :ensure-system-package
-    ((cargo) (rustup) (rls . "rustup component add rls"))
+    ((cargo) (rustup) (racer . "rustup toolchain add nightly && rustup component add rust-src && cargo +nightly install racer"))
     :init
-    (add-hook 'rust-mode-hook #'lsp)))
+    (add-hook 'rust-mode-hook #'racer-mode)
+    (add-hook 'racer-mode-hook #'eldoc-mode))
+  )
 
 (when (executable-find "pip3")
   (use-package python-mode
