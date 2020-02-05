@@ -169,8 +169,6 @@ Code taken from `hack-dir-local-variables'."
 (require 'use-package-ensure)
 (setq use-package-always-ensure t)
 
-(use-package use-package-ensure-system-package)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; packages
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -193,18 +191,16 @@ Code taken from `hack-dir-local-variables'."
 (use-package doom-themes)
 (use-package sexy-monochrome-theme)
 (use-package meson-mode)
-(use-package flycheck)
+(use-package flycheck
+  :hook (prog-mode . flycheck-mode))
 
 (use-package company
-  :init
-  (global-company-mode)
+  :hook
+  (prog-mode . company-mode)
   :config
   (setq company-tooltip-align-annotations t
-	      company-idle-delay 0.25)
-  (defun my-company-ispell-hook ()
-    (make-local-variable 'company-backends)
-    (push 'company-ispell company-backends))
-  (add-hook 'text-mode-hook 'my-company-ispell-hook))
+	company-idle-delay 0.25
+	company-minimum-prefix-length 1))
 
 (when (executable-find "git")
   (use-package magit
@@ -225,29 +221,55 @@ Code taken from `hack-dir-local-variables'."
   (projectile-mode t))
 
 (use-package lsp-mode
+  :commands lsp
   :config
-  (setq lsp-enable-snippet nil))
+  (require 'lsp-clients))
 
-(use-package lsp-ui
-  :after (lsp-mode)
-  :init
-  (require 'lsp-ui-imenu)
-  (setq lsp-ui-sideline-ignore-duplicate t
-        lsp-ui-flycheck-enable t
-        lsp-ui-sideline-enable nil)
-  (add-hook 'lsp-mode-hook 'lsp-ui-mode)
-  :config
-  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
+(use-package lsp-ui)
+
+(use-package dap-mode)
+(use-package dap-rust
+  :after dap-mode)
+(use-package dap-ruby
+  :after dap-mode)
 
 (use-package company-lsp
   :after (lsp-mode company)
+  :commands company-lsp
   :init
   (push 'company-lsp company-backends)
   (setq
    company-transformers nil
-   company-lsp-async t
+   company-lsp-async nil
    company-lsp-cache-candidates nil))
+
+(use-package rust-mode)
+
+(use-package flycheck-rust
+  :after rust-mode
+  :config (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+  ;; (use-package racer
+  ;;   :after (rust-mode company-mode)
+  ;;   :bind
+  ;;   (:map rust-mode-map ("TAB" . #'company-indent-or-complete-common))
+  ;;   :init
+  ;;   (add-hook 'rust-mode-hook #'racer-mode)
+  ;;   (add-hook 'racer-mode-hook #'eldoc-mode))
+  
+(use-package cquery
+  :after (lsp-mode lsp-ui)
+  :init
+  (setq cquery-extra-init-params '(:completion (:detailedLabel t))))
+
+(use-package js2-mode
+  :after (lsp-mode)
+  :init
+  (add-hook 'js2-mode-hook #'lsp)
+  (add-hook 'typescript-mode-hook #'lsp)
+  (add-hook 'css-mode-hook #'lsp))
+
+(use-package typescript-mode
+  :after (js2-mode))
 
 (use-package omnisharp
   :after (csharp-mode company flycheck)
@@ -260,52 +282,19 @@ Code taken from `hack-dir-local-variables'."
   (add-hook 'csharp-mode-hook 'flycheck-mode)
   (push 'company-omnisharp company-backends))
 
-(when (executable-find "go")
-  (use-package go-mode
-    :ensure-system-package
-    ((go)
-     (gometalinter . "go get -u github.com/alecthomas/gometalinter; gometalinter --install --update")
-     (gocode . "go get -u github.com/nsf/gocode"))))
-
-(use-package go-eldoc
-  :after (go-mode)
+(use-package slime
+  :functions (slime-setup)
   :init
-  (add-hook 'go-mode-hook 'go-eldoc-setup))
+  (require 'slime-autoloads)
+  (setq slime-contribs '(slime-fancy))
+  (slime-setup)
+  :config
+  (add-to-list 'slime-lisp-implementations '(sbcl ("sbcl") :coding-system utf-8-unix)))
 
-(use-package company-go
-  :after (go-mode company)
+(use-package slime-company
+  :after (company-mode slime)
   :init
-  (push 'company-go company-backends))
-
-(when (executable-find "stack")
-  (use-package haskell-mode))
-
-(use-package ghc
-  :functions (ghc-init)
-  :after (haskell-mode)
-  :init
-  (autoload 'ghc-init "ghc" nil t)
-  (autoload 'ghc-debug "ghc" nil t)
-  (add-hook 'haskell-mode-hook #'ghc-init))
-
-(use-package company-ghc
-  :after (haskell-mode company-mode)
-  :init
-  (push 'company-haskell company-backends))
-
-(when (executable-find "sbcl")
-  (use-package slime
-    :functions (slime-setup)
-    :init
-    (require 'slime-autoloads)
-    (setq slime-contribs '(slime-fancy))
-    (slime-setup)
-    :config
-    (add-to-list 'slime-lisp-implementations '(sbcl ("sbcl") :coding-system utf-8-unix)))
-  (use-package slime-company
-    :after (company-mode slime)
-    :init
-    (push 'company-slime company-backends)))
+  (push 'company-slime company-backends))
 
 (use-package paredit
   :bind
@@ -333,78 +322,25 @@ Code taken from `hack-dir-local-variables'."
     (visual-line-mode 1))
   (advice-add 'markdown-mode :after #'my-custom-markdown-mode))
 
-(when (executable-find "npm")
-  (use-package js2-mode
-    :after (lsp-mode)
-    :ensure-system-package
-    ((npm)
-     (html-languageserver . "npm install -g vscode-html-languageserver-bin"))
-    :init
-    (add-hook 'js2-mode-hook #'lsp)
-    (add-hook 'typescript-mode-hook #'lsp)
-    (add-hook 'css-mode-hook #'lsp)))
-
-(when (executable-find "npm")
-  (use-package typescript-mode
-    :after (js2-mode)
-    :ensure-system-package
-    ((npm)
-     (tsc . "npm install -g typescript"))))
-
-(when (executable-find "cargo")
-  ;; (use-package rust-mode
-  ;;   :after (lsp-mode)
-  ;;   :ensure-system-package
-  ;;   ((cargo) (rustup) (rls . "rustup component add rls"))
-  ;;   :init
-  ;;   (add-hook 'rust-mode-hook #'lsp))
-  (use-package rust-mode)
-  (use-package racer
-    :after (rust-mode company-mode)
-    :bind
-    (:map rust-mode-map ("TAB" . #'company-indent-or-complete-common))
-    :ensure-system-package
-    ((cargo) (rustup) (racer . "rustup toolchain add nightly && rustup component add rust-src && cargo +nightly install racer"))
-    :init
-    (add-hook 'rust-mode-hook #'racer-mode)
-    (add-hook 'racer-mode-hook #'eldoc-mode))
-  )
-
-(when (executable-find "pip3")
-  (use-package python-mode
-    :after (projectile lsp-mode)
-    :ensure-system-package
-    ((pip) (python) (pyls . "pip3 install --user 'python-language-server'"))
-    :init
-    (require 'lsp-pyls)
-    (add-hook 'python-mode-hook #'lsp-pyls-enable)))
-
-(when (executable-find "gem")
-  (use-package ruby-mode
-    :ensure-system-package
-    ((gem)
-     (rubocop     . "gem install rubocop")
-     (ruby-lint   . "gem install ruby-lint")
-     (ripper-tags . "gem install ripper-tags")
-     (pry         . "gem install pry"))
-    :mode "\\.rb\\'"
-    :interpreter "ruby"
-    :functions (inf-ruby-keys launch-ruby kill-ruby)
-    :init
-    (defun my-ruby-mode-hook ()
-      (require 'inf-ruby)
-      (inf-ruby-keys))
-    (defun launch-ruby ()
-      (interactive)
-      (unless (get-buffer "*ruby*")
-        (let ((buf (current-buffer)))
-          (inf-ruby)
-          (set-buffer buf))))      
-    (defun kill-ruby ()
-      (interactive)
-      (when (get-buffer "*ruby*")
-        (kill-buffer "*ruby*")))
-    (add-hook 'ruby-mode-hook 'my-ruby-mode-hook)))
+(use-package ruby-mode
+  :mode "\\.rb\\'"
+  :interpreter "ruby"
+  :functions (inf-ruby-keys launch-ruby kill-ruby)
+  :init
+  (defun my-ruby-mode-hook ()
+    (require 'inf-ruby)
+    (inf-ruby-keys))
+  (defun launch-ruby ()
+    (interactive)
+    (unless (get-buffer "*ruby*")
+      (let ((buf (current-buffer)))
+	(inf-ruby)
+	(set-buffer buf))))      
+  (defun kill-ruby ()
+    (interactive)
+    (when (get-buffer "*ruby*")
+      (kill-buffer "*ruby*")))
+  (add-hook 'ruby-mode-hook 'my-ruby-mode-hook))
 
 (use-package inf-ruby
   :after ruby-mode)
@@ -445,26 +381,6 @@ Code taken from `hack-dir-local-variables'."
   (push 'company-web-html company-backends)
   (push 'company-web-jade company-backends)
   (push 'company-web-slim company-backends))
-
-(when (executable-find "global")
-  (use-package ggtags
-    :after (company)
-    :bind
-    (:map ggtags-mode-map
-          ("C-c g s" . ggtags-find-other-symbol)
-          ("C-c g h" . ggtags-view-tag-history)
-          ("C-c g r" . ggtags-find-reference)
-          ("C-c g f" . ggtags-find-file)
-          ("C-c g c" . ggtags-create-tags)
-          ("C-c g u" . ggtags-update-tags)
-          ("M-," . pop-tag-mark))
-    :init
-    (add-hook 'c-mode-common-hook
-              (lambda ()
-                (when (derived-mode-p 'c-mode 'c++-mode 'java-mode 'asm-mode)
-                  (ggtags-mode 1))))
-    :config
-    (push 'company-gtags company-backends)))
 
 (use-package olivetti
   :init
@@ -535,19 +451,12 @@ Code taken from `hack-dir-local-variables'."
   (define-key global-map [menu-bar tools games quiz]
     '(menu-item "Quiz" quiz :help "Be quizzed")))
 
-(when (executable-find "clang-format")
-  (use-package clang-format
-    :init
-    (defun my-clang-format-on-save ()
-      (make-local-variable 'before-save-hook)
-      (add-hook 'before-save-hook 'clang-format-buffer))
-    (add-hook 'c-mode-hook 'my-clang-format-on-save)))
-
-(when (executable-find "cquery")
-  (use-package cquery
-    :after (lsp-mode lsp-ui)
-    :init
-    (setq cquery-extra-init-params '(:completion (:detailedLabel t)))))
+(use-package clang-format
+  :init
+  (defun my-clang-format-on-save ()
+    (make-local-variable 'before-save-hook)
+    (add-hook 'before-save-hook 'clang-format-buffer))
+  (add-hook 'c-mode-hook 'my-clang-format-on-save))
 
 (use-package org
   :after (f)
