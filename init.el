@@ -261,10 +261,10 @@ Code taken from `hack-dir-local-variables'."
   :init
   (setq cquery-extra-init-params '(:completion (:detailedLabel t))))
 
-(use-package js2-mode
+(use-package js3-mode
   :after (lsp-mode)
   :init
-  (add-hook 'js2-mode-hook #'lsp)
+  (add-hook 'js3-mode-hook #'lsp)
   (add-hook 'typescript-mode-hook #'lsp)
   (add-hook 'css-mode-hook #'lsp))
 
