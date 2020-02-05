@@ -227,23 +227,47 @@ Code taken from `hack-dir-local-variables'."
 
 (use-package lsp-ui)
 
-(use-package dap-mode)
-(use-package dap-rust
-  :after dap-mode)
-(use-package dap-ruby
-  :after dap-mode)
+(use-package dap-mode
+  :hook
+  ((web-mode . dap-mode)
+   (python-mode . dap-mode)
+   (ruby-mode . dap-mode)
+   (c-mode . dap-mode)
+   (js3-mode . dap-mode))
+  :config
+  (dap-ui-mode 1)
+  ;; enables mouse hover support
+  (dap-tooltip-mode 1)
+  ;; use tooltips for mouse hover
+  ;; if it is not enabled `dap-mode' will use the minibuffer.
+  (tooltip-mode 1)
+  (require 'dap-ruby)
+  (require 'dap-gdb-lldb)
+  (require 'dap-node)
+  (require 'dap-python)
+  (require 'dap-firefox))
 
 (use-package company-lsp
   :after (lsp-mode company)
-  :commands company-lsp
-  :init
+  :config
   (push 'company-lsp company-backends)
   (setq
    company-transformers nil
-   company-lsp-async nil
+   company-lsp-async t
    company-lsp-cache-candidates nil))
 
-(use-package rust-mode)
+(use-package rust-mode
+  :after lsp-mode
+  :config
+  (setq rust-format-on-save t
+	lsp-rust-all-features t
+	lsp-rust-build-on-save nil)
+  (when (executable-find "racer")
+    (setq lsp-rust-racer-completion t))
+  (when (executable-find "ra_lsp_server")
+    (setq
+     lsp-rust-racer-completion nil
+     lsp-rust-server 'rust-analyzer)))
 
 (use-package flycheck-rust
   :after rust-mode
