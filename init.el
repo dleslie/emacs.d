@@ -43,7 +43,11 @@
 
 ;; Always show imenu
 (defun my-try-to-add-imenu ()
-  (condition-case nil (imenu-add-to-menubar "Imenu") (error nil)))
+  "Attempt to add imenu."
+  (condition-case
+      nil
+      (imenu-add-to-menubar "Imenu")
+    (error nil)))
 (add-hook 'font-lock-mode-hook 'my-try-to-add-imenu)
 
 ;; Dired Omit Mode
@@ -51,10 +55,10 @@
 (setq-default dired-omit-files-p t) ; Buffer-local variable
 (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
 (defvar v-dired-omit t
-  "If dired-omit-mode enabled by default. Don't setq me.")
+  "If dired-omit-mode enabled by default.  Don't setq me.")
 (defun dired-omit-switch ()
-  "This function is a small enhancement for `dired-omit-mode', which will
-   \"remember\" omit state across Dired buffers."
+  "This function is a small enhancement for `dired-omit-mode'.
+It will \"remember\" omit state across Dired buffers."
   (interactive)
   (if (eq v-dired-omit t)
       (setq v-dired-omit nil)
@@ -63,6 +67,7 @@
   (revert-buffer))
 
 (defun dired-omit-caller ()
+  "Ensures dired-omit is working."
   (if v-dired-omit
       (setq dired-omit-mode t)
     (setq dired-omit-mode nil)))
@@ -75,7 +80,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun flatten(x)
-  "Flattens a list"
+  "Flattens list X."
   (cond ((null x) nil)
         ((listp x) (append (flatten (car x)) (flatten (cdr x))))
         (t (list x))))
@@ -134,7 +139,7 @@ Code taken from `hack-dir-local-variables'."
        (message (format "[%s : %sms, %s cells]" ,name (truncate (* 1000 (- (float-time) begin-time))) (- cons-cells-consed begin-cells))))))
 
 (defun dos2unix (buffer)
-  "Remove carriage returns"
+  "Remove all carriage return from BUFFER."
   (interactive "*b")
   (save-excursion
     (goto-char (point-min))
@@ -148,8 +153,10 @@ Code taken from `hack-dir-local-variables'."
 (require 'ansi-color)
 
 (defun my-compilation-custom-hook ()
+  "Enable visual line mode."
   (visual-line-mode 1))
 (defun my-colorize-compilation-buffer ()
+  "Enable ansi colors."
   (read-only-mode nil)
   (ansi-color-apply-on-region (point-min) (point-max))
   (read-only-mode t))
@@ -359,7 +366,7 @@ Code taken from `hack-dir-local-variables'."
     (unless (get-buffer "*ruby*")
       (let ((buf (current-buffer)))
 	(inf-ruby)
-	(set-buffer buf))))      
+	(set-buffer buf))))
   (defun kill-ruby ()
     (interactive)
     (when (get-buffer "*ruby*")
@@ -529,7 +536,7 @@ Code taken from `hack-dir-local-variables'."
      ("c" "Contact" entry (file+headline "addresses.org" "Addresses")
       "* %(org-contacts-template-name)\n   :PROPERTIES:\n   :EMAIL: %(org-contacts-template-email)\n   :END:\n   %i%?\n"))
    org-modules
-   '(org-bbdb org-bibtex org-docview org-gnus org-info org-jsinfo org-habit org-irc org-mew org-mhe org-rmail org-special-blocks org-vm org-wl org-w3m org-mouse org-bookmark org-drill org-eshell org-invoice org-registry org-contacts))  
+   '(org-bbdb org-bibtex org-docview org-gnus org-info org-jsinfo org-habit org-irc org-mew org-mhe org-rmail org-special-blocks org-vm org-wl org-w3m org-mouse org-bookmark org-drill org-eshell org-invoice org-registry org-contacts))
   (defun my-custom-org-hook ()
     (interactive)
     (visual-line-mode t))
@@ -599,3 +606,6 @@ Code taken from `hack-dir-local-variables'."
 
 (load "server")
 (unless (server-running-p) (server-start))
+
+(provide 'init)
+;;; init.el ends here
