@@ -279,18 +279,6 @@ Code taken from `hack-dir-local-variables'."
 (use-package flycheck-rust
   :after rust-mode
   :config (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
-  ;; (use-package racer
-  ;;   :after (rust-mode company-mode)
-  ;;   :bind
-  ;;   (:map rust-mode-map ("TAB" . #'company-indent-or-complete-common))
-  ;;   :init
-  ;;   (add-hook 'rust-mode-hook #'racer-mode)
-  ;;   (add-hook 'racer-mode-hook #'eldoc-mode))
-  
-(use-package cquery
-  :after (lsp-mode lsp-ui)
-  :init
-  (setq cquery-extra-init-params '(:completion (:detailedLabel t))))
 
 (use-package js3-mode
   :after (lsp-mode)
@@ -312,6 +300,11 @@ Code taken from `hack-dir-local-variables'."
   (add-hook 'csharp-mode-hook 'omnisharp-mode)
   (add-hook 'csharp-mode-hook 'flycheck-mode)
   (push 'company-omnisharp company-backends))
+
+(use-package ccls
+  :after (lsp-mode)
+  :init
+  (setq ccls-executable (executable-find "ccls")))
 
 (use-package slime
   :functions (slime-setup)
