@@ -229,6 +229,11 @@ Code taken from `hack-dir-local-variables'."
 
 (use-package lsp-mode
   :commands lsp
+  :hook
+  ((rust-mode . lsp)
+   (ruby-mode . lsp)
+   (python-mode . lsp)
+   (js3-mode . lsp))
   :config
   (require 'lsp-clients))
 
@@ -274,7 +279,15 @@ Code taken from `hack-dir-local-variables'."
   (when (executable-find "ra_lsp_server")
     (setq
      lsp-rust-racer-completion nil
-     lsp-rust-server 'rust-analyzer)))
+     lsp-rust-server 'rust-analyzer)
+    
+    (let ((clients (lsp--filter-clients
+		    (lambda (client)
+		      (equalp 'rust-analyzer (lsp--client-server-id client))))))
+      (when clients
+	(mapcar (lambda (client)
+		  (setf (lsp--client-priority client) 2))
+		clients)))))
 
 (use-package flycheck-rust
   :after rust-mode
@@ -568,6 +581,8 @@ Code taken from `hack-dir-local-variables'."
 (global-set-key "\C-c\\" 'comment-or-uncomment-region)
 (global-set-key "\C-cs" 'eshell-here)
 (global-set-key [f12] 'toggle-frame-fullscreen)
+(global-set-key (kbd "C-;") 'hippie-expand)
+(global-set-key (kbd "C-,") 'company-complete)
 
 (add-hook 'emacs-startup-hook
           (lambda ()
