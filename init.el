@@ -7,6 +7,9 @@
 
 ;;; Code:
 
+;; CL this shit
+(require 'cl)
+
 ;; Disable GC during load
 (setq gc-cons-threshold 402653184
       gc-cons-percentage 0.6)
