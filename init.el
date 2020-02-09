@@ -558,19 +558,23 @@ Code taken from `hack-dir-local-variables'."
 
 ;; General Emacs Sanity
 (setq
+ auto-window-vscroll nil
  c-basic-offset 2
+ column-number-mode t
  debug-on-error nil
+ delete-selection-mode t
  indent-tabs-mode nil
+ inhibit-startup-screen t
  make-backup-files nil
+ scroll-bar-mode nil
+ scroll-conservatively 10000
+ scroll-step 2
+ show-paren-mode t
  tab-stop-list (number-sequence 2 120 2)
  tab-width 2
- truncate-lines t
- inhibit-startup-screen t
- scroll-step 2
- scroll-conservatively 10000
- auto-window-vscroll nil
- delete-selection-mode t
- show-paren-mode t)
+ tool-bar-mode nil
+ truncate-lines t)
+
 (global-eldoc-mode t)
 (global-hl-line-mode t)
 
@@ -589,6 +593,8 @@ Code taken from `hack-dir-local-variables'."
 
 (add-hook 'emacs-startup-hook
           (lambda ()
+	    (override-theme 'doom-outrun-electric)
+	    
             ;; Sanitize company-backends
             (setq company-backends
                   (delq nil
