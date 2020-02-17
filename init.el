@@ -282,15 +282,17 @@ Code taken from `hack-dir-local-variables'."
   (when (executable-find "ra_lsp_server")
     (setq
      lsp-rust-racer-completion nil
-     lsp-rust-server 'rust-analyzer)
-    
+     lsp-rust-server 'rust-analyzer))
+  (defun my-ra-hack ()
     (let ((clients (lsp--filter-clients
 		    (lambda (client)
 		      (equalp 'rust-analyzer (lsp--client-server-id client))))))
       (when clients
 	(mapcar (lambda (client)
 		  (setf (lsp--client-priority client) 2))
-		clients)))))
+		clients))))
+  :hook
+  ((rust-mode . my-ra-hack)))
 
 (use-package flycheck-rust
   :after rust-mode
