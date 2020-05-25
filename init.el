@@ -501,15 +501,20 @@ Code taken from `hack-dir-local-variables'."
   (add-hook 'c-mode-hook 'my-clang-format-on-save))
 
 (use-package org
+  :ensure org-plus-contrib
   :after (f)
   :bind
   (("C-c t" . org-todo-list)
    ("C-c l" . org-store-link)
    ("C-c a" . org-agenda)
    ("C-c b" . org-iswitchb)
-   ("C-c c" . org-capture))
+   ("C-c c" . org-capture)
+   ("C-c x v" . my-org-show-all-inline-images))
   :init
   (require 'org)
+  (defun my-org-show-all-inline-images ()
+    (interactive)
+    (org-display-inline-images t t))
   (setq
    org-default-notes-file (f-join org-directory "notes.org")
    org-agenda-files `(,(f-join org-directory "todo.org") ,(f-join org-directory "agenda.org"))
@@ -552,6 +557,19 @@ Code taken from `hack-dir-local-variables'."
     (interactive)
     (visual-line-mode t))
   (add-hook 'org-mode-hook 'my-custom-org-hook))
+
+(use-package org-roam
+  :after (org)
+  :hook
+  (after-init . org-roam-mode)
+  :custom
+  (org-roam-directory org-directory)
+  :bind (:map org-roam-mode-map
+              (("C-c n l" . org-roam)
+               ("C-c n f" . org-roam-find-file)
+               ("C-c n g" . org-roam-show-graph))
+              :map org-mode-map
+              (("C-c n i" . org-roam-insert))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Finish
