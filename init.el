@@ -44,7 +44,8 @@
         ("melpa" . "https://melpa.org/packages/")
         ("org" . "https://orgmode.org/elpa/")
         ("elpy" . "https://jorgenschaefer.github.io/packages/")))
-                                        ;(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+
+(package-initialize 'no-activate)
 (package-initialize)
 
 ;; Always show imenu
@@ -503,6 +504,7 @@ Code taken from `hack-dir-local-variables'."
     (add-hook 'before-save-hook 'clang-format-buffer))
   (add-hook 'c-mode-hook 'my-clang-format-on-save))
 
+(load-library "org")
 (use-package org
   :ensure org-plus-contrib
   :after (f)
@@ -559,20 +561,19 @@ Code taken from `hack-dir-local-variables'."
   (defun my-custom-org-hook ()
     (interactive)
     (visual-line-mode t))
-  (add-hook 'org-mode-hook 'my-custom-org-hook))
-
-(use-package org-roam
-  :after (org)
-  :hook
-  (after-init . org-roam-mode)
-  :custom
-  (org-roam-directory org-directory)
-  :bind (:map org-roam-mode-map
-              (("C-c n l" . org-roam)
-               ("C-c n f" . org-roam-find-file)
-               ("C-c n g" . org-roam-show-graph))
-              :map org-mode-map
-              (("C-c n i" . org-roam-insert))))
+  (add-hook 'org-mode-hook 'my-custom-org-hook)
+  
+  (use-package org-roam
+    :hook
+    (after-init . org-roam-mode)
+    :custom
+    (org-roam-directory org-directory)
+    :bind (:map org-roam-mode-map
+		(("C-c n l" . org-roam)
+		 ("C-c n f" . org-roam-find-file)
+		 ("C-c n g" . org-roam-show-graph))
+		:map org-mode-map
+		(("C-c n i" . org-roam-insert)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Finish
