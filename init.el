@@ -40,9 +40,9 @@
 ;; Where are we finding things?
 (require 'package)
 (setq package-archives
-      '(("gnu" . "https://elpa.gnu.org/packages/")
+      '(("org" . "https://orgmode.org/elpa/")
+        ("gnu" . "https://elpa.gnu.org/packages/")
         ("melpa" . "https://melpa.org/packages/")
-        ("org" . "https://orgmode.org/elpa/")
         ("elpy" . "https://jorgenschaefer.github.io/packages/")))
 
 (package-initialize 'no-activate)
@@ -504,7 +504,6 @@ Code taken from `hack-dir-local-variables'."
     (add-hook 'before-save-hook 'clang-format-buffer))
   (add-hook 'c-mode-hook 'my-clang-format-on-save))
 
-(load-library "org")
 (use-package org
   :ensure org-plus-contrib
   :after (f)
@@ -516,7 +515,6 @@ Code taken from `hack-dir-local-variables'."
    ("C-c c" . org-capture)
    ("C-c x v" . my-org-show-all-inline-images))
   :init
-  (require 'org)
   (defun my-org-show-all-inline-images ()
     (interactive)
     (org-display-inline-images t t))
@@ -636,6 +634,9 @@ Code taken from `hack-dir-local-variables'."
               (load custom-file))
 
             (garbage-collect)
+
+	    (show-paren-mode nil)
+	    (show-paren-mode t)
 
             (message "Emacs ready in %s with %d garbage collections."
                      (format "%.2f seconds"
