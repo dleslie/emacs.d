@@ -48,7 +48,7 @@
       '(("elpy" . 70)
 	("melpa" . 80)
 	("org" . 90)
-	("gnu" . 100))))
+	("gnu" . 100)))
 
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 (package-initialize 'no-activate)
@@ -334,38 +334,6 @@ Code taken from `hack-dir-local-variables'."
   :init
   (setq ccls-executable (executable-find "ccls")))
 
-(use-package slime
-  :functions (slime-setup)
-  :init
-  (require 'slime-autoloads)
-  (setq slime-contribs '(slime-fancy))
-  (slime-setup)
-  :config
-  (add-to-list 'slime-lisp-implementations '(sbcl ("sbcl") :coding-system utf-8-unix)))
-
-(use-package slime-company
-  :after (company-mode slime)
-  :init
-  (push 'company-slime company-backends))
-
-(use-package paredit
-  :bind
-  (:map paredit-mode-map
-        ("{" . paredit-open-curly)
-        ("}" . paredit-close-curly))
-  :init
-  (mapc
-   (lambda (mode-hook)
-     (add-hook mode-hook #'paredit-mode))
-   '(emacs-lisp-mode-hook
-     eval-expression-minibuffer-setup-hook
-     ielm-mode-hook
-     lisp-mode-hook
-     lisp-interaction-mode-hook
-     scheme-mode-hook
-     slime-repl-mode-hook
-     clojure-mode-hook)))
-
 (use-package markdown-mode
   :mode ("\\.markdown\\'" "\\.md\\'")
   :init
@@ -509,6 +477,36 @@ Code taken from `hack-dir-local-variables'."
     (make-local-variable 'before-save-hook)
     (add-hook 'before-save-hook 'clang-format-buffer))
   (add-hook 'c-mode-hook 'my-clang-format-on-save))
+
+(use-package sly)
+(use-package sly-asdf
+  :after (sly)
+  :init
+  (add-to-list 'sly-contribs 'sly-asdf 'append))
+(use-package sly-quicklisp
+  :after (sly))
+(use-package sly-macrostep
+  :after (sly))
+(use-package sly-repl-ansi-color
+  :after (sly))
+
+(use-package paredit
+  :bind
+  (:map paredit-mode-map
+        ("{" . paredit-open-curly)
+        ("}" . paredit-close-curly))
+  :init
+  (mapc
+   (lambda (mode-hook)
+     (add-hook mode-hook #'paredit-mode))
+   '(emacs-lisp-mode-hook
+     eval-expression-minibuffer-setup-hook
+     ielm-mode-hook
+     lisp-mode-hook
+     lisp-interaction-mode-hook
+     scheme-mode-hook
+     sly-mode-hook
+     clojure-mode-hook)))
 
 (use-package org
   :ensure org-plus-contrib
