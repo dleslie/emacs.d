@@ -43,8 +43,14 @@
       '(("org" . "https://orgmode.org/elpa/")
         ("gnu" . "https://elpa.gnu.org/packages/")
         ("melpa" . "https://melpa.org/packages/")
-        ("elpy" . "https://jorgenschaefer.github.io/packages/")))
+        ("elpy" . "https://jorgenschaefer.github.io/packages/"))
+      package-archive-priorities
+      '(("elpy" . 70)
+	("melpa" . 80)
+	("org" . 90)
+	("gnu" . 100))))
 
+(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 (package-initialize 'no-activate)
 (package-initialize)
 
@@ -577,29 +583,6 @@ Code taken from `hack-dir-local-variables'."
 ;; Finish
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-;; General Emacs Sanity
-(setq
- auto-window-vscroll nil
- c-basic-offset 2
- column-number-mode t
- debug-on-error nil
- delete-selection-mode t
- indent-tabs-mode nil
- inhibit-startup-screen t
- make-backup-files nil
- scroll-bar-mode nil
- scroll-conservatively 10000
- scroll-step 2
- show-paren-mode t
- tab-stop-list (number-sequence 2 120 2)
- tab-width 2
- tool-bar-mode nil
- truncate-lines t)
-
-(global-eldoc-mode t)
-(global-hl-line-mode t)
-
 ;; Useful bindings
 (global-set-key "\C-w" 'clipboard-kill-region)
 (global-set-key "\M-w" 'clipboard-kill-ring-save)
@@ -615,8 +598,6 @@ Code taken from `hack-dir-local-variables'."
 
 (add-hook 'emacs-startup-hook
           (lambda ()
-	    (override-theme 'doom-outrun-electric)
-	    
             ;; Sanitize company-backends
             (setq company-backends
                   (delq nil
@@ -630,13 +611,32 @@ Code taken from `hack-dir-local-variables'."
             ;; Enable file handler
             (setq file-name-handler-alist default-file-name-handler-alist)
 
-            (when (file-exists-p custom-file)
+	    ;; General Emacs Sanity
+	    (setq
+	     auto-window-vscroll nil
+	     c-basic-offset 2
+	     column-number-mode t
+	     debug-on-error nil
+	     delete-selection-mode t
+	     indent-tabs-mode nil
+	     inhibit-startup-screen t
+	     make-backup-files nil
+	     scroll-bar-mode nil
+	     scroll-conservatively 10000
+	     scroll-step 2
+	     show-paren-mode t
+	     tab-stop-list (number-sequence 2 120 2)
+	     tab-width 2
+	     tool-bar-mode nil
+	     truncate-lines t)
+
+	    (global-eldoc-mode t)
+	    (global-hl-line-mode t)
+
+	    (when (file-exists-p custom-file)
               (load custom-file))
 
             (garbage-collect)
-
-	    (show-paren-mode nil)
-	    (show-paren-mode t)
 
             (message "Emacs ready in %s with %d garbage collections."
                      (format "%.2f seconds"
@@ -646,8 +646,6 @@ Code taken from `hack-dir-local-variables'."
 
             (delete-other-windows)))
 
-(load "server")
-(unless (server-running-p) (server-start))
 
 (provide 'init)
 ;;; init.el ends here
