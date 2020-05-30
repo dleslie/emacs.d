@@ -594,56 +594,47 @@ Code taken from `hack-dir-local-variables'."
 (global-set-key (kbd "C-;") 'hippie-expand)
 (global-set-key (kbd "C-,") 'company-complete)
 
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            ;; Sanitize company-backends
-            (setq company-backends
-                  (delq nil
-                        (delete-dups
-                         (remove 'company-semantic (flatten company-backends)))))
+;; Enable GC
+(setq gc-cons-threshold 16777216
+      gc-cons-percentage 0.1)
 
-            ;; Enable GC
-            (setq gc-cons-threshold 16777216
-                  gc-cons-percentage 0.1)
+;; Enable file handler
+(setq file-name-handler-alist default-file-name-handler-alist)
 
-            ;; Enable file handler
-            (setq file-name-handler-alist default-file-name-handler-alist)
+;; General Emacs Sanity
+(setq
+ auto-window-vscroll nil
+ c-basic-offset 2
+ column-number-mode t
+ debug-on-error nil
+ delete-selection-mode t
+ indent-tabs-mode nil
+ inhibit-startup-screen t
+ make-backup-files nil
+ scroll-bar-mode nil
+ scroll-conservatively 10000
+ scroll-step 2
+ show-paren-mode t
+ tab-stop-list (number-sequence 2 120 2)
+ tab-width 2
+ tool-bar-mode nil
+ truncate-lines t)
 
-	    ;; General Emacs Sanity
-	    (setq
-	     auto-window-vscroll nil
-	     c-basic-offset 2
-	     column-number-mode t
-	     debug-on-error nil
-	     delete-selection-mode t
-	     indent-tabs-mode nil
-	     inhibit-startup-screen t
-	     make-backup-files nil
-	     scroll-bar-mode nil
-	     scroll-conservatively 10000
-	     scroll-step 2
-	     show-paren-mode t
-	     tab-stop-list (number-sequence 2 120 2)
-	     tab-width 2
-	     tool-bar-mode nil
-	     truncate-lines t)
+(global-eldoc-mode t)
+(global-hl-line-mode t)
 
-	    (global-eldoc-mode t)
-	    (global-hl-line-mode t)
+(when (file-exists-p custom-file)
+  (load custom-file))
 
-	    (when (file-exists-p custom-file)
-              (load custom-file))
+(garbage-collect)
 
-            (garbage-collect)
+(message "Emacs ready in %s with %d garbage collections."
+         (format "%.2f seconds"
+                 (float-time
+                  (time-subtract after-init-time before-init-time)))
+         gcs-done)
 
-            (message "Emacs ready in %s with %d garbage collections."
-                     (format "%.2f seconds"
-                             (float-time
-                              (time-subtract after-init-time before-init-time)))
-                     gcs-done)
-
-            (delete-other-windows)))
-
+(delete-other-windows)
 
 (provide 'init)
 ;;; init.el ends here
