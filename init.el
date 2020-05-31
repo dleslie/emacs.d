@@ -50,7 +50,11 @@
 	("org" . 90)
 	("gnu" . 100)))
 
-(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+(when  
+    (not (or (string-match-p "Microsoft" (shell-command-to-string "uname -a"))
+	     (eq 'windows-nt system-type)))
+  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
+
 (package-initialize 'no-activate)
 (package-initialize)
 
