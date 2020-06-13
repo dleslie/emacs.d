@@ -627,6 +627,8 @@ Code taken from `hack-dir-local-variables'."
 (global-eldoc-mode t)
 (global-hl-line-mode t)
 
+(when (file-exists-p custom-file)
+  (load custom-file))
 
 (garbage-collect)
 
@@ -635,13 +637,6 @@ Code taken from `hack-dir-local-variables'."
                  (float-time
                   (time-subtract after-init-time before-init-time)))
          gcs-done)
-
-(defun my-init-hook ()
-  (when (file-exists-p custom-file)
-    (load custom-file))
-  (delete-other-windows))
-
-(add-hook 'window-setup-hook 'my-init-hook)
 
 (provide 'init)
 ;;; init.el ends here
