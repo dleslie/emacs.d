@@ -500,7 +500,15 @@ Code taken from `hack-dir-local-variables'."
     (add-hook 'before-save-hook 'clang-format-buffer))
   (add-hook 'c-mode-hook 'my-clang-format-on-save))
 
-(use-package sly)
+(use-package sly
+  :after (company)
+  :hook ((sly-mode . company-mode))
+  :init
+  (setq sly-lisp-implementations
+	(remove-if-not (lambda (imp) (caadr imp))
+		`((ecl (,(executable-find "ecl")))
+		  (cmucl (,(executable-find "cmucl") "-quiet"))
+		  (sbcl (,(executable-find "sbcl")) :coding-system utf-8-unix)))))
 (use-package sly-asdf
   :after (sly)
   :init
