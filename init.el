@@ -182,6 +182,20 @@ Code taken from `hack-dir-local-variables'."
 (add-hook 'compilation-filter-hook 'my-colorize-compilation-buffer)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; utf8
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(set-file-name-coding-system 'utf-8)
+(set-clipboard-coding-system 'utf-8)
+(set-w32-system-coding-system 'utf-8)
+(set-buffer-file-coding-system 'utf-8) 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; use-package
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -469,6 +483,9 @@ Code taken from `hack-dir-local-variables'."
   (define-key-after global-map [menu-bar tools apps dictionary-search]
     '(menu-item "Dictionary" dictionary-search :help "Search dictionary") t))
 
+(use-package powerthesaurus
+  :bind (("C-c t" . powerthesaurus-lookup-word-dwim)))
+
 (use-package quiz
   :bind (("C-c q" . quiz))
   :init
@@ -512,16 +529,28 @@ Code taken from `hack-dir-local-variables'."
      sly-mode-hook
      clojure-mode-hook)))
 
+(use-package telephone-line
+  :init
+  (setq telephone-line-primary-left-separator
+	'telephone-line-tan-right
+	telephone-line-primary-right-separator
+	'telephone-line-tan-left
+	telephone-line-secondary-left-separator
+	'telephone-line-tan-right
+	telephone-line-secondary-right-separator
+	'telephone-line-tan-left)
+  (telephone-line-mode 1))
+
 (use-package org
   :ensure org-plus-contrib
   :after (f)
   :bind
-  (("C-c t" . org-todo-list)
-   ("C-c l" . org-store-link)
-   ("C-c a" . org-agenda)
-   ("C-c b" . org-iswitchb)
-   ("C-c c" . org-capture)
-   ("C-c x v" . my-org-show-all-inline-images))
+  (("C-c C-o t" . org-todo-list)
+   ("C-c C-o l" . org-store-link)
+   ("C-c C-o a" . org-agenda)
+   ("C-c C-o b" . org-iswitchb)
+   ("C-c C-o c" . org-capture)
+   ("C-c C-o v" . my-org-show-all-inline-images))
   :init
   (defun my-org-show-all-inline-images ()
     (interactive)
