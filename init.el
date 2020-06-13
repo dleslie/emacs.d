@@ -192,8 +192,9 @@ Code taken from `hack-dir-local-variables'."
 (set-selection-coding-system 'utf-8)
 (set-file-name-coding-system 'utf-8)
 (set-clipboard-coding-system 'utf-8)
-(set-w32-system-coding-system 'utf-8)
 (set-buffer-file-coding-system 'utf-8) 
+(when (boundp 'set-w32-system-coding-system)
+  (set-w32-system-coding-system 'utf-8))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; use-package
@@ -528,18 +529,6 @@ Code taken from `hack-dir-local-variables'."
      scheme-mode-hook
      sly-mode-hook
      clojure-mode-hook)))
-
-(use-package telephone-line
-  :init
-  (setq telephone-line-primary-left-separator
-	'telephone-line-tan-right
-	telephone-line-primary-right-separator
-	'telephone-line-tan-left
-	telephone-line-secondary-left-separator
-	'telephone-line-tan-right
-	telephone-line-secondary-right-separator
-	'telephone-line-tan-left)
-  (telephone-line-mode 1))
 
 (use-package org
   :ensure org-plus-contrib
