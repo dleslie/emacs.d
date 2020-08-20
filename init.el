@@ -506,9 +506,10 @@ Code taken from `hack-dir-local-variables'."
   :init
   (setq sly-lisp-implementations
 	(remove-if-not (lambda (imp) (caadr imp))
-		`((ecl (,(executable-find "ecl")))
-		  (cmucl (,(executable-find "cmucl") "-quiet"))
-		  (sbcl (,(executable-find "sbcl")) :coding-system utf-8-unix)))))
+		       `((ecl (,(executable-find "ecl")))
+			 (armcl (,(executable-find "armcl")))
+			 (cmucl (,(executable-find "cmucl") "-quiet"))
+			 (sbcl (,(executable-find "sbcl")) :coding-system utf-8-unix)))))
 (use-package sly-asdf
   :after (sly)
   :init
