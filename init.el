@@ -7,8 +7,7 @@
 
 ;;; Code:
 
-;; CL this shit
-(require 'cl)
+(require 'cl-lib)
 
 ;; Disable GC during load
 (setq gc-cons-threshold 402653184
@@ -55,7 +54,7 @@
 	     (eq 'windows-nt system-type)))
   (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
 
-(package-initialize 'no-activate)
+;;(package-initialize 'no-activate)
 (package-initialize)
 
 ;; Always show imenu
@@ -265,9 +264,7 @@ Code taken from `hack-dir-local-variables'."
   ((rust-mode . lsp)
    (ruby-mode . lsp)
    (python-mode . lsp)
-   (js3-mode . lsp))
-  :config
-  (require 'lsp-clients))
+   (js3-mode . lsp)))
 
 (use-package lsp-ui)
 
@@ -337,16 +334,16 @@ Code taken from `hack-dir-local-variables'."
 (use-package typescript-mode
   :after (js2-mode))
 
-(use-package omnisharp
-  :after (csharp-mode company flycheck)
-  :bind
-  (:map csharp-mode-map
-        ("M-." . omnisharp-go-to-definition)
-        ("C-c C-c" . recompile))
-  :init
-  (add-hook 'csharp-mode-hook 'omnisharp-mode)
-  (add-hook 'csharp-mode-hook 'flycheck-mode)
-  (push 'company-omnisharp company-backends))
+;; (use-package omnisharp
+;;   :after (csharp-mode company flycheck)
+;;   :bind
+;;   (:map csharp-mode-map
+;;         ("M-." . omnisharp-go-to-definition)
+;;         ("C-c C-c" . recompile))
+;;   :init
+;;   (add-hook 'csharp-mode-hook 'omnisharp-mode)
+;;   (add-hook 'csharp-mode-hook 'flycheck-mode)
+;;   (push 'company-omnisharp company-backends))
 
 (use-package ccls
   :after (lsp-mode)
@@ -505,7 +502,7 @@ Code taken from `hack-dir-local-variables'."
   :hook ((sly-mode . company-mode))
   :init
   (setq sly-lisp-implementations
-	(remove-if-not (lambda (imp) (caadr imp))
+	(cl-remove-if-not (lambda (imp) (caadr imp))
 		       `((sbcl (,(executable-find "sbcl")) :coding-system utf-8-unix)
 			 (armcl (,(executable-find "armcl")))
 			 (cmucl (,(executable-find "cmucl") "-quiet"))
