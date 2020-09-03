@@ -224,7 +224,7 @@ Code taken from `hack-dir-local-variables'."
 (use-package geiser)
 (use-package toml)
 (use-package csharp-mode)
-(use-package restclient)
+;(use-package restclient)
 (use-package constant-theme)
 (use-package doom-themes)
 (use-package sexy-monochrome-theme)
@@ -236,6 +236,8 @@ Code taken from `hack-dir-local-variables'."
   :hook
   (prog-mode . company-mode)
   :config
+  (setq company-backends
+	'(company-capf company-gtags company-etags company-files))
   (setq company-tooltip-align-annotations t
 	company-idle-delay 0.25
 	company-minimum-prefix-length 1))
@@ -288,14 +290,13 @@ Code taken from `hack-dir-local-variables'."
   (require 'dap-python)
   (require 'dap-firefox))
 
-(use-package company-lsp
-  :after (lsp-mode company)
-  :config
-  (push 'company-lsp company-backends)
-  (setq
-   company-transformers nil
-   company-lsp-async t
-   company-lsp-cache-candidates nil))
+(when (executable-find "ccls")
+  (use-package ccls
+    :after lsp-mode
+    :config
+    (add-hook 'c-mode-hook 'lsp)
+    (add-hook 'c++-mode-hook 'lsp)
+    (setq ccls-executable (executable-find "ccls"))))
 
 (use-package rust-mode
   :after lsp-mode
@@ -344,11 +345,6 @@ Code taken from `hack-dir-local-variables'."
 ;;   (add-hook 'csharp-mode-hook 'omnisharp-mode)
 ;;   (add-hook 'csharp-mode-hook 'flycheck-mode)
 ;;   (push 'company-omnisharp company-backends))
-
-(use-package ccls
-  :after (lsp-mode)
-  :init
-  (setq ccls-executable (executable-find "ccls")))
 
 (use-package markdown-mode
   :mode ("\\.markdown\\'" "\\.md\\'")
