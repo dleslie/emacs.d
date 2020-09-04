@@ -221,7 +221,9 @@ Code taken from `hack-dir-local-variables'."
   :functions (f-join))
 
 (use-package dash)
-(use-package geiser)
+(use-package geiser
+  :config
+  (setq geiser-chicken-binary (or (executable-find "chicken-csi") (executable-find "csi"))))
 (use-package toml)
 (use-package csharp-mode)
 ;(use-package restclient)
@@ -532,6 +534,11 @@ Code taken from `hack-dir-local-variables'."
      scheme-mode-hook
      sly-mode-hook
      clojure-mode-hook)))
+
+(use-package ace-jump-mode
+  :bind (("C-c SPC" . ace-jump-mode))
+  :init
+  (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t))
 
 (use-package org
   :ensure org-plus-contrib
