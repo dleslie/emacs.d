@@ -234,6 +234,15 @@ Code taken from `hack-dir-local-variables'."
 (use-package flycheck
   :hook (prog-mode . flycheck-mode))
 
+(use-package selectrum
+  :init
+  (selectrum-mode +1))
+(use-package selectrum-prescient
+  :after selectrum
+  :init
+  (selectrum-prescient-mode +1)
+  (prescient-persist-mode +1))
+
 (use-package company
   :hook
   (prog-mode . company-mode)
@@ -436,8 +445,8 @@ Code taken from `hack-dir-local-variables'."
   :init
   (add-hook 'text-mode-hook 'writegood-mode))
 
-(use-package smex
-  :bind (("M-x" . smex)))
+;; (use-package smex
+;;   :bind (("M-x" . smex)))
 
 (use-package ido
   :init
