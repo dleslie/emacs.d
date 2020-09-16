@@ -196,11 +196,23 @@ Code taken from `hack-dir-local-variables'."
   (set-w32-system-coding-system 'utf-8))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; use-package
+;; straight
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(dolist (dir (directory-files  (expand-file-name "lisp" user-emacs-directory) t "[^\\.]"))
-  (add-to-list 'load-path dir))
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+(straight-use-package 'use-package)
 
 (require 'use-package)
 (require 'bind-key)
