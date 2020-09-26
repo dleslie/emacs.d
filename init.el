@@ -542,10 +542,10 @@ Code taken from `hack-dir-local-variables'."
      sly-mode-hook
      clojure-mode-hook)))
 
-(use-package ace-jump-mode
-  :bind (("C-c SPC" . ace-jump-mode))
-  :init
-  (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t))
+;; (use-package ace-jump-mode
+;;   :bind (("C-c SPC" . ace-jump-mode))
+;;   :init
+;;   (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t))
 
 (use-package org
   :ensure org-plus-contrib
@@ -626,15 +626,29 @@ Code taken from `hack-dir-local-variables'."
     (easy-menu-define my-menu map
       "My Menu"
       '("Mine"
+	;; ("Org"
+	;;  ["Todo" org-todo-list]
+	;;  ["Agenda" org-agenda]
+	;;  ["Capture" org-capture])
+	
 	["Todo" org-todo-list]
 	["Agenda" org-agenda]
 	["Capture" org-capture]
-	"--"))
+	"--"
+	["Magit" magit-status]
+        "--"
+        ["Shell Here" eshell-here]
+        ["dos2unix" dos2unix]
+        "--"
+        ["Override Theme" override-theme]
+        ["Reset Theme" reset-theme]))
     map))
+
 (define-minor-mode my-mode
   "Minor mode to provide my custom menu items."
   :keymap my-mode-map
   :global t)
+
 (my-mode t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -678,7 +692,9 @@ Code taken from `hack-dir-local-variables'."
  tab-stop-list (number-sequence 2 120 2)
  tab-width 2
  tool-bar-mode nil
- truncate-lines t)
+ truncate-lines t
+ fringe-mode t
+ line-number-mode t)
 
 (global-eldoc-mode t)
 (global-hl-line-mode t)
