@@ -604,17 +604,38 @@ Code taken from `hack-dir-local-variables'."
     (visual-line-mode t))
   (add-hook 'org-mode-hook 'my-custom-org-hook)
   
-  (use-package org-roam
-    :hook
-    (after-init . org-roam-mode)
-    :custom
-    (org-roam-directory org-directory)
-    :bind (:map org-roam-mode-map
-		(("C-c n l" . org-roam)
-		 ("C-c n f" . org-roam-find-file)
-		 ("C-c n g" . org-roam-show-graph))
-		:map org-mode-map
-		(("C-c n i" . org-roam-insert)))))
+  ;; (use-package org-roam
+  ;;   :hook
+  ;;   (after-init . org-roam-mode)
+  ;;   :custom
+  ;;   (org-roam-directory org-directory)
+  ;;   :bind (:map org-roam-mode-map
+  ;; 		(("C-c n l" . org-roam)
+  ;; 		 ("C-c n f" . org-roam-find-file)
+  ;; 		 ("C-c n g" . org-roam-show-graph))
+  ;; 		:map org-mode-map
+  ;; 		(("C-c n i" . org-roam-insert))))
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Menus
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defvar my-mode-map
+  (let ((map (make-sparse-keymap)))
+    (easy-menu-define my-menu map
+      "My Menu"
+      '("Mine"
+	["Todo" org-todo-list]
+	["Agenda" org-agenda]
+	["Capture" org-capture]
+	"--"))
+    map))
+(define-minor-mode my-mode
+  "Minor mode to provide my custom menu items."
+  :keymap my-mode-map
+  :global t)
+(my-mode t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Finish
