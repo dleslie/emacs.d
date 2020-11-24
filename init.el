@@ -457,9 +457,6 @@ Code taken from `hack-dir-local-variables'."
   :init
   (add-hook 'text-mode-hook 'writegood-mode))
 
-;; (use-package smex
-;;   :bind (("M-x" . smex)))
-
 (use-package ido
   :init
   (setq
@@ -480,19 +477,8 @@ Code taken from `hack-dir-local-variables'."
       'grep)))
 
 (use-package dumb-jump
-  :bind
-  (("C-c j" . dumb-jump-go)
-   ("C-c J" . dumb-jump-quick-look)
-   ("C-x j" . dumb-jump-back))
   :init
-  (define-key-after global-map [menu-bar edit dj-menu]
-    (cons "Dumb Jump" (make-sparse-keymap "dumb jump")) 'goto)
-  (define-key global-map [menu-bar edit dj-menu go]
-    '(menu-item "Go" dumb-jump-go :help "Jump to definition"))
-  (define-key global-map [menu-bar edit dj-menu quick-look]
-    '(menu-item "Quick Look" dumb-jump-quick-look :help "Look at definition"))
-  (define-key global-map [menu-bar edit dj-menu back]
-    '(menu-item "Back" dumb-jump-back :help "Go back")))
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
 
 (use-package dictionary
   :bind (("C-c d" . dictionary-search))
@@ -556,10 +542,10 @@ Code taken from `hack-dir-local-variables'."
      sly-mode-hook
      clojure-mode-hook)))
 
-(use-package ace-jump-mode
-  :bind (("C-c SPC" . ace-jump-mode))
-  :init
-  (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t))
+;; (use-package ace-jump-mode
+;;   :bind (("C-c SPC" . ace-jump-mode))
+;;   :init
+;;   (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t))
 
 (use-package org
   :ensure org-plus-contrib
@@ -618,17 +604,52 @@ Code taken from `hack-dir-local-variables'."
     (visual-line-mode t))
   (add-hook 'org-mode-hook 'my-custom-org-hook)
   
-  (use-package org-roam
-    :hook
-    (after-init . org-roam-mode)
-    :custom
-    (org-roam-directory org-directory)
-    :bind (:map org-roam-mode-map
-		(("C-c n l" . org-roam)
-		 ("C-c n f" . org-roam-find-file)
-		 ("C-c n g" . org-roam-show-graph))
-		:map org-mode-map
-		(("C-c n i" . org-roam-insert)))))
+  ;; (use-package org-roam
+  ;;   :hook
+  ;;   (after-init . org-roam-mode)
+  ;;   :custom
+  ;;   (org-roam-directory org-directory)
+  ;;   :bind (:map org-roam-mode-map
+  ;; 		(("C-c n l" . org-roam)
+  ;; 		 ("C-c n f" . org-roam-find-file)
+  ;; 		 ("C-c n g" . org-roam-show-graph))
+  ;; 		:map org-mode-map
+  ;; 		(("C-c n i" . org-roam-insert))))
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Menus
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defvar my-mode-map
+  (let ((map (make-sparse-keymap)))
+    (easy-menu-define my-menu map
+      "My Menu"
+      '("Mine"
+	;; ("Org"
+	;;  ["Todo" org-todo-list]
+	;;  ["Agenda" org-agenda]
+	;;  ["Capture" org-capture])
+	
+	["Todo" org-todo-list]
+	["Agenda" org-agenda]
+	["Capture" org-capture]
+	"--"
+	["Magit" magit-status]
+        "--"
+        ["Shell Here" eshell-here]
+        ["dos2unix" dos2unix]
+        "--"
+        ["Override Theme" override-theme]
+        ["Reset Theme" reset-theme]))
+    map))
+
+(define-minor-mode my-mode
+  "Minor mode to provide my custom menu items."
+  :keymap my-mode-map
+  :global t)
+
+(my-mode t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Finish
@@ -671,13 +692,21 @@ Code taken from `hack-dir-local-variables'."
  tab-stop-list (number-sequence 2 120 2)
  tab-width 2
  tool-bar-mode nil
- truncate-lines t)
+ truncate-lines t
+ fringe-mode t
+ line-number-mode t)
 
 (global-eldoc-mode t)
 (global-hl-line-mode t)
 
 (when (file-exists-p custom-file)
   (load custom-file))
+
+(reset-theme)
+(override-theme 'sexy-monochrome)
+
+(show-paren-mode nil)
+(show-paren-mode t)
 
 (garbage-collect)
 
