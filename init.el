@@ -358,16 +358,16 @@ Code taken from `hack-dir-local-variables'."
 (use-package typescript-mode
   :after (js2-mode))
 
-;; (use-package omnisharp
-;;   :after (csharp-mode company flycheck)
-;;   :bind
-;;   (:map csharp-mode-map
-;;         ("M-." . omnisharp-go-to-definition)
-;;         ("C-c C-c" . recompile))
-;;   :init
-;;   (add-hook 'csharp-mode-hook 'omnisharp-mode)
-;;   (add-hook 'csharp-mode-hook 'flycheck-mode)
-;;   (push 'company-omnisharp company-backends))
+(use-package omnisharp
+  :after (csharp-mode company flycheck)
+  :bind
+  (:map csharp-mode-map
+        ("M-." . omnisharp-go-to-definition)
+        ("C-c C-c" . recompile))
+  :init
+  (add-hook 'csharp-mode-hook 'omnisharp-mode)
+  (add-hook 'csharp-mode-hook 'flycheck-mode)
+  (push 'company-omnisharp company-backends))
 
 (use-package markdown-mode
   :mode ("\\.markdown\\'" "\\.md\\'")
