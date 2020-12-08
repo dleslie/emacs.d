@@ -29,7 +29,7 @@
 
 ;; Projectile search paths
 (setq projectile-project-search-path '())
-(dolist (p '("~/org/" "~/Workspace/"))
+(dolist (p '("~/org/" "~/Workspace/" "/c/work/" "/d/work/" "/mnt/c/work/" "/mnt/d/work/" "C:/work/" "D:/work/"))
   (when (file-exists-p p)
     (push p projectile-project-search-path)))
 
