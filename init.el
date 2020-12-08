@@ -28,7 +28,10 @@
 (defvar org-directory "~/org")
 
 ;; Projectile search paths
-(setq projectile-project-search-path '("~/Workspace/" "~/org/"))
+(setq projectile-project-search-path '())
+(dolist (p '("~/org/" "~/Workspace/"))
+  (when (file-exists-p p)
+    (push p projectile-project-search-path)))
 
 (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1) (c-set-style "java")))
 (add-hook 'c-mode-hook (lambda () (eldoc-mode 1) (c-set-style "java")))
