@@ -296,6 +296,15 @@ Code taken from `hack-dir-local-variables'."
 
 (use-package lsp-ui)
 
+(use-package hydra)
+
+(use-package gdb-mi
+  :after hydra
+  :straight (:host github :repo "weirdNox/emacs-gdb" :files ("*.el" "*.c" "*.h" "Makefile"))
+  :init
+  (fmakunbound 'gdb)
+  (fmakunbound 'gdb-enable-debug))
+
 (use-package dap-mode
   :hook
   ((web-mode . dap-mode)
@@ -605,20 +614,7 @@ Code taken from `hack-dir-local-variables'."
   (defun my-custom-org-hook ()
     (interactive)
     (visual-line-mode t))
-  (add-hook 'org-mode-hook 'my-custom-org-hook)
-  
-  ;; (use-package org-roam
-  ;;   :hook
-  ;;   (after-init . org-roam-mode)
-  ;;   :custom
-  ;;   (org-roam-directory org-directory)
-  ;;   :bind (:map org-roam-mode-map
-  ;; 		(("C-c n l" . org-roam)
-  ;; 		 ("C-c n f" . org-roam-find-file)
-  ;; 		 ("C-c n g" . org-roam-show-graph))
-  ;; 		:map org-mode-map
-  ;; 		(("C-c n i" . org-roam-insert))))
-  )
+  (add-hook 'org-mode-hook 'my-custom-org-hook))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Menus
