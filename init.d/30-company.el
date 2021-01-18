@@ -17,5 +17,10 @@
 	company-idle-delay 0.25
 	company-minimum-prefix-length 1))
 
+(use-package company-quickhelp
+  :after company
+  :hook
+  (company-mode . company-quickhelp-mode))
+
 (provide '30-company)
 ;;; 30-company.el ends here
