@@ -23,6 +23,12 @@ Connect Emacs clients as desired:
 emacsclient -c
 ```
 
+Or (preferred) launch an Emacs client and have it create a server if necessary:
+
+```
+emacsclient -c -a ""
+```
+
 Using .projectile to Create a Project Root
 ==========================================
 
