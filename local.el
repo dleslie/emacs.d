@@ -23,6 +23,7 @@
 (global-set-key [f12] 'toggle-frame-fullscreen)
 (global-set-key (kbd "C-;") 'hippie-expand)
 (global-set-key (kbd "C-,") 'company-complete)
+(global-set-key "\C-c\C-t" 'next-theme)
 
 ;; Projectile search paths
 (setq projectile-project-search-path '())
@@ -66,7 +67,6 @@
   :global t)
 
 (my-mode t)
-
 
 ;; org stuff
 (setq
@@ -125,9 +125,10 @@
 
 (delete-selection-mode 1)
 (global-eldoc-mode t)
-(global-hl-line-mode t)
 (show-paren-mode t)
+
 (global-display-line-numbers-mode t)
+(global-hl-line-mode t)
 
 (provide 'local)
 ;;; local.el ends here

@@ -13,21 +13,6 @@
         ((listp x) (append (flatten (car x)) (flatten (cdr x))))
         (t (list x))))
 
-(defun reset-theme ()
-  "Disable all active themes."
-  (interactive)
-  (while custom-enabled-themes
-    (disable-theme (car custom-enabled-themes))))
-
-(defun override-theme (theme)
-  "Disable all enabled themes and then load the provided theme THEME."
-  (interactive
-   (list
-    (intern (completing-read "Load custom theme: "
-                             (mapcar 'symbol-name (custom-available-themes))))))
-  (reset-theme)
-  (load-theme theme t))
-
 (defun eshell-here ()
   "Opens up a new shell in the directory associated with the current buffer's file.  The eshell is renamed to match that directory to make multiple eshell windows easier."
   (interactive)
