@@ -128,7 +128,7 @@
 (show-paren-mode t)
 
 (global-display-line-numbers-mode t)
-(global-hl-line-mode t)
+;(global-hl-line-mode t)
 
 (provide 'local)
 ;;; local.el ends here
