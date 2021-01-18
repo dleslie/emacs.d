@@ -10,7 +10,7 @@
 ;; disable other themes before loading new one
 (defadvice load-theme (before theme-dont-propagate activate)
   "Disable theme before loading new one."
-  (mapcar #'disable-theme custom-enabled-themes))
+  (mapc #'disable-theme custom-enabled-themes))
 
 (use-package constant-theme)
 (use-package doom-themes)
