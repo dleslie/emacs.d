@@ -39,7 +39,7 @@
 ;; Load all files in init.d
 (let ((initd (expand-file-name (concat user-emacs-directory (file-name-as-directory "init.d")))))
   (when (file-exists-p initd)
-    (dolist (lsp (directory-files initd nil "\\.el$"))
+    (dolist (lsp (sort (directory-files initd nil "\\.el$") 'string<))
       (load-file (concat initd lsp)))))
 
 ;; Load local configurations

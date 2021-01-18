@@ -7,8 +7,6 @@
 
 ;;; Code:
 
-(use-package gdb)
-
 ;; Replaces the built-in gdb-mi with something better
 (use-package gdb-mi
   :after hydra
