@@ -39,13 +39,13 @@
 		   (car all-themes)))
 	 (success nil))
     (while (not success)
-      (let ((next (cadr (memq next all-themes))))
-	(when (not next)
-	  (setq next (car all-themes)))
-	(reset-theme)
-	(unless (ignore-errors (load-theme next t))
-	    (setq success t)
-	    (message "Using \"%S\"" next))))))
+      (setq next (cadr (memq next all-themes)))
+      (when (not next)
+	(setq next (car all-themes)))
+      (reset-theme)
+      (when (ignore-errors (load-theme next t))
+	(setq success t)
+	(message "Using \"%S\"" next)))))
 
 (use-package afternoon-theme)
 (use-package alect-themes)
@@ -54,7 +54,7 @@
 (use-package color-theme-sanityinc-tomorrow)
 (use-package constant-theme)
 (use-package cyberpunk-theme)
-(use-package doom-themes)
+;(use-package doom-themes)
 (use-package flatland-theme)
 (use-package gruber-darker-theme)
 (use-package gruvbox-theme)
@@ -64,7 +64,9 @@
 (use-package zenburn-theme)
 
 (ignore-errors
-  (load-theme 'tango t))
+  (progn
+    (reset-theme)
+    (load-theme 'tango t)))
 
 (provide '99-themes)
 ;;; 99-themes.el ends here
