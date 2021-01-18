@@ -27,7 +27,7 @@
     (run-hooks 'after-cache-faces-hook)))
 
 (if (daemonp)
-    (add-hook 'server-after-make-frame-hook #'cache-faces)
+    (add-hook 'server-after-make-frame-hook 'cache-faces)
   (cache-faces))
 
 (defun reset-face (face)
