@@ -10,6 +10,9 @@
 (use-package nyan-mode
   :functions (nyan-mode)
   :init
+  (setq
+   nyan-animate-nyancat t
+   nyan-wavy-trail t)
   (nyan-mode t))
 
 (provide '90-nyan)
