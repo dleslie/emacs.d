@@ -58,13 +58,7 @@
      ("e" "Event" entry (file+headline "agenda.org" "Events")
       "* %^{title} %^g\n     SCHEDULED: %^{when}t\n   %i%?\n")
      ("c" "Contact" entry (file+headline "addresses.org" "Addresses")
-      "* %(org-contacts-template-name)\n   :PROPERTIES:\n   :EMAIL: %(org-contacts-template-email)\n   :END:\n   %i%?\n"))
-   org-modules
-   '(org-bbdb org-bibtex org-docview org-gnus org-info org-jsinfo org-habit org-irc org-mew org-mhe org-rmail org-special-blocks org-vm org-wl org-w3m org-mouse org-bookmark org-drill org-eshell org-invoice org-registry org-contacts))
-  (defun my-custom-org-hook ()
-    (interactive)
-    (visual-line-mode t))
-  (add-hook 'org-mode-hook 'my-custom-org-hook))
+      "* %(org-contacts-template-name)\n   :PROPERTIES:\n   :EMAIL: %(org-contacts-template-email)\n   :END:\n   %i%?\n"))))
 
 (provide '70-org)
 ;;; 70-org.el ends here

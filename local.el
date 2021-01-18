@@ -25,15 +25,12 @@
 
 ;; Projectile search paths
 (setq projectile-project-search-path '())
-(dolist (p `(,org-directory "~/Workspace/" "/c/work/" "/d/work/" "/mnt/c/work/" "/mnt/d/work/" "C:/work/" "D:/work/"))
+(dolist (p `(,org-directory "~/Workspace/" "~/Workspace/GitHub" "~/Workspace/github" "~/Workspace/GitLab" "~/Workspace/gitlab" "~/Workspace/other" "~/Workspace/Other" "/c/work/" "/d/work/" "/mnt/c/work/" "/mnt/d/work/" "C:/work/" "D:/work/"))
   (when (file-exists-p p)
-    (push p projectile-project-search-path)))
+    (push (expand-file-name p) projectile-project-search-path)))
 
 (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1) (c-set-style "java")))
 (add-hook 'c-mode-hook (lambda () (eldoc-mode 1) (c-set-style "java")))
-
-;; Arduino ino files
-(add-to-list 'auto-mode-alist '("\\.ino?\\'" . c++-mode))
 
 ;; My menu
 (defvar my-mode-map
@@ -69,29 +66,25 @@
 ;; General Emacs Sanity
 (setq
  auto-window-vscroll nil
- c-basic-offset 2
  column-number-mode t
  debug-on-error nil
- delete-selection-mode t
  indent-tabs-mode nil
  inhibit-startup-screen t
  make-backup-files nil
  scroll-bar-mode nil
  scroll-conservatively 10000
  scroll-step 2
- show-paren-mode t
+ c-basic-offset 2
  tab-stop-list (number-sequence 2 120 2)
  tab-width 2
  tool-bar-mode nil
- truncate-lines t
- fringe-mode t
- line-number-mode t)
+ truncate-lines t)
 
+(delete-selection-mode 1)
 (global-eldoc-mode t)
 (global-hl-line-mode t)
-
-(show-paren-mode nil)
 (show-paren-mode t)
+(global-display-line-numbers-mode t)
 
 (provide 'local)
 ;;; local.el ends here
