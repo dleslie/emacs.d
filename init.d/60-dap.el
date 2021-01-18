@@ -22,7 +22,7 @@
   ;; if it is not enabled `dap-mode' will use the minibuffer.
   (tooltip-mode 1)
   (require 'dap-ruby)
-  (require 'dap-dap-lldb)
+  (require 'dap-gdb-lldb)
   (require 'dap-node)
   (require 'dap-python)
   (require 'dap-firefox))
