@@ -70,6 +70,17 @@
   (reset-theme)
   (load-theme theme t))
 
+(defun random-theme ()
+  "Changes to a random theme."
+  (interactive)
+  (let ((success nil)
+	(all-themes (delete-dups (sort (append (custom-available-themes) custom-known-themes) (lambda (a b) (string< (symbol-name a) (symbol-name b)))))))
+    (while (not success)
+      (let ((new-theme (seq-random-elt all-themes)))
+	(when (ignore-errors (change-theme new-theme))
+	  (setq success t)
+	  (message "Using \"%S\"" new-theme))))))
+
 (defun next-theme ()
   "Cycles through all available themes."
   (interactive)

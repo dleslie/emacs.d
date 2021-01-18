@@ -57,7 +57,9 @@
         ["Shell Here" eshell-here]
         ["dos2unix" dos2unix]
         "--"
-        ["Override Theme" override-theme]
+        ["Change Theme" change-theme]
+	["Next Theme" next-theme]
+	["Random Theme" random-theme]
         ["Reset Theme" reset-theme]))
     map))
 
