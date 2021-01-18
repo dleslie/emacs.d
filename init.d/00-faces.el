@@ -24,7 +24,7 @@
 			     (font . ,(face-font face))
 			     (attributes . ,(face-all-attributes face)))))
 		  (face-list)))
-    (run-hooks after-cache-faces-hook)))
+    (run-hooks 'after-cache-faces-hook)))
 
 (if (daemonp)
     (add-hook 'server-after-make-frame-hook #'cache-faces)
