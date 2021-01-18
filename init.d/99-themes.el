@@ -7,20 +7,41 @@
 
 ;;; Code:
 
+(defvar default-faces-cache '())
+
+(setq default-faces-cache
+      (mapcar (lambda (face)
+		`(,face .
+			((foreground . ,(face-foreground face))
+			 (background . ,(face-background face))
+			 (stipple . ,(face-stipple face))
+			 (bold . ,(face-bold-p face))
+			 (italic . ,(face-italic-p face))
+			 (underline . ,(face-underline-p face)))))
+	      (face-list)))
+
 (defun reset-face (face)
-  "Sets FACE to a monotone black on white."
-  (set-face-foreground face "black")
-  (set-face-background face "white")
-  (set-face-stipple face nil)
-  (set-face-bold-p face nil)
-  (set-face-italic-p face nil)
-  (set-face-underline-p face nil))
+  "Reset FACE to what its value was on load, if possible."
+  (let ((data (assoc face default-faces-cache)))
+    (when data
+      (let ((foreground (cdr (assoc 'foreground (cdr data))))
+	    (background (cdr (assoc 'background (cdr data))))
+	    (stipple (cdr (assoc 'stipple (cdr data))))
+	    (bold (cdr (assoc 'bold (cdr data))))
+	    (italic (cdr (assoc 'italic (cdr data))))
+	    (underline (cdr (assoc 'underline (cdr data)))))
+	(set-face-foreground face foreground)
+	(set-face-background face background)
+	(set-face-stipple face stipple)
+	(set-face-italic face italic)
+	(set-face-underline face underline)))))
 
 (defun reset-theme ()
   "Disable all active themes."
   (interactive)
   (while custom-enabled-themes
-    (disable-theme (car custom-enabled-themes))))
+    (disable-theme (car custom-enabled-themes)))
+  (mapc #'reset-face (face-list)))
 
 (defun change-theme (theme)
   "Disable all enabled themes and then load the provided theme THEME."
@@ -63,10 +84,8 @@
 (use-package solarized-theme)
 (use-package zenburn-theme)
 
-(ignore-errors
-  (progn
-    (reset-theme)
-    (load-theme 'tango t)))
+(reset-theme)
+(load-theme 'tango t)
 
 (provide '99-themes)
 ;;; 99-themes.el ends here
