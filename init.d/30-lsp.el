@@ -1,4 +1,4 @@
-;;; 30-lsp.el --- imenu
+;;; 30-lsp.el --- lsp
 
 ;;; Commentary:
 

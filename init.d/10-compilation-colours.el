@@ -1,4 +1,4 @@
-;;; 10-compilation-colours.el --- imenu
+;;; 10-compilation-colours.el --- compilation colours
 
 ;;; Commentary:
 

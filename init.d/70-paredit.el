@@ -1,4 +1,4 @@
-;;; 70-paredit.el --- ace jump
+;;; 70-paredit.el --- paredit
 
 ;;; Commentary:
 

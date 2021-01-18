@@ -1,4 +1,4 @@
-;;; 50-scheme.el --- imenu
+;;; 50-scheme.el --- scheme
 
 ;;; Commentary:
 

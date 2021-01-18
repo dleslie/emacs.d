@@ -1,4 +1,4 @@
-;;; 00-functions.el --- dired-omit
+;;; 00-functions.el --- miscellaneous functions
 
 ;;; Commentary:
 

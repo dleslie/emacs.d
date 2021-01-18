@@ -1,4 +1,4 @@
-;;; 30-magit.el --- imenu
+;;; 30-magit.el --- magit
 
 ;;; Commentary:
 

@@ -1,4 +1,4 @@
-;;; 20-dash.el --- dash
+;;; 15-dash.el --- dash
 
 ;;; Commentary:
 
@@ -9,5 +9,5 @@
 
 (use-package dash)
 
-(provide '20-dash)
-;;; 20-dash.el ends here
+(provide '15-dash)
+;;; 15-dash.el ends here

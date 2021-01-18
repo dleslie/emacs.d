@@ -1,4 +1,4 @@
-;;; 30-selectrum.el --- imenu
+;;; 30-selectrum.el --- selectrum
 
 ;;; Commentary:
 

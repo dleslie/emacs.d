@@ -1,4 +1,4 @@
-;;; 30-flycheck.el --- imenu
+;;; 30-flycheck.el --- flycheck
 
 ;;; Commentary:
 

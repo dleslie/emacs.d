@@ -1,4 +1,4 @@
-;;; 00-straight.el --- imenu
+;;; 00-straight.el --- straight
 
 ;;; Commentary:
 

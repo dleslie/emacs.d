@@ -1,4 +1,4 @@
-;;; 00-utf8.el --- imenu
+;;; 00-utf8.el --- utf8 configuration
 
 ;;; Commentary:
 

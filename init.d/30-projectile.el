@@ -1,4 +1,4 @@
-;;; 30-projectile.el --- imenu
+;;; 30-projectile.el --- projectile
 
 ;;; Commentary:
 

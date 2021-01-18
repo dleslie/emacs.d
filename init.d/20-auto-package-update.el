@@ -1,4 +1,4 @@
-;;; 20-auto-package-update.el --- imenu
+;;; 20-auto-package-update.el --- automatically update packages
 
 ;;; Commentary:
 

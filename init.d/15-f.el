@@ -1,4 +1,4 @@
-;;; 20-f.el --- imenu
+;;; 15-f.el --- f
 
 ;;; Commentary:
 
@@ -10,5 +10,5 @@
 (use-package f
   :functions (f-join))
 
-(provide '20-f)
-;;; 20-f.el ends here
+(provide '15-f)
+;;; 15-f.el ends here

@@ -1,4 +1,4 @@
-;;; 99-themes.el --- imenu
+;;; 99-themes.el --- themes
 
 ;;; Commentary:
 
