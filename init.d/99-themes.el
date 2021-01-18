@@ -7,67 +7,6 @@
 
 ;;; Code:
 
-(defvar default-faces-cache '())
-
-(setq default-faces-cache
-      (mapcar (lambda (face)
-		`(,face .
-			((foreground . ,(face-foreground face))
-			 (background . ,(face-background face))
-			 (stipple . ,(face-stipple face))
-			 (bold . ,(face-bold-p face))
-			 (italic . ,(face-italic-p face))
-			 (underline . ,(face-underline-p face)))))
-	      (face-list)))
-
-(defun reset-face (face)
-  "Reset FACE to what its value was on load, if possible."
-  (let ((data (assoc face default-faces-cache)))
-    (when data
-      (let ((foreground (cdr (assoc 'foreground (cdr data))))
-	    (background (cdr (assoc 'background (cdr data))))
-	    (stipple (cdr (assoc 'stipple (cdr data))))
-	    (bold (cdr (assoc 'bold (cdr data))))
-	    (italic (cdr (assoc 'italic (cdr data))))
-	    (underline (cdr (assoc 'underline (cdr data)))))
-	(set-face-foreground face foreground)
-	(set-face-background face background)
-	(set-face-stipple face stipple)
-	(set-face-italic face italic)
-	(set-face-underline face underline)))))
-
-(defun reset-theme ()
-  "Disable all active themes."
-  (interactive)
-  (while custom-enabled-themes
-    (disable-theme (car custom-enabled-themes)))
-  (mapc #'reset-face (face-list)))
-
-(defun change-theme (theme)
-  "Disable all enabled themes and then load the provided theme THEME."
-  (interactive
-   (list
-    (intern (completing-read "Load custom theme: "
-                             (mapcar 'symbol-name (custom-available-themes))))))
-  (reset-theme)
-  (load-theme theme t))
-
-(defun next-theme ()
-  "Cycles through all available themes."
-  (interactive)
-  (let* ((all-themes (delete-dups (sort (append (custom-available-themes) custom-known-themes) (lambda (a b) (string< (symbol-name a) (symbol-name b))))))
-	 (next (or (car custom-enabled-themes)
-		   (car all-themes)))
-	 (success nil))
-    (while (not success)
-      (setq next (cadr (memq next all-themes)))
-      (when (not next)
-	(setq next (car all-themes)))
-      (reset-theme)
-      (when (ignore-errors (load-theme next t))
-	(setq success t)
-	(message "Using \"%S\"" next)))))
-
 (use-package afternoon-theme)
 (use-package alect-themes)
 (use-package ample-theme)
@@ -75,7 +14,6 @@
 (use-package color-theme-sanityinc-tomorrow)
 (use-package constant-theme)
 (use-package cyberpunk-theme)
-;(use-package doom-themes)
 (use-package flatland-theme)
 (use-package gruber-darker-theme)
 (use-package gruvbox-theme)
