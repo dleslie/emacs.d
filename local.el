@@ -129,6 +129,7 @@
 
 (global-display-line-numbers-mode t)
 ;(global-hl-line-mode t)
+(global-prettify-symbols-mode +1)
 
 (provide 'local)
 ;;; local.el ends here
