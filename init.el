@@ -40,7 +40,9 @@
 (let ((initd (expand-file-name (concat user-emacs-directory (file-name-as-directory "init.d")))))
   (when (file-exists-p initd)
     (dolist (lsp (sort (directory-files initd nil "\\.el$") 'string<))
-      (load-file (concat initd lsp)))))
+      (condition-case err
+	  (load-file (concat initd lsp))
+	(error (message "Caught error loading %S: %S" lsp (error-message-string err)))))))
 
 ;; Load local configurations
 (let ((localel (expand-file-name (concat user-emacs-directory "local.el"))))

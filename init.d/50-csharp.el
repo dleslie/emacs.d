@@ -18,12 +18,12 @@
   :init
   (add-hook 'csharp-mode-hook 'omnisharp-mode)
   (add-hook 'csharp-mode-hook 'flycheck-mode)
-  (push 'company-omnisharp company-backends))
+  (push 'company-omnisharp company-backends)
 
-(when (not omnisharp-server-executable-path)
-  (let ((omnisharp (executable-find "omnisharp")))
-    (when omnisharp
-      (setq omnisharp-server-executable-path omnisharp))))
+  (when (or (not (boundp 'omnisharp-server-executable-path)) (not omnisharp-server-executable-path))
+    (let ((omnisharp (executable-find "omnisharp")))
+      (when omnisharp
+	(setq omnisharp-server-executable-path omnisharp)))))
 
 (provide '50-csharp)
 ;;; 50-csharp.el ends here
