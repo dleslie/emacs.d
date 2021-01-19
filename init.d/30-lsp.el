@@ -13,7 +13,7 @@
   ((rust-mode . lsp)
    (ruby-mode . lsp)
    (python-mode . lsp)
-   (js3-mode . lsp)
+   (js2-mode . lsp)
    (c-mode . lsp)
    (c++-mode . lsp)))
 

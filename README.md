@@ -6,6 +6,22 @@ A collection of my Emacs settings.
 Setup
 =====
 
+For the most part, simply clone the git repo to `~/.emacs.d` and launch Emacs!
+
+Some programming languages require extra tools, for the full suite I'd go with:
+* `git`
+* `ccls`
+* `python2` and `python3`
+* `npm`
+* `rustup`
+* `ag`
+* `rvm`
+* `dotnet-core`
+* `chicken`
+* `sbcl`
+* `gdb`, `make`, `gcc`, etc that you'll find in `base-devel` or `build-essential` or similar
+
+
 Making it Launch Quickly
 ========================
 
@@ -27,6 +43,16 @@ Or (preferred) launch an Emacs client in a login shell and have it create a serv
 
 ```
 bash --login -c 'emacsclient -c -a ""'
+```
+
+Windows
+=======
+
+I recommend using [Scoop](https://scoop.sh/) to install packages.
+
+And I create a shortcut to `Emacsclientw` similar to:
+```
+emacsclientw.exe -c -a ""
 ```
 
 Using .projectile to Create a Project Root
