@@ -11,16 +11,17 @@ For the most part, simply clone the git repo to `~/.emacs.d` and launch Emacs!
 Some programming languages require extra tools, for the full suite I'd go with:
 * `git`
 * `ccls`
+* `clang-format`
 * `python2` and `python3`
 * `npm`
 * `rustup`
+* `rust-analyzer`
 * `ag`
 * `rvm`
 * `dotnet-core`
 * `chicken`
-* `sbcl`
+* `sbcl`, `cmucl`, `ecl` or `armcl`
 * `gdb`, `make`, `gcc`, etc that you'll find in `base-devel` or `build-essential` or similar
-
 
 Making it Launch Quickly
 ========================
