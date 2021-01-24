@@ -6,6 +6,23 @@ A collection of my Emacs settings.
 Setup
 =====
 
+For the most part, simply clone the git repo to `~/.emacs.d` and launch Emacs!
+
+Some programming languages require extra tools, for the full suite I'd go with:
+* `git`
+* `ccls`
+* `clang-format`
+* `python2` and `python3`
+* `npm`
+* `rustup`
+* `rust-analyzer`
+* `ag`
+* `rvm`
+* `dotnet-core`
+* `chicken`
+* `sbcl`, `cmucl`, `ecl` or `armcl`
+* `gdb`, `make`, `gcc`, etc that you'll find in `base-devel` or `build-essential` or similar
+
 Docker is useful:
 ```
 \curl -fsSL https://get.docker.com | bash
@@ -49,6 +66,16 @@ Or (preferred) launch an Emacs client in a login shell and have it create a serv
 
 ```
 bash --login -c 'emacsclient -c -a ""'
+```
+
+Windows
+=======
+
+I recommend using [Scoop](https://scoop.sh/) to install packages.
+
+And I create a shortcut to `Emacsclientw` similar to:
+```
+emacsclientw.exe -c -a ""
 ```
 
 Using .projectile to Create a Project Root

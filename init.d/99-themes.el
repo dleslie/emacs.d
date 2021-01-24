@@ -25,8 +25,10 @@ Will not defer loading if IMMEDIATE is true."
     (use-package sexy-monochrome-theme :defer defer)
     (use-package solarized-theme :defer defer)
     (use-package zenburn-theme :defer defer)
-    (when (not (ignore-errors (change-theme active-theme)))
-      (change-theme 'tango))))
+    (when (not defer)
+      (reset-theme)
+      (when (not (ignore-errors (change-theme active-theme)))
+	(change-theme 'tango)))))
 
 ;; Running Emacs as a daemon doesn't properly configure default faces
 ;; until after the first window is created. So we attach a hook to the
