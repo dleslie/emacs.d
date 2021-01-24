@@ -6,6 +6,28 @@ A collection of my Emacs settings.
 Setup
 =====
 
+Docker is useful:
+```
+\curl -fsSL https://get.docker.com | bash
+```
+
+You may want to install the docker image for several LSP servers:
+```
+docker pull emacslsp/lsp-docker-langservers
+```
+
+And install the Rust and its language servers:
+```
+\curl https://sh.rustup.rs -sSf | sh -s -- -y
+
+rustup install stable && \
+  rustup component add rls rust-analysis rust-src && \
+  rustup toolchain add nightly && rustup component add rust-src && ca
+
+export PATH="$HOME/.cargo/bin:$PATH"
+export RUST_SRC_PATH="$(rustc --print sysroot)/lib/rustlib/src/rust/src"
+```
+
 Making it Launch Quickly
 ========================
 
