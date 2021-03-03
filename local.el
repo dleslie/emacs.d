@@ -9,7 +9,7 @@
 
 ;; Where are we storing org files?
 (defvar org-directory)
-(setq org-directory (expand-file-name "~/org"))
+(setq org-directory (expand-file-name "~/org/"))
 
 ;; Useful bindings
 (global-set-key "\C-w" 'clipboard-kill-region)
@@ -72,9 +72,9 @@
 
 ;; org stuff
 (setq
- org-default-notes-file (f-join org-directory "notes.org")
- org-agenda-files `(,(f-join org-directory "todo.org") ,(f-join org-directory "agenda.org"))
- org-agenda-diary-file (f-join org-directory "diary.org")
+ org-default-notes-file (concat (expand-file-name org-directory) "notes.org")
+ org-agenda-files `(,(concat (expand-file-name org-directory) "todo.org") ,(f-join org-directory "agenda.org"))
+ org-agenda-diary-file (concat (expand-file-name org-directory) "diary.org")
  org-todo-keywords
  '((sequence "TODO(t)" "PROG(p)" "BLCK(b)" "STAL(s)" "|" "DONE(d)" "WONT(w)"))
  org-todo-keyword-faces
