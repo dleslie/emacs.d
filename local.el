@@ -73,7 +73,7 @@
 ;; org stuff
 (setq
  org-default-notes-file (concat (expand-file-name org-directory) "notes.org")
- org-agenda-files `(,(concat (expand-file-name org-directory) "todo.org") ,(f-join org-directory "agenda.org"))
+ org-agenda-files `(,(concat (expand-file-name org-directory) "todo.org") ,(concat (expand-file-name org-directory) "agenda.org"))
  org-agenda-diary-file (concat (expand-file-name org-directory) "diary.org")
  org-todo-keywords
  '((sequence "TODO(t)" "PROG(p)" "BLCK(b)" "STAL(s)" "|" "DONE(d)" "WONT(w)"))
