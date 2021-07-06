@@ -13,8 +13,7 @@
   (setq minimap-window-location 'right)
   (setq minimap-hide-fringes t)
   (setq minimap-always-recenter nil)
-  (setq minimap-major-modes '(prog-mode text-mode org-mode))
-  (minimap-mode 1))
+  (setq minimap-major-modes '(prog-mode text-mode org-mode)))
 
 (provide '70-minimap)
 ;;; 70-minimap.el ends here
