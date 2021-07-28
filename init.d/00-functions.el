@@ -59,5 +59,10 @@ Code taken from `hack-dir-local-variables'."
     (while (search-forward (string ?\C-m) nil t)
       (replace-match "" nil t))))
 
+(require 'ansi-color)
+(defun display-ansi-colors ()
+  (interactive)
+  (ansi-color-apply-on-region (point-min) (point-max)))
+
 (provide '00-functions)
 ;;; 00-functions.el ends here
