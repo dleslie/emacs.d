@@ -15,10 +15,10 @@
         ("melpa" . "https://melpa.org/packages/")
         ("elpy" . "https://jorgenschaefer.github.io/packages/"))
       package-archive-priorities
-      '(("elpy" . 70)
-	("melpa" . 80)
-	("org" . 90)
-	("gnu" . 100)))
+      '(("elpy" . 90)
+	("melpa" . 100)
+	("org" . 70)
+	("gnu" . 80)))
 
 ;;(package-initialize 'no-activate)
 (package-initialize)
