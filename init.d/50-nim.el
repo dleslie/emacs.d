@@ -14,4 +14,3 @@
 
 (provide '50-nim)
 ;;; 50-nim.el ends here
--
