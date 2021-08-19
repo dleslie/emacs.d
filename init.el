@@ -24,9 +24,6 @@
 	     (eq 'windows-nt system-type)))
   (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
 
-;; Make custom file not this one
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-
 ;; Disable file handler search during load
 (defvar default-file-name-handler-alist file-name-handler-alist)
 (setq file-name-handler-alist nil)
@@ -47,6 +44,9 @@
 ;; Load local configurations
 (let ((localel (expand-file-name (concat user-emacs-directory "local.el"))))
   (load localel))
+
+;; Make custom file not this one
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
 ;; Load custom.el
 (when (file-exists-p custom-file)
