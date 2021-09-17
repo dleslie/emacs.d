@@ -8,16 +8,9 @@
 ;;; Code:
 
 (use-package projectile
-  :bind
-  (:map projectile-mode-map
-        ("C-c p f" . projectile-find-file)
-        ("C-c p p" . projectile-switch-project)
-        ("C-c p d" . projectile-find-dir)
-        ("C-c p g" . projectile-grep))
   :init
-  (setq projectile-switch-project-action 'projectile-find-dir
-        projectile-find-dir-includes-top-level t)
-  (projectile-mode t))
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (projectile-mode +1))
 
 (provide '30-projectile)
 ;;; 30-projectile.el ends here

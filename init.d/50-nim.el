@@ -8,9 +8,7 @@
 ;;; Code:
 
 (use-package nim-mode
-  :ensure t
-  :hook
-  (nim-mode . lsp))
+  :ensure t)
 
 (provide '50-nim)
 ;;; 50-nim.el ends here
