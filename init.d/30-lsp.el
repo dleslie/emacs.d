@@ -30,10 +30,18 @@
   (require 'lsp-rust)
   (require 'lsp-racket)
   (require 'lsp-json)
-  (require 'lsp-pyls))
+  (require 'lsp-pyls)
+  (setq lsp-modeline-code-actions-segments '(count icon)))
 
 (use-package lsp-ui
-  :after lsp-mode)
+  :after lsp-mode
+  :init
+  (setq lsp-ui-sideline-update-mode 'line
+	lsp-ui-sideline-delay 0.2
+	lsp-ui-imenu-auto-refresh t
+	lsp-ui-sideline-show-code-actions nil)
+  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
 
 (use-package lsp-treemacs
   :after lsp-mode)

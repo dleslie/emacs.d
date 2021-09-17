@@ -7,25 +7,9 @@
 
 ;;; Code:
 
-(use-package csharp-mode)
-
-(use-package omnisharp
-  :after (csharp-mode company flycheck)
-  :bind
-  (:map csharp-mode-map
-        ("M-." . omnisharp-go-to-definition)
-        ("C-c C-c" . recompile))
+(use-package csharp-mode
+  :ensure t
   :init
-  (add-hook 'csharp-mode-hook 'omnisharp-mode)
-  (add-hook 'csharp-mode-hook 'flycheck-mode)
-  (push 'company-omnisharp company-backends)
-
-  (when (not (boundp 'c-default-style))
-    (setq c-default-style '()))
-  (if (not (assoc 'csharp-mode c-default-style))
-      (pushnew '(csharp-mode . "csharp") c-default-style)
-    (setcdr (assoc 'csharp-mode c-default-style) "csharp"))
-
   (let* ((dotnet (executable-find "dotnet"))
 	 (dotnet-script (executable-find "dotnet-script")))
     (when (and dotnet (not dotnet-script))
@@ -41,11 +25,13 @@
 	  (when-let ((b (make-comint "CSharpRepl" repl)))
             (switch-to-buffer-other-window b))))))
   (define-key csharp-mode-map (kbd "C-c C-z") 'my-csharp-repl)
-
-  (when (or (not (boundp 'omnisharp-server-executable-path)) (not omnisharp-server-executable-path))
-    (let ((omnisharp (executable-find "omnisharp")))
-      (when omnisharp
-	(setq omnisharp-server-executable-path omnisharp)))))
+  (defun my/csharp-mode-hook ()
+    (setq-local lsp-auto-guess-root t)
+    (setq-local indent-tabs-mode nil)
+    (setq-local comment-column 40)
+    (setq-local c-basic-offset 4)
+    (lsp))
+  (add-hook 'csharp-mode-hook #'my/csharp-mode-hook))
 
 (provide '50-csharp)
 ;;; 50-csharp.el ends here
