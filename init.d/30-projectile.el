@@ -9,8 +9,9 @@
 
 (use-package projectile
   :init
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
-  (projectile-mode +1))
+  (projectile-mode +1)
+  :config
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
 (provide '30-projectile)
 ;;; 30-projectile.el ends here

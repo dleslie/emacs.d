@@ -53,10 +53,12 @@
 	["Capture" org-capture]
 	"--"
 	["Magit" magit-status]
-        "--"
+        "---"
         ["Shell Here" eshell-here]
         ["dos2unix" dos2unix]
         "--"
+        ["Smartparens Cheat Sheet" s-cheat-sheet]
+        "---"
         ["Change Theme" change-theme]
 	["Next Theme" next-theme]
 	["Random Theme" random-theme]
