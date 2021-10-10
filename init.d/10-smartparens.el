@@ -2,6 +2,6 @@
   :ensure t
   :config
   (require 'smartparens-config)
-  (setq smartparens-global-mode t))
+  (add-hook 'lisp-mode-hook 'smartparens))
 
 (provide '10-smartparens.el)
