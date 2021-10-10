@@ -8,8 +8,8 @@
 ;;; Code:
 
 (use-package ace-jump-mode
-  :bind (("C-c SPC" . ace-jump-mode))
   :init
+  (global-set-key "\C-c SPC" 'ace-jump-mode)
   (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t))
 
 (provide '20-ace-jump)

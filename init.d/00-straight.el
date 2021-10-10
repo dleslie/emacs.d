@@ -27,6 +27,6 @@
 (require 'bind-key)
 (require 'use-package-ensure)
 (setq use-package-always-ensure t)
-
+(setq package-native-compile t)
 (provide '00-straight)
 ;;; 00-straight.el ends here

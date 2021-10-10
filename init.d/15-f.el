@@ -7,8 +7,7 @@
 
 ;;; Code:
 
-(use-package f
-  :functions (f-join))
+(use-package f)
 
 (provide '15-f)
 ;;; 15-f.el ends here

@@ -28,14 +28,14 @@
   (add-hook 'text-mode-hook 'writegood-mode))
 
 (use-package dictionary
-  :bind (("C-c d" . dictionary-search))
   :init
+  (global-set-key "\C-c d" 'dictionary-search)
   (define-key-after global-map [menu-bar tools apps dictionary-search]
     '(menu-item "Dictionary" dictionary-search :help "Search dictionary") t))
 
 (use-package powerthesaurus
-  :bind (("C-c t" . powerthesaurus-lookup-word-dwim))
   :init
+  (global-set-key "\C-c t" 'powerthesaurus-lookup-word-dwim)
   (define-key-after global-map [menu-bar tools apps powerthesaurus-lookup-word]
     '(menu-item "Thesaurus" powerthesaurus-lookup-word :help "Search thesaurus") t))
 

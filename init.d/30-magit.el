@@ -9,8 +9,8 @@
 
 (when (executable-find "git")
   (use-package magit
-    :bind (("C-c g" . magit-status))
     :init
+    (global-set-key "\C-c g" 'magit-status)
     (setq magit-last-seen-setup-instructions "1.4.0")))
 
 (provide '30-magit)

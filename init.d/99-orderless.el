@@ -8,10 +8,10 @@
 ;;; Code:
 
 (use-package orderless
-  :after (company)
   :ensure t
-  :init (icomplete-mode)
-  :custom (completion-styles '(orderless orderless-flex))
+  :init
+  (icomplete-mode)
+  (setq completion-styles '(orderless orderless-flex))
   :config
   (defun just-one-face (fn &rest args)
     (let ((orderless-match-faces [completions-common-part]))

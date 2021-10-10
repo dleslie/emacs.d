@@ -8,9 +8,8 @@
 ;;; Code:
 
 (use-package company
-  :hook
-  (prog-mode . company-mode)
-  :config
+  :init
+  (add-hook 'prog-mode-hook 'company-mode)
   (setq company-backends
 	'(company-capf company-gtags company-etags company-files))
   (setq company-tooltip-align-annotations t
@@ -19,8 +18,8 @@
 
 (use-package company-quickhelp
   :after company
-  :hook
-  (company-mode . company-quickhelp-mode))
+  :init
+  (add-hook 'company-mode-hook 'company-quickhelp-mode))
 
 (provide '30-company)
 ;;; 30-company.el ends here

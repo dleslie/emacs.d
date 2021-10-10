@@ -8,7 +8,6 @@
 ;;; Code:
 
 (use-package minions
-  :functions (minions-mode)
   :config
   (minions-mode 1))
 

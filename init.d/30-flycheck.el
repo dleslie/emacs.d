@@ -8,7 +8,8 @@
 ;;; Code:
 
 (use-package flycheck
-  :hook (prog-mode . flycheck-mode))
+  :init
+  (add-hook 'prog-mode-hook 'flycheck-mode))
 
 (provide '30-flycheck)
 ;;; 30-flycheck.el ends here

@@ -8,18 +8,6 @@
 ;;; Code:
 
 (use-package lsp-mode
-  :commands lsp
-  :hook
-  ((rust-mode . lsp)
-   (ruby-mode . lsp)
-   (python-mode . lsp)
-   (js2-mode . lsp)
-   (c-mode . lsp)
-   (c++-mode . lsp)
-   (js2-mode . lsp)
-   (go-mode . lsp)
-   (bash-mode . lsp)
-   (dockerfile-mode . lsp))
   :init
   (require 'lsp-clangd)
   (require 'lsp-dockerfile)
@@ -31,6 +19,19 @@
   (require 'lsp-racket)
   (require 'lsp-json)
   (require 'lsp-pyls)
+
+  (add-hook 'rust-mode-hook 'lsp)
+  (add-hook 'ruby-mode-hook 'lsp)
+  (add-hook 'python-mode-hook 'lsp)
+  (add-hook 'js2-mode-hook 'lsp)
+  (add-hook 'c-mode-hook 'lsp)
+  (add-hook 'c++-mode-hook 'lsp)
+  (add-hook 'js2-mode-hook 'lsp)
+  (add-hook 'go-mode-hook 'lsp)
+  (add-hook 'bash-mode-hook 'lsp)
+  (add-hook 'dockerfile-mode-hook 'lsp)
+  (add-hook 'csharp-mode-hook 'lsp)
+  
   (setq lsp-modeline-code-actions-segments '(count icon)))
 
 (use-package lsp-ui

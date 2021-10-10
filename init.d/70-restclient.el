@@ -10,7 +10,6 @@
 (use-package restclient)
 
 (use-package company-restclient
-  :after (restclient company)
   :init
   (push 'company-restclient company-backends))
 

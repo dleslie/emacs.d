@@ -8,16 +8,15 @@
 ;;; Code:
 
 (use-package visual-regexp
-  :bind
-  (("C-c r" . vr/replace)
-   ("C-c q" . vr/query-replace)))
+  :init
+  (global-set-key "\C-c r" 'vr/replace)
+  (global-set-key "\C-c q" 'vr/query-replace))
 
 (when (executable-find "python2")
   (use-package visual-regexp-steroids
-    :after visual-regexp
-    :bind
-    (("C-r" . vr/isearch-backward)
-     ("C-s" . vr/isearch-forward))))
+    :init
+    (global-set-key "\C-r" 'vr/isearch-backward)
+    (global-set-key "\C-s" 'vr/isearch-forward)))
 
 (provide '70-visual-regexp)
 ;;; 70-visual-regexp.el ends here

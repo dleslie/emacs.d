@@ -8,7 +8,9 @@
 ;;; Code:
 
 (use-package markdown-mode
-  :mode ("\\.markdown\\'" "\\.md\\'"))
+  :init
+  (autoload 'markdown-mode "markdown-mode" "Markdown Mode" t ".md")
+  (autoload 'markdown-mode "markdown-mode" "Markdown Mode" t ".markdown"))
 
 (provide '70-markdown)
 ;;; 70-markdown.el ends here

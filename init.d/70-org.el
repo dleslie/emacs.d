@@ -11,15 +11,13 @@
 
 (use-package org
   :ensure org-plus-contrib
-  :after (f)
-  :bind
-  (("C-c C-o t" . org-todo-list)
-   ("C-c C-o l" . org-store-link)
-   ("C-c C-o a" . org-agenda)
-   ("C-c C-o b" . org-iswitchb)
-   ("C-c C-o c" . org-capture)
-   ("C-c C-o v" . my-org-show-all-inline-images))
   :init
+  (global-set-key "\C-c \C-o t" 'org-todo-list)
+  (global-set-key "\C-c \C-o t" 'org-store-link)
+  (global-set-key "\C-c \C-o t" 'org-agenda)
+  (global-set-key "\C-c \C-o t" 'org-iswitchb)
+  (global-set-key "\C-c \C-o t" 'org-capture)
+  (global-set-key "\C-c \C-o t" 'my-org-show-all-inline-images)
   (defun my-org-show-all-inline-images ()
     (interactive)
     (org-display-inline-images t t)))
