@@ -12,7 +12,7 @@
   (global-set-key "\C-c r" 'vr/replace)
   (global-set-key "\C-c q" 'vr/query-replace))
 
-(when (executable-find "python2")
+(when (executable-find "python")
   (use-package visual-regexp-steroids
     :init
     (global-set-key "\C-r" 'vr/isearch-backward)
