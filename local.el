@@ -113,19 +113,26 @@
 ;; General Emacs Sanity
 (setq
  auto-window-vscroll nil
+ c-basic-offset 2
  column-number-mode t
+ css-indent-offset 2
  debug-on-error nil
  indent-tabs-mode nil
+ indicate-buffer-boundaries 'left
+ indicate-empty-lines t
  inhibit-startup-screen t
+ js-indent-level 2
  make-backup-files nil
  scroll-bar-mode nil
  scroll-conservatively 10000
  scroll-step 2
- c-basic-offset 2
+ show-paren-delay 0
+ show-trailing-whitespace t
  tab-stop-list (number-sequence 2 120 2)
  tab-width 2
  tool-bar-mode nil
  truncate-lines t)
+(setq-default tab-width 2)
 
 (delete-selection-mode 1)
 (global-eldoc-mode t)
