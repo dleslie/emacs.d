@@ -13,7 +13,7 @@
   (let* ((dotnet (executable-find "dotnet"))
 	 (dotnet-script (executable-find "dotnet-script")))
     (when (and dotnet (not dotnet-script))
-      (shell-command (concat dotnet " tool install -g dotnet-script"))))
+      (shell-command (concat "\"" dotnet "\" tool install -g dotnet-script"))))
   
   (defun my-csharp-repl ()
     "Switch to the CSharpRepl buffer, creating it if necessary."
