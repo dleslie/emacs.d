@@ -10,8 +10,7 @@
 ;; Where are we finding things?
 (require 'package)
 (setq package-archives
-      '(("org" . "https://orgmode.org/elpa/")
-        ("gnu" . "https://elpa.gnu.org/packages/")
+      '(("gnu" . "https://elpa.gnu.org/packages/")
         ("melpa" . "https://melpa.org/packages/")
         ("elpy" . "https://jorgenschaefer.github.io/packages/"))
       package-archive-priorities
