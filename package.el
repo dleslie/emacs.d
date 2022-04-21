@@ -16,7 +16,6 @@
       package-archive-priorities
       '(("elpy" . 90)
 	("melpa" . 100)
-	("org" . 70)
 	("gnu" . 80)))
 
 ;;(package-initialize 'no-activate)
