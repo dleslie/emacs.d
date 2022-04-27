@@ -10,7 +10,6 @@
 (defvar org-directory '())
 
 (use-package org
-  :ensure org-plus-contrib
   :init
   (global-set-key "\C-cot" 'org-todo-list)
   (global-set-key "\C-col" 'org-store-link)
