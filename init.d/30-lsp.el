@@ -54,12 +54,6 @@
 	(defvar lsp-docker-client-packages
 		'(lsp-css lsp-clients lsp-bash lsp-go lsp-pyls lsp-html lsp-typescript
 							lsp-terraform lsp-cpp))
-
-	(lsp-docker-init-clients
-	 :path-mappings '(("path-to-projects-you-want-to-use" . "/projects"))
-	 :client-packages lsp-docker-client-packages
-	 :client-configs lsp-docker-client-configs)
-
 	(defvar lsp-docker-client-configs
 		(list
 		 (list :server-id 'bash-ls :docker-server-id 'bashls-docker :server-command "bash-language-server start")
