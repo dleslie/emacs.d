@@ -11,10 +11,10 @@
   :init
   (add-hook 'prog-mode-hook 'company-mode)
   (setq company-backends
-	'(company-capf company-gtags company-etags company-files))
+				'(company-capf company-files company-gtags company-etags))
   (setq company-tooltip-align-annotations t
-	company-idle-delay 0.25
-	company-minimum-prefix-length 1))
+				company-idle-delay 1
+				company-minimum-prefix-length 1))
 
 (use-package company-quickhelp
   :after company

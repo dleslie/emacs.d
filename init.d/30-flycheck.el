@@ -9,7 +9,8 @@
 
 (use-package flycheck
   :init
-  (add-hook 'prog-mode-hook 'flycheck-mode))
+  (add-hook 'prog-mode-hook 'flycheck-mode)
+	(setq flycheck-idle-change-delay 2))
 
 (provide '30-flycheck)
 ;;; 30-flycheck.el ends here

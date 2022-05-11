@@ -9,7 +9,7 @@
 
 ;; Where are we storing org files?
 (defvar org-directory)
-(setq org-directory (expand-file-name "~/org/"))
+(setq org-directory (expand-file-name "c:/personal/dleslie/org/"))
 
 ;; Useful bindings
 (global-set-key "\C-w" 'clipboard-kill-region)
@@ -131,7 +131,8 @@
  tab-stop-list (number-sequence 2 120 2)
  tab-width 2
  tool-bar-mode nil
- truncate-lines t)
+ truncate-lines t
+ electric-indent-mode nil)
 (setq-default tab-width 2)
 
 (delete-selection-mode 1)
