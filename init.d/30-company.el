@@ -21,5 +21,9 @@
   :init
   (add-hook 'company-mode-hook 'company-quickhelp-mode))
 
+(use-package company-box
+	:after company
+	:hook (company-mode . company-box-mode))
+
 (provide '30-company)
 ;;; 30-company.el ends here
