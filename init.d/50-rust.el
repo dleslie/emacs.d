@@ -9,24 +9,7 @@
 
 (use-package rust-mode
   :config
-  (setq rust-format-on-save t
-	lsp-rust-all-features t
-	lsp-rust-build-on-save nil)
-  (when (executable-find "racer")
-    (setq lsp-rust-racer-completion t))
-  (when (executable-find "ra_lsp_server")
-    (setq
-     lsp-rust-racer-completion nil
-     lsp-rust-server 'rust-analyzer))
-  (defun my-ra-hack ()
-    (let ((clients (lsp--filter-clients
-		    (lambda (client)
-		      (equalp 'rust-analyzer (lsp--client-server-id client))))))
-      (when clients
-	(mapcar (lambda (client)
-		  (setf (lsp--client-priority client) 2))
-		clients))))
-  (add-hook 'rust-mode-hook 'my-ra-hack))
+  (setq rust-format-on-save t))
 
 (use-package flycheck-rust
   :config (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))

@@ -7,17 +7,11 @@
 
 ;;; Code:
 
-(use-package js2-mode
-  :init
-  (add-hook 'js2-mode-hook #'lsp))
+(use-package js2-mode)
 
-(use-package css-mode
-  :init
-  (add-hook 'css-mode-hook #'lsp))
+(use-package css-mode)
 
-(use-package typescript-mode
-  :init  
-  (add-hook 'typescript-mode-hook #'lsp))
+(use-package typescript-mode)
 
 (use-package tern
   :init

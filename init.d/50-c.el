@@ -7,14 +7,6 @@
 
 ;;; Code:
 
-(when (executable-find "ccls")
-  (use-package ccls
-    :after lsp-mode
-    :config
-    (add-hook 'c-mode-hook 'lsp)
-    (add-hook 'c++-mode-hook 'lsp)
-    (setq ccls-executable (executable-find "ccls"))))
-
 (when (executable-find "clang-format")
   (use-package clang-format
     :init

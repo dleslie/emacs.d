@@ -25,11 +25,9 @@
 	  (when-let ((b (make-comint "CSharpRepl" repl)))
             (switch-to-buffer-other-window b))))))
   (defun my/csharp-mode-hook ()
-    (setq-local lsp-auto-guess-root t)
     (setq-local indent-tabs-mode nil)
     (setq-local comment-column 40)
-    (setq-local c-basic-offset 4)
-    (lsp))
+    (setq-local c-basic-offset 4))
   (add-hook 'csharp-mode-hook #'my/csharp-mode-hook)
   :config
   (define-key csharp-mode-map (kbd "C-c C-z") 'my-csharp-repl))
