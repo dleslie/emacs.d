@@ -11,7 +11,9 @@
   :ensure t
   :init
   (icomplete-mode)
-  (setq completion-styles '(orderless orderless-flex))
+  (setq completion-styles '(orderless orderless-flex basic)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion))))
   :config
   (defun just-one-face (fn &rest args)
     (let ((orderless-match-faces [completions-common-part]))
