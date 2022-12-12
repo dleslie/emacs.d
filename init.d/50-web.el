@@ -24,11 +24,5 @@
   (autoload 'web-mode "web-mode" "Web Mode" t ".tsx")
   (autoload 'web-mode "web-mode" "Web Mode" t ".jsx"))
 
-(use-package company-web
-  :init
-  (push 'company-web-html company-backends)
-  (push 'company-web-jade company-backends)
-  (push 'company-web-slim company-backends))
-
 (provide '50-web)
 ;;; 50-web.el ends here

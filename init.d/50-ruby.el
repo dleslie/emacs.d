@@ -39,9 +39,6 @@
   :init
   (advice-add 'launch-ruby :after #'robe-start))
 
-(use-package company-inf-ruby
-  :init
-  (push 'company-inf-ruby company-backends))
 
 (provide '50-ruby)
 ;;; 50-ruby.el ends here

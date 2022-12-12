@@ -13,13 +13,7 @@
   (icomplete-mode)
   (setq completion-styles '(orderless orderless-flex basic)
         completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion))))
-  :config
-  (defun just-one-face (fn &rest args)
-    (let ((orderless-match-faces [completions-common-part]))
-      (apply fn args)))
-  
-  (advice-add 'company-capf--candidates :around #'just-one-face))
+        completion-category-overrides '((file (styles partial-completion)))))
 
 (provide '99-orderless)
 ;;; 99-orderless.el ends here

@@ -16,8 +16,6 @@
   (use-package sly-macrostep)
   (use-package sly-repl-ansi-color)
 
-  (add-hook 'sly-mode-hook 'company-mode)
-
   (setq sly-lisp-implementations
 	(cl-remove-if-not (lambda (imp) (caadr imp))
 		       `((sbcl (,(executable-find "sbcl")) :coding-system utf-8-unix)
