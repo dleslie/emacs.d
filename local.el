@@ -9,7 +9,7 @@
 
 ;; Where are we storing org files?
 (defvar org-directory)
-(setq org-directory (expand-file-name "c:/personal/dleslie/org/"))
+(setq org-directory (expand-file-name "~/org/"))
 
 ;; Useful bindings
 (global-set-key "\C-w" 'clipboard-kill-region)
@@ -24,14 +24,6 @@
 (global-set-key (kbd "C-;") 'hippie-expand)
 (global-set-key (kbd "C-,") 'company-complete)
 (global-set-key "\C-c\C-t" 'next-theme)
-
-;; Projectile search paths
-(setq projectile-project-search-path '())
-(dolist (p `(,org-directory "~/Workspace/" "~/Workspace/GitHub" "~/Workspace/github" "~/Workspace/GitLab" "~/Workspace/gitlab" "~/Workspace/other" "~/Workspace/Other" "/c/work/" "/d/work/" "/mnt/c/work/" "/mnt/d/work/" "C:/work/" "D:/work/"))
-  (when p
-    (let ((expanded (expand-file-name p)))
-      (when (and expanded (file-exists-p expanded))
-	(push expanded projectile-project-search-path)))))
 
 ;; Default C style
 (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1) (c-set-style "java")))
@@ -117,6 +109,7 @@
  column-number-mode t
  css-indent-offset 2
  debug-on-error nil
+ electric-indent-mode nil
  indent-tabs-mode nil
  indicate-buffer-boundaries 'left
  indicate-empty-lines t
@@ -131,17 +124,13 @@
  tab-stop-list (number-sequence 2 120 2)
  tab-width 2
  tool-bar-mode nil
- truncate-lines t
- electric-indent-mode nil)
-(setq-default tab-width 2)
+ truncate-lines t)
 
 (delete-selection-mode 1)
 (global-eldoc-mode t)
 (show-paren-mode t)
 
-(icomplete-mode)
-
-(global-display-line-numbers-mode t)
+;(global-display-line-numbers-mode)
 ;(global-hl-line-mode t)
 (global-prettify-symbols-mode +1)
 
