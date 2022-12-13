@@ -11,7 +11,9 @@
   :ensure t
   :custom
   (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles basic partial-completion)))))
+  (setq
+	 completion-category-overrides '((file (styles basic partial-completion))
+																	 (eglot (styles orderless)))))
 
 (provide '99-orderless)
 ;;; 99-orderless.el ends here

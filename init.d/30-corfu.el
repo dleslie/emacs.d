@@ -20,13 +20,17 @@
   ;; This is recommended since Dabbrev can be used globally (M-/).
   ;; See also `corfu-excluded-modes'.
   :init
-  (global-corfu-mode))
+  (global-corfu-mode)
+	(corfu-popupinfo-mode))
 
 ;; A few more useful configurations...
 (use-package emacs
   :init
   ;; TAB cycle if there are only few candidates
-  (setq completion-cycle-threshold 3)
+  (setq completion-cycle-threshold 3
+				corfu-auto t
+				corfu-quit-no-match 'separator
+				corfu-popupinfo-delay 0.5)
 
   ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
   ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
