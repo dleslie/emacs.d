@@ -7,7 +7,9 @@
 
 ;;; Code:
 
-(use-package eglot)
+(use-package eglot
+	:init
+	(setq eglot-connect-timeout 240))
 
 (provide '30-lsp)
 ;;; 30-lsp.el ends here
