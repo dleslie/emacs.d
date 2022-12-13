@@ -9,6 +9,7 @@
 
 (when (executable-find "ag")
   (use-package ag
+    :defer t
     :init
     (define-key-after global-map [menu-bar tools ag]
       '(menu-item "Search Files (ag)..." ag :help "Search files for strings or regexps (with ag)...")

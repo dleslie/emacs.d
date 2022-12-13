@@ -7,6 +7,11 @@
 
 ;;; Code:
 
+(defun byte-recompile-initd ()
+  "Byte Recompile init.d Directory"
+  (interactive)
+  (byte-recompile-directory (expand-file-name "~/.emacs.d/init.d") 0))
+
 (defun flatten(x)
   "Flattens list X."
   (cond ((null x) nil)

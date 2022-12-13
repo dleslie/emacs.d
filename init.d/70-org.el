@@ -10,6 +10,7 @@
 (defvar org-directory '())
 
 (use-package org
+  :defer t
   :init
   (global-set-key "\C-cot" 'org-todo-list)
   (global-set-key "\C-col" 'org-store-link)
