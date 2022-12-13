@@ -9,11 +9,9 @@
 
 (use-package orderless
   :ensure t
-  :init
-  (icomplete-mode)
-  (setq completion-styles '(orderless orderless-flex basic)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles basic partial-completion)))))
 
 (provide '99-orderless)
 ;;; 99-orderless.el ends here
