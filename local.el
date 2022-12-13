@@ -139,6 +139,8 @@
 (global-eldoc-mode t)
 (show-paren-mode t)
 
+(icomplete-mode)
+
 (global-display-line-numbers-mode t)
 ;(global-hl-line-mode t)
 (global-prettify-symbols-mode +1)
