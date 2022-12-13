@@ -30,7 +30,8 @@
   (setq completion-cycle-threshold 3
 				corfu-auto t
 				corfu-quit-no-match 'separator
-				corfu-popupinfo-delay 0.5)
+				corfu-popupinfo-delay 0.5
+				corfu-preselect-first t)
 
   ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
   ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
