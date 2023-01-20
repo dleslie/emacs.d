@@ -54,6 +54,8 @@
         ["Change Theme" change-theme]
 	["Next Theme" next-theme]
 	["Random Theme" random-theme]
+	["Random Dark Theme" random-dark-theme]
+	["Random Light Theme" random-light-theme]
         ["Reset Theme" reset-theme]))
     map))
 

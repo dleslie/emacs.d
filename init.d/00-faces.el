@@ -32,6 +32,22 @@
 	  (setq success t)
 	  (message "Using \"%S\"" new-theme))))))
 
+(defun random-dark-theme ()
+  "Changes to a random dark theme."
+  (interactive)
+  (while
+      (progn
+	(random-theme)
+	(not (background-is-dark)))))
+
+(defun random-light-theme ()
+  "Changes to a random light theme."
+  (interactive)
+  (while
+      (progn
+	(random-theme)
+	(background-is-dark))))
+
 (defun next-theme ()
   "Cycles through all available themes."
   (interactive)
@@ -47,6 +63,13 @@
       (when (ignore-errors (load-theme next t))
 	(setq success t)
 	(message "Using \"%S\"" next)))))
+
+(defun background-is-dark ()
+  "Returns t if the current theme background is dark"
+  (interactive)
+  (let ((dark 0.33))
+    (seq-every-p (lambda (x) (<= x dark))
+		 (color-name-to-rgb (face-attribute 'default :background)))))
 
 (provide '00-faces)
 ;;; 00-faces.el ends here
