@@ -25,12 +25,13 @@
   "Changes to a random theme."
   (interactive)
   (let ((success nil)
-	(all-themes (delete-dups (sort (append (custom-available-themes) custom-known-themes) (lambda (a b) (string< (symbol-name a) (symbol-name b)))))))
-    (while (not success)
+	(current (car custom-enabled-themes))
+	(all-themes (delete-dups (sort (append (custom-available-themes) custom-known-themes) 
+				       (lambda (a b) (string< (symbol-name a) (symbol-name b)))))))
+    (while 
       (let ((new-theme (seq-random-elt all-themes)))
-	(when (ignore-errors (change-theme new-theme))
-	  (setq success t)
-	  (message "Using \"%S\"" new-theme))))))
+	(or (string-equal current new-theme)
+	    (not (ignore-errors (change-theme new-theme))))))))
 
 (defun random-dark-theme ()
   "Changes to a random dark theme."
