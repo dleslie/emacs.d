@@ -7,4 +7,4 @@
          ("<tab>" . 'copilot-accept-completion)
          ("TAB" . 'copilot-accept-completion))
   :init
-  (add-hook 'prog-mode-hook 'copilot-mode))
+  (global-copilot-mode))
