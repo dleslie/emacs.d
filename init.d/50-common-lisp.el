@@ -9,9 +9,6 @@
 
 (use-package sly
   :init
-  (use-package sly-asdf
-    :init
-    (add-to-list 'sly-contribs 'sly-asdf 'append))
   (use-package sly-quicklisp)
   (use-package sly-macrostep)
   (use-package sly-repl-ansi-color)
