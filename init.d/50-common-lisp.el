@@ -15,14 +15,7 @@
   (use-package sly-quicklisp)
   (use-package sly-macrostep)
   (use-package sly-repl-ansi-color)
-
-  (setq sly-lisp-implementations
-	(cl-remove-if-not (lambda (imp) (caadr imp))
-		       `((sbcl (,(executable-find "sbcl")) :coding-system utf-8-unix)
-			 (armcl (,(executable-find "armcl")))
-			 (cmucl (,(executable-find "cmucl") "-quiet"))
-			 (ecl (,(executable-find "ecl")))
-			 ))))
+  (require 'sly-autoloads))
 
 (let ((ros-file (expand-file-name "~/.roswell/helper.el")))
   (when (file-exists-p ros-file)
