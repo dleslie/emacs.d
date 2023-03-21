@@ -14,10 +14,10 @@
   (use-package sly-repl-ansi-color)
   (require 'sly-autoloads))
 
-(let ((ros-file (expand-file-name "~/.roswell/helper.el")))
-  (when (file-exists-p ros-file)
-    (load ros-file)
-    (setq inferior-lisp-program "ros -Q run")))
+;; (let ((ros-file (expand-file-name "~/.roswell/helper.el")))
+;;   (when (file-exists-p ros-file)
+;;     (load ros-file)
+;;     (setq inferior-lisp-program "ros -Q run")))
 
 (provide '50-common-lisp)
 ;;; 50-common-lisp.el ends here
