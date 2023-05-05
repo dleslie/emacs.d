@@ -9,20 +9,15 @@
 
 (use-package sly
   :init
-  (use-package sly-asdf
-    :init
-    (add-to-list 'sly-contribs 'sly-asdf 'append))
   (use-package sly-quicklisp)
   (use-package sly-macrostep)
   (use-package sly-repl-ansi-color)
+  (require 'sly-autoloads))
 
-  (setq sly-lisp-implementations
-	(cl-remove-if-not (lambda (imp) (caadr imp))
-		       `((sbcl (,(executable-find "sbcl")) :coding-system utf-8-unix)
-			 (armcl (,(executable-find "armcl")))
-			 (cmucl (,(executable-find "cmucl") "-quiet"))
-			 (ecl (,(executable-find "ecl")))
-			 ))))
+;; (let ((ros-file (expand-file-name "~/.roswell/helper.el")))
+;;   (when (file-exists-p ros-file)
+;;     (load ros-file)
+;;     (setq inferior-lisp-program "ros -Q run")))
 
 (provide '50-common-lisp)
 ;;; 50-common-lisp.el ends here

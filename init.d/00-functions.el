@@ -45,17 +45,6 @@ Code taken from `hack-dir-local-variables'."
       (setq dir-name (nth 0 variables-file))))
     dir-name))
 
-(defmacro with-perf-metrics (name &rest body)
-  "Show time of scope NAME taken to execute BODY."
-  (declare (indent 1) (debug t))
-  `(progn
-     (let ((begin-time (float-time))
-           (begin-cells cons-cells-consed))
-       (message (format "[%s]" ,name))
-       (with-demoted-errors "Error: %S"
-         ,(cons 'progn body))
-       (message (format "[%s : %sms, %s cells]" ,name (truncate (* 1000 (- (float-time) begin-time))) (- cons-cells-consed begin-cells))))))
-
 (defun dos2unix (buffer)
   "Remove all carriage return from BUFFER."
   (interactive "*b")

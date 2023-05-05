@@ -33,14 +33,17 @@
   (when (file-exists-p packaged)
     (load packaged)))
 
+
 ;; Load all files in init.d
 (let ((initd (expand-file-name (concat user-emacs-directory (file-name-as-directory "init.d")))))
   (when (file-exists-p initd)
     (dolist (lsp (sort (directory-files initd nil "\\.el$") 'string<))
-      (let ((file-to-load (file-name-sans-extension lsp)))
+      (let ((start-time (float-time))
+            (file-to-load (file-name-sans-extension lsp)))
 	(condition-case err
 	    (load (concat initd file-to-load))
-	  (error (message "Caught error loading %S: %S" file-to-load (error-message-string err))))))))
+	  (error (message "Caught error loading %S: %S" file-to-load (error-message-string err))))
+        (message (format "Loading %s took %5.3gs" file-to-load (- (float-time) start-time)))))))
 
 ;; Load local configurations
 (let ((localel (expand-file-name (concat user-emacs-directory "local.el"))))
