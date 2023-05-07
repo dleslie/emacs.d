@@ -8,7 +8,8 @@
 ;;; Code:
 
 (use-package org
-  :defer t
+  :ensure t
+  :straight t
   :custom
   (org-directory (file-truename "~/org/")
    org-default-notes-file (concat (file-truename org-directory) "notes.org")
@@ -62,12 +63,16 @@
 
 (use-package org-bullets
   :after org
+  :straight t
   :init
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 (defvar org-roam-directory '())
+(defvar org--inhibit-version-check t)
 
 (use-package org-roam
+  :straight t
+  :ensure t
   :after org
   :hook
   (after-init . org-roam-mode)
@@ -83,7 +88,8 @@
 	   "%?"
 	   :file-name "%<%Y%m%d%H%M%S>-${slug}"
 	   :head "#+title: ${title}\n#+roam_tags: \n\n"
-	   :unnarrowed t))))
+	   :unnarrowed t)))
+  (org-roam-db-autosync-mode))
 
 (provide '70-org)
 ;;; 70-org.el ends here
