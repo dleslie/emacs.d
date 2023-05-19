@@ -12,11 +12,13 @@
 (setq package-archives
       '(("gnu" . "https://elpa.gnu.org/packages/")
         ("melpa" . "https://melpa.org/packages/")
-        ("elpy" . "https://jorgenschaefer.github.io/packages/"))
+        ("elpy" . "https://jorgenschaefer.github.io/packages/")
+	( "jcs-elpa" . "https://jcs-emacs.github.io/jcs-elpa/packages/"))
       package-archive-priorities
       '(("elpy" . 90)
 	("melpa" . 100)
-	("gnu" . 80)))
+	("gnu" . 80)
+	("jcs-elpa" . 70)))
 
 ;;(package-initialize 'no-activate)
 (package-initialize)
