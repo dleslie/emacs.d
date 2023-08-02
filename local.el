@@ -96,5 +96,7 @@
 ;(global-hl-line-mode t)
 (global-prettify-symbols-mode +1)
 
+(change-theme 'leuven-dark)
+
 (provide 'local)
 ;;; local.el ends here

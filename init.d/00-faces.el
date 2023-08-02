@@ -28,10 +28,9 @@
 	(current (car custom-enabled-themes))
 	(all-themes (delete-dups (sort (append (custom-available-themes) custom-known-themes) 
 				       (lambda (a b) (string< (symbol-name a) (symbol-name b)))))))
-    (while 
-      (let ((new-theme (seq-random-elt all-themes)))
-	(or (string-equal current new-theme)
-	    (not (ignore-errors (change-theme new-theme))))))))
+    (let ((new-theme (seq-random-elt all-themes)))
+      (message (format "Switching to theme %s" new-theme))
+      (ignore-errors (change-theme new-theme)))))
 
 (defun random-dark-theme ()
   "Changes to a random dark theme."
