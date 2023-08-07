@@ -64,6 +64,9 @@
 
 (my-mode t)
 
+;; Enable truncate lines for all text mode buffers
+(add-hook 'text-mode-hook 'toggle-truncate-lines)
+
 ;; General Emacs Sanity
 (setq
  auto-window-vscroll nil
@@ -85,8 +88,7 @@
  show-trailing-whitespace t
  tab-stop-list (number-sequence 2 120 2)
  tab-width 2
- tool-bar-mode nil
- truncate-lines t)
+ tool-bar-mode nil)
 
 (delete-selection-mode 1)
 (global-eldoc-mode t)

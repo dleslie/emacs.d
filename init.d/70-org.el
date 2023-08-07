@@ -61,11 +61,11 @@
    ("C-c o s" . org-search-view)
    ("C-c o i" . my-org-show-all-inline-images)))
 
-(use-package org-bullets
-  :after org
-  :straight t
-  :init
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+;; (use-package org-bullets
+;;   :after org
+;;   :straight t
+;;   :init
+;;   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 (defvar org-roam-directory '())
 (defvar org--inhibit-version-check t)
