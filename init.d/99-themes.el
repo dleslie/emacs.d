@@ -7,6 +7,7 @@
 
 ;;; Code:
 
+;; This is considered dangerous, but I think the practice of approving themes individually pre-dates the accepted use of use-package. So long as they're coming from trusted package sources I don't see where there's much benefit to _also_ approving individual themes.
 (setq custom-safe-themes t)
 
 (use-package afternoon-theme)
@@ -30,9 +31,8 @@
 (defun reset-theme ()
   "Disable all active themes."
   (interactive)
-  (cl-loop
-   for theme in custom-enabled-themes do
-   (disable-theme theme)))
+  (dolist (theme custom-enabled-themes)
+    (disable-theme theme)))
 
 (defun change-theme (theme)
   "Disable all enabled themes and then load the provided theme THEME."
@@ -56,6 +56,8 @@
 (defun random-dark-theme ()
   "Changes to a random dark theme."
   (interactive)
+  (do 
+      ())
   (while
       (progn
 	(random-theme)
