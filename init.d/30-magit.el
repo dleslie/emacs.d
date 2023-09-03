@@ -11,8 +11,7 @@
   (use-package magit
     :defer t
     :init
-    (global-set-key "\C-c g" 'magit-status)
-    (setq magit-last-seen-setup-instructions "1.4.0")))
+    (global-set-key "\C-c g" 'magit-status)))
 
 (provide '30-magit)
 ;;; 30-magit.el ends here

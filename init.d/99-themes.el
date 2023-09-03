@@ -7,6 +7,8 @@
 
 ;;; Code:
 
+(setq custom-safe-themes t)
+
 (use-package afternoon-theme)
 (use-package alect-themes)
 (use-package ample-theme)
@@ -39,7 +41,7 @@
     (intern (completing-read "Load custom theme: "
                              (mapcar 'symbol-name (custom-available-themes))))))
   (reset-theme)
-  (load-theme theme t))
+  (load-theme theme))
 
 (defun random-theme ()
   "Changes to a random theme."
@@ -70,18 +72,16 @@
 (defun next-theme ()
   "Cycles through all available themes."
   (interactive)
-  (let* ((all-themes (delete-dups (sort (append (custom-available-themes) custom-known-themes) (lambda (a b) (string< (symbol-name a) (symbol-name b))))))
-	 (next (or (car custom-enabled-themes)
-		   (car all-themes)))
-	 (success nil))
-    (while (not success)
-      (setq next (cadr (memq next all-themes)))
-      (when (not next)
-	(setq next (car all-themes)))
-      (reset-theme)
-      (when (ignore-errors (load-theme next t))
-	(setq success t)
-	(message "Using \"%S\"" next)))))
+  (let* ((current (car custom-enabled-themes))
+	 (all-themes (custom-available-themes)))
+    (if (not current)
+	(change-theme (car all-themes))
+      (let* ((remaining 
+	      (seq-drop all-themes 
+			(+ 1 (seq-position all-themes current))))
+	     (next (or (car remaining)
+		       (car all-themes))))
+	(change-theme next)))))
 
 (defun background-is-dark ()
   "Returns t if the current theme background is dark"
