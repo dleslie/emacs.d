@@ -7,50 +7,30 @@
 
 ;;; Code:
 
-(defun acquire-themes (&optional defer)
-  "Acquires themes.
-Will not defer loading if IMMEDIATE is true."
-  (let ((active-theme (car custom-enabled-themes)))
-    (use-package afternoon-theme :defer defer)
-    (use-package alect-themes :defer defer)
-    (use-package ample-theme :defer defer)
-    (use-package clues-theme :defer defer)
-    (use-package color-theme-sanityinc-tomorrow :defer defer)
-    (use-package constant-theme :defer defer)
-    (use-package cyberpunk-theme :defer defer)
-    (use-package flatland-theme :defer defer)
-    (use-package gruber-darker-theme :defer defer)
-    (use-package gruvbox-theme :defer defer)
-    (use-package moe-theme :defer defer)
-    (use-package sexy-monochrome-theme :defer defer)
-    (use-package solarized-theme :defer defer)
-    (use-package zenburn-theme :defer defer)
-		(use-package almost-mono-themes :defer defer)
-		(use-package quasi-monochrome-theme :defer defer)
-		(use-package monochrome-theme :defer defer)
-    (when (not defer)
-      (reset-theme)
-      (when (not (ignore-errors (change-theme active-theme)))
-	(change-theme 'tango)))))
-
-;; Running Emacs as a daemon doesn't properly configure default faces
-;; until after the first window is created. So we attach a hook to the
-;; cache faces method in order to wait for that to occur.
-(acquire-themes t)
-(add-hook 'after-init-hook 'acquire-themes)
-
-(defun find-all-custom-themes ()
-  "Locates all known custom themes"
-  (delete-dups (sort (append (custom-available-themes) custom-known-themes) 
-		     (lambda (a b) (string< (symbol-name a) (symbol-name b))))))
+(use-package afternoon-theme)
+(use-package alect-themes)
+(use-package ample-theme)
+(use-package clues-theme)
+(use-package color-theme-sanityinc-tomorrow)
+(use-package constant-theme)
+(use-package cyberpunk-theme)
+(use-package flatland-theme)
+(use-package gruber-darker-theme)
+(use-package gruvbox-theme)
+(use-package moe-theme)
+(use-package sexy-monochrome-theme)
+(use-package solarized-theme)
+(use-package zenburn-theme)
+(use-package almost-mono-themes)
+(use-package quasi-monochrome-theme)
+(use-package monochrome-theme)
 
 (defun reset-theme ()
   "Disable all active themes."
   (interactive)
   (cl-loop
-   for theme in (find-all-custom-themes) do
-   (when (-contains? custom-enabled-themes theme)
-     (disable-theme theme))))
+   for theme in custom-enabled-themes do
+   (disable-theme theme)))
 
 (defun change-theme (theme)
   "Disable all enabled themes and then load the provided theme THEME."
@@ -66,7 +46,7 @@ Will not defer loading if IMMEDIATE is true."
   (interactive)
   (let ((success nil)
 	(current (car custom-enabled-themes))
-	(all-themes (find-all-custom-themes)))
+	(all-themes (custom-available-themes)))
     (let ((new-theme (seq-random-elt all-themes)))
       (message (format "Switching to theme %s" new-theme))
       (ignore-errors (change-theme new-theme)))))
