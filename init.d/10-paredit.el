@@ -4,4 +4,13 @@
   (add-hook 'eval-expression-minibuffer-setup-hook 'enable-paredit-mode)
   (add-hook 'ielm-mode-hook 'enable-paredit-mode)
   (add-hook 'lisp-interaction-mode-hook 'enable-paredit-mode)
-  (add-hook 'lisp-mode-hook 'enable-paredit-mode))
+  (add-hook 'lisp-mode-hook 'enable-paredit-mode)
+  (add-hook 'sly-mode-hook 'enable-paredit-mode)
+  (advice-add 
+   'paredit-RET
+   :after
+   (lambda ()
+     (when (string-prefix-p 
+	    "*sly-mrepl for"
+	    (buffer-name (current-buffer)))
+       (sly-mrepl-return)))))
