@@ -9,7 +9,6 @@
 
 (when (executable-find "git")
   (use-package magit
-    :defer t
     :init
     (global-set-key "\C-c g" 'magit-status)))
 
