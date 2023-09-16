@@ -9,7 +9,7 @@
 
 (use-package org
   :ensure t
-  :straight t
+  :straight nil
   :custom
   (org-directory (file-truename "~/org/")
    org-default-notes-file (concat (file-truename org-directory) "notes.org")
@@ -70,26 +70,26 @@
 (defvar org-roam-directory '())
 (defvar org--inhibit-version-check t)
 
-(use-package org-roam
-  :straight t
-  :ensure t
-  :after org
-  :hook
-  (after-init . org-roam-mode)
-  :custom
-  (org-roam-directory (file-truename "~/org/roam"))
-  :bind
-  (("C-c o r" . org-roam)
-   ("C-c o f" . org-roam-find-file)
-   ("C-c o g" . org-roam-graph))
-  :config
-  (setq org-roam-capture-templates
-	'(("d" "default" plain (function org-roam--capture-get-point)
-	   "%?"
-	   :file-name "%<%Y%m%d%H%M%S>-${slug}"
-	   :head "#+title: ${title}\n#+roam_tags: \n\n"
-	   :unnarrowed t)))
-  (org-roam-db-autosync-mode))
+;; (use-package org-roam
+;;   :straight t
+;;   :ensure t
+;;   :after org
+;;   :hook
+;;   (after-init . org-roam-mode)
+;;   :custom
+;;   (org-roam-directory (file-truename "~/org/roam"))
+;;   :bind
+;;   (("C-c o r" . org-roam)
+;;    ("C-c o f" . org-roam-find-file)
+;;    ("C-c o g" . org-roam-graph))
+;;   :config
+;;   (setq org-roam-capture-templates
+;; 	'(("d" "default" plain (function org-roam--capture-get-point)
+;; 	   "%?"
+;; 	   :file-name "%<%Y%m%d%H%M%S>-${slug}"
+;; 	   :head "#+title: ${title}\n#+roam_tags: \n\n"
+;; 	   :unnarrowed t)))
+;;   (org-roam-db-autosync-mode))
 
 (provide '70-org)
 ;;; 70-org.el ends here

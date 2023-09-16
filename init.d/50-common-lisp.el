@@ -7,12 +7,7 @@
 
 ;;; Code:
 
-(use-package sly
-  :init
-  (use-package sly-quicklisp)
-  (use-package sly-macrostep)
-  (use-package sly-repl-ansi-color)
-  (require 'sly-autoloads))
+(use-package sly)
 
 (provide '50-common-lisp)
 ;;; 50-common-lisp.el ends here
