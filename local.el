@@ -68,34 +68,34 @@
 (add-hook 'text-mode-hook 'toggle-truncate-lines)
 
 ;; General Emacs Sanity
-(setq
- auto-window-vscroll nil
- c-basic-offset 2
- column-number-mode t
- css-indent-offset 2
- debug-on-error nil
- electric-indent-mode nil
- indent-tabs-mode nil
- indicate-buffer-boundaries 'left
- indicate-empty-lines t
- inhibit-startup-screen t
- js-indent-level 2
- make-backup-files nil
- scroll-bar-mode nil
- scroll-conservatively 10000
- scroll-step 2
- show-paren-delay 0
- show-trailing-whitespace t
- tab-stop-list (number-sequence 2 120 2)
- tab-width 2
- tool-bar-mode nil)
+(custom-set-variables
+ '(auto-window-vscroll nil)
+ '(c-basic-offset 2)
+ '(column-number-mode t)
+ '(css-indent-offset 2)
+ '(debug-on-error nil)
+ '(electric-indent-mode nil)
+ '(indent-tabs-mode nil)
+ '(indicate-buffer-boundaries 'left)
+ '(indicate-empty-lines t)
+ '(inhibit-startup-screen t)
+ '(js-indent-level 2)
+ '(make-backup-files nil)
+ '(scroll-bar-mode nil)
+ '(scroll-conservatively 10000)
+ '(scroll-step 2)
+ '(show-paren-delay 0)
+ '(show-trailing-whitespace t)
+ '(tab-stop-list (number-sequence 2 120 2))
+ '(tab-width 2)
+ '(tool-bar-mode nil))
 
 (delete-selection-mode 1)
 (global-eldoc-mode t)
 (show-paren-mode t)
 
 ;(global-display-line-numbers-mode)
-;(global-hl-line-mode t)
+(global-hl-line-mode t)
 (global-prettify-symbols-mode +1)
 
 (provide 'local)

@@ -33,6 +33,9 @@
   (when (file-exists-p packaged)
     (load packaged)))
 
+;; Load local configurations
+(let ((localel (expand-file-name (concat user-emacs-directory "local.el"))))
+  (load localel))
 
 ;; Load all files in init.d
 (let ((initd (expand-file-name (concat user-emacs-directory (file-name-as-directory "init.d")))))
@@ -46,10 +49,6 @@
 	      (load (concat initd file-to-load)))
 	  (error (message "Caught error loading %S: %S" file-to-load (error-message-string err))))
         (message (format "Loading %s took %5.3gs" file-to-load (- (float-time) start-time)))))))
-
-;; Load local configurations
-(let ((localel (expand-file-name (concat user-emacs-directory "local.el"))))
-  (load localel))
 
 ;; Make custom file not this one
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
