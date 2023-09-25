@@ -10,23 +10,23 @@
 ;; This is considered dangerous, but I think the practice of approving themes individually pre-dates the accepted use of use-package. So long as they're coming from trusted package sources I don't see where there's much benefit to _also_ approving individual themes.
 (setq custom-safe-themes t)
 
-(use-package afternoon-theme)
-(use-package alect-themes)
-(use-package ample-theme)
-(use-package clues-theme)
-(use-package color-theme-sanityinc-tomorrow)
-(use-package constant-theme)
-(use-package cyberpunk-theme)
-(use-package flatland-theme)
-(use-package gruber-darker-theme)
-(use-package gruvbox-theme)
-(use-package moe-theme)
-(use-package sexy-monochrome-theme)
-(use-package solarized-theme)
-(use-package zenburn-theme)
-(use-package almost-mono-themes)
-(use-package quasi-monochrome-theme)
-(use-package monochrome-theme)
+(use-package afternoon-theme :defer t)
+(use-package alect-themes :defer t)
+(use-package ample-theme :defer t)
+(use-package clues-theme :defer t)
+(use-package color-theme-sanityinc-tomorrow :defer t)
+(use-package constant-theme :defer t)
+(use-package cyberpunk-theme :defer t)
+(use-package flatland-theme :defer t)
+(use-package gruber-darker-theme :defer t)
+(use-package gruvbox-theme :defer t)
+(use-package moe-theme :defer t)
+(use-package sexy-monochrome-theme :defer t)
+(use-package solarized-theme :defer t)
+(use-package zenburn-theme :defer t)
+(use-package almost-mono-themes :defer t)
+(use-package quasi-monochrome-theme :defer t)
+(use-package monochrome-theme :defer t)
 
 (defun reset-theme ()
   "Disable all active themes."
@@ -56,7 +56,7 @@
 (defun random-dark-theme ()
   "Changes to a random dark theme."
   (interactive)
-  (do 
+  (do
       ())
   (while
       (progn
@@ -78,8 +78,8 @@
 	 (all-themes (custom-available-themes)))
     (if (not current)
 	(change-theme (car all-themes))
-      (let* ((remaining 
-	      (seq-drop all-themes 
+      (let* ((remaining
+	      (seq-drop all-themes
 			(+ 1 (seq-position all-themes current))))
 	     (next (or (car remaining)
 		       (car all-themes))))
