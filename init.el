@@ -33,8 +33,17 @@
   (when (file-exists-p packaged)
     (load packaged)))
 
+;; Compilation helper
+(defun byte-compile-if-newer (file)
+  (let ((el-file (concat file ".el"))
+        (elc-file (concat file ".elc")))
+    (if (or (not (file-exists-p elc-file))
+            (file-newer-than-file-p el-file elc-file))
+        (byte-compile-file el-file))))
+
 ;; Load local configurations
-(let ((localel (expand-file-name (concat user-emacs-directory "local.el"))))
+(let ((localel (expand-file-name (concat user-emacs-directory "local"))))
+  (byte-compile-if-newer localel)
   (load localel))
 
 ;; Make custom file not this one
