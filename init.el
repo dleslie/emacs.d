@@ -37,19 +37,6 @@
 (let ((localel (expand-file-name (concat user-emacs-directory "local.el"))))
   (load localel))
 
-;; Load all files in init.d
-(let ((initd (expand-file-name (concat user-emacs-directory (file-name-as-directory "init.d")))))
-  (when (file-exists-p initd)
-    (dolist (lsp (sort (directory-files initd nil "\\.el$") 'string<))
-      (let ((start-time (float-time))
-            (file-to-load (file-name-sans-extension lsp)))
-	(condition-case err
-	    (progn
-	      (message (format "Loading %s" file-to-load))
-	      (load (concat initd file-to-load)))
-	  (error (message "Caught error loading %S: %S" file-to-load (error-message-string err))))
-        (message (format "Loading %s took %5.3gs" file-to-load (- (float-time) start-time)))))))
-
 ;; Make custom file not this one
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
