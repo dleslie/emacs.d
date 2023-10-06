@@ -7,8 +7,6 @@
 
 ;;; Code:
 
-;; Where are we storing org files?
-
 ;; Useful bindings
 (global-set-key "\C-w" 'clipboard-kill-region)
 (global-set-key "\M-w" 'clipboard-kill-ring-save)
@@ -27,42 +25,8 @@
 (add-hook 'c++-mode-hook (lambda () (eldoc-mode 1) (c-set-style "java")))
 (add-hook 'c-mode-hook (lambda () (eldoc-mode 1) (c-set-style "java")))
 
-;; My menu
-(defvar my-mode-map
-  (let ((map (make-sparse-keymap)))
-    (easy-menu-define my-menu map
-      "My Menu"
-      '("Mine"
-	      ;; ("Org"
-	      ;;  ["Todo" org-todo-list]
-	      ;;  ["Agenda" org-agenda]
-	      ;;  ["Capture" org-capture])
-	      
-	      ["Todo" org-todo-list]
-	      ["Agenda" org-agenda]
-	      ["Capture" org-capture]
-	      "--"
-	      ["Magit" magit-status]
-        "---"
-        ["Shell Here" eshell-here]
-        ["dos2unix" dos2unix]
-        "--"
-        ["Smartparens Cheat Sheet" s-cheat-sheet]
-        "---"
-        ["Change Theme" change-theme]
-	      ["Next Theme" next-theme]
-	      ["Random Theme" random-theme]
-	      ["Random Dark Theme" random-dark-theme]
-	      ["Random Light Theme" random-light-theme]
-        ["Reset Theme" reset-theme]))
-    map))
-
-(define-minor-mode my-mode
-  "Minor mode to provide my custom menu items."
-  :keymap my-mode-map
-  :global t)
-
-(my-mode t)
+;; Extra C/C++ Mode Hooks
+(add-to-list 'auto-mode-alist '("\\.ino?\\'" . c++-mode))
 
 ;; Enable truncate lines for all text mode buffers
 (add-hook 'text-mode-hook 'toggle-truncate-lines)
@@ -93,21 +57,57 @@
 (delete-selection-mode 1)
 (global-eldoc-mode t)
 (show-paren-mode t)
-
-                                        ;(global-display-line-numbers-mode)
 (global-hl-line-mode t)
 (global-prettify-symbols-mode +1)
-
 (prefer-coding-system 'utf-8)
 
-(defun flatten(x)
-  "Flattens list X."
-  (cond ((null x) nil)
-        ((listp x) (append (flatten (car x)) (flatten (cdr x))))
-        (t (list x))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; My Menu
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defvar my-mode-map
+  (let ((map (make-sparse-keymap)))
+    (easy-menu-define my-menu map
+      "My Menu"
+      '("Mine"
+	      ;; ("Org"
+	      ;;  ["Todo" org-todo-list]
+	      ;;  ["Agenda" org-agenda]
+	      ;;  ["Capture" org-capture])
+
+	      ["Todo" org-todo-list]
+	      ["Agenda" org-agenda]
+	      ["Capture" org-capture]
+	      "--"
+	      ["Magit" magit-status]
+        "---"
+        ["Shell Here" eshell-here]
+        ["dos2unix" dos2unix]
+        "--"
+        ["Smartparens Cheat Sheet" s-cheat-sheet]
+        "---"
+        ["Change Theme" change-theme]
+	      ["Next Theme" next-theme]
+	      ["Random Theme" random-theme]
+	      ["Random Dark Theme" random-dark-theme]
+	      ["Random Light Theme" random-light-theme]
+        ["Reset Theme" reset-theme]))
+    map))
+
+(define-minor-mode my-mode
+  "Minor mode to provide my custom menu items."
+  :keymap my-mode-map
+  :group 'menu
+  :global t)
+
+(my-mode t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Helpful Functions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun eshell-here ()
-  "Opens up a new shell in the directory associated with the current buffer's file.  The eshell is renamed to match that directory to make multiple eshell windows easier."
+  "Opens up a new shell in the directory of the current buffer's file."
   (interactive)
   (let* ((parent (if (buffer-file-name)
                      (file-name-directory (buffer-file-name))
@@ -117,21 +117,7 @@
     (split-window-vertically (- height))
     (other-window 1)
     (eshell "new")
-    (rename-buffer (concat "*eshell: " name "*"))
-    (insert (concat "ls"))
-    (eshell-send-input)))
-
-(defun dir-locals-dir ()
-  "Return the directory local variables directory.
-Code taken from `hack-dir-local-variables'."
-  (let ((variables-file (dir-locals-find-file (or (buffer-file-name) default-directory)))
-        (dir-name nil))
-    (cond
-     ((stringp variables-file)
-      (setq dir-name (file-name-directory variables-file)))
-     ((consp variables-file)
-      (setq dir-name (nth 0 variables-file))))
-    dir-name))
+    (rename-buffer (concat "*eshell: " name "*"))))
 
 (defun dos2unix (buffer)
   "Remove all carriage return from BUFFER."
@@ -143,12 +129,18 @@ Code taken from `hack-dir-local-variables'."
 
 (require 'ansi-color)
 (defun display-ansi-colors ()
+  "Enables ANSI color for the entire buffer."
   (interactive)
   (ansi-color-apply-on-region (point-min) (point-max)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Compilation Mode Improvements
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun my-compilation-custom-hook ()
   "Enable visual line mode."
   (visual-line-mode 1))
+
 (defun my-colorize-compilation-buffer ()
   "Enable ansi colors."
   (read-only-mode nil)
@@ -157,6 +149,10 @@ Code taken from `hack-dir-local-variables'."
 
 (add-hook 'compilation-mode-hook 'my-compilation-custom-hook)
 (add-hook 'compilation-filter-hook 'my-colorize-compilation-buffer)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Dired Mode Improvements
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'dired-x)
 (setq-default dired-omit-files-p t) ; Buffer-local variable
@@ -182,6 +178,10 @@ It will \"remember\" omit state across Dired buffers."
 (define-key dired-mode-map (kbd "C-x M-o") 'dired-omit-switch)
 (add-hook 'dired-mode-hook 'dired-omit-caller)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; IMenu Improvements
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;; Always show imenu
 (defun my-try-to-add-imenu ()
   "Attempt to add imenu."
@@ -189,7 +189,25 @@ It will \"remember\" omit state across Dired buffers."
       nil
       (imenu-add-to-menubar "Imenu")
     (error nil)))
+
 (add-hook 'font-lock-mode-hook 'my-try-to-add-imenu)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Package Management
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Configure package manager
+(require 'package)
+(setq package-archives
+      '(("gnu" . "https://elpa.gnu.org/packages/")
+        ("melpa" . "https://melpa.org/packages/")
+        ("elpy" . "https://jorgenschaefer.github.io/packages/")
+	      ( "jcs-elpa" . "https://jcs-emacs.github.io/jcs-elpa/packages/"))
+      package-archive-priorities
+      '(("elpy" . 90)
+	      ("melpa" . 100)
+	      ("gnu" . 80)
+	      ("jcs-elpa" . 70)))
 
 ;; Configure straight
 (defvar bootstrap-version)
@@ -213,15 +231,50 @@ It will \"remember\" omit state across Dired buffers."
 (setq use-package-always-ensure t)
 (setq package-native-compile t)
 
-(use-package dash)
+(use-package auto-package-update
+  :init
+  (setq auto-package-update-delete-old-versions t
+        auto-package-update-hide-results t)
+  (auto-package-update-maybe))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Short Package Definitions
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package dash)
 (use-package f)
+(use-package clojure-mode)
+(use-package css-mode)
+(use-package js2-mode)
+(use-package json-mode)
+(use-package nim-mode)
+(use-package sly)
+(use-package typescript-mode)
+(use-package flatbuffers-mode)
+(use-package meson-mode)
+(use-package dockerfile-mode)
+(use-package restclient)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Ace Jump
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package ace-jump-mode
   :init
   (global-set-key "\C-c SPC" 'ace-jump-mode)
   (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Dumb Jump
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package dumb-jump
+  :init
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Paredit
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package paredit
   :init
@@ -240,6 +293,33 @@ It will \"remember\" omit state across Dired buffers."
 	          (buffer-name (current-buffer)))
        (sly-mrepl-return)))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Rainbow Delimiters
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package rainbow-delimiters
+  :init
+  (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'ielm-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'lisp-interaction-mode-hook 'rainbow-delimiters-mode)
+  (add-hook 'lisp-mode-hook 'rainbow-delimiters-mode)
+
+  (require 'rainbow-delimiters)
+  (set-face-foreground 'rainbow-delimiters-depth-1-face "#c66")  ; red
+  (set-face-foreground 'rainbow-delimiters-depth-2-face "#6c6")  ; green
+  (set-face-foreground 'rainbow-delimiters-depth-3-face "#69f")  ; blue
+  (set-face-foreground 'rainbow-delimiters-depth-4-face "#cc6")  ; yellow
+  (set-face-foreground 'rainbow-delimiters-depth-5-face "#6cc")  ; cyan
+  (set-face-foreground 'rainbow-delimiters-depth-6-face "#c6c")  ; magenta
+  (set-face-foreground 'rainbow-delimiters-depth-7-face "#ccc")  ; light gray
+  (set-face-foreground 'rainbow-delimiters-depth-8-face "#999")  ; medium gray
+  (set-face-foreground 'rainbow-delimiters-depth-9-face "#666")  ; dark gray
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Ag
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (when (executable-find "ag")
   (use-package ag
     :init
@@ -247,15 +327,9 @@ It will \"remember\" omit state across Dired buffers."
       '(menu-item "Search Files (ag)..." ag :help "Search files for strings or regexps (with ag)...")
       'grep)))
 
-(use-package auto-package-update
-  :init
-  (setq auto-package-update-delete-old-versions t
-        auto-package-update-hide-results t)
-  (auto-package-update-maybe))
-
-(use-package dumb-jump
-  :init
-  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Ido
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package ido
   :init
@@ -264,40 +338,34 @@ It will \"remember\" omit state across Dired buffers."
    ido-enable-flex-matching t
    ido-everywhere t))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Minions (Minor Modes in Modeline)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package minions
+  :config
+  (minions-mode 1))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Marginalia (Minibuffer Sigils)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package marginalia
-  ;; Either bind `marginalia-cycle` globally or only in the minibuffer
   :bind (("M-A" . marginalia-cycle)
          :map minibuffer-local-map
          ("M-A" . marginalia-cycle))
-
-  ;; The :init configuration is always executed (Not lazy!)
   :init
-
-  ;; Must be in the :init section of use-package such that the mode gets
-  ;; enabled right away. Note that this forces loading the package.
   (marginalia-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Vertico (Minibuffer Interaction)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package vertico
   :init
   (vertico-mode)
-
-  ;; Different scroll margin
-  ;; (setq vertico-scroll-margin 0)
-
-  ;; Show more candidates
-  ;; (setq vertico-count 20)
-
-  ;; Grow and shrink the Vertico minibuffer
-  ;; (setq vertico-resize t)
-
-  ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
-  ;; (setq vertico-cycle t)
-  )
-
-;; Persist history over Emacs restarts. Vertico sorts by history position.
-(use-package savehist
-  :init
-  (savehist-mode))
+  (setq vertico-resize t)
+  (setq vertico-cycle t))
 
 ;; A few more useful configurations...
 (use-package emacs
@@ -318,13 +386,20 @@ It will \"remember\" omit state across Dired buffers."
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
-  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-  ;; Vertico commands are hidden in normal buffers.
-  ;; (setq read-extended-command-predicate
-  ;;       #'command-completion-default-include-p)
-
   ;; Enable recursive minibuffers
   (setq enable-recursive-minibuffers t))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Save History (Minibuffer)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package savehist
+  :init
+  (savehist-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Corfu (Completions)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package corfu
   ;; Optional customizations
@@ -361,24 +436,44 @@ It will \"remember\" omit state across Dired buffers."
 				corfu-popupinfo-delay 0.5
 				corfu-preselect-first t)
 
-  ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
-  ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
-  ;; (setq read-extended-command-predicate
-  ;;       #'command-completion-default-include-p)
-
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
   (setq tab-always-indent 'complete))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Orderless
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package orderless
+  :ensure t
+  :init
+  (icomplete-mode)
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles basic partial-completion))
+				                           (eglot (styles orderless)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Flycheck
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package flycheck
   :init
   (add-hook 'prog-mode-hook 'flycheck-mode)
 	(setq flycheck-idle-change-delay 2))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Magit
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (when (executable-find "git")
   (use-package magit
     :init
     (global-set-key "\C-c g" 'magit-status)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Projectile
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package projectile
   :init
@@ -398,122 +493,157 @@ It will \"remember\" omit state across Dired buffers."
   (setq eglot-connect-timeout 240))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CoPilot
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(when (executable-find "node")
+  (use-package copilot
+    :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+    :ensure t
+    :bind (("C-TAB" . 'copilot-accept-completion-by-word)
+           ("C-<tab>" . 'copilot-accept-completion-by-word)
+	         :map copilot-completion-map
+           ("<tab>" . 'copilot-accept-completion)
+           ("TAB" . 'copilot-accept-completion))
+    :init
+    (global-copilot-mode)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Visual Regexp
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package visual-regexp
+  :init
+  (global-set-key "\C-c r" 'vr/replace)
+  (global-set-key "\C-c q" 'vr/query-replace))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Which Key?
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package which-key
+  :init
+  ;; Allow C-h to trigger which-key before it is done automatically
+  (setq which-key-show-early-on-C-h t)
+  ;; make sure which-key doesn't show normally but refreshes quickly after it is
+  ;; triggered.
+  (setq which-key-idle-delay 1)
+  (setq which-key-idle-secondary-delay 0.05)
+  (which-key-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C#
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package csharp-mode
-  :ensure t
-  :init
-  (let* ((dotnet (executable-find "dotnet"))
-	       (dotnet-script (executable-find "dotnet-script")))
-    (when (and dotnet (not dotnet-script))
-      (shell-command (concat "\"" dotnet "\" tool install -g dotnet-script"))))
+(when (executable-find "dotnet")
+  (use-package csharp-mode
+    :ensure t
+    :init
+    (let* ((dotnet (executable-find "dotnet"))
+	         (dotnet-script (executable-find "dotnet-script")))
+      (when (and dotnet (not dotnet-script))
+        (shell-command (concat "\"" dotnet "\" tool install -g dotnet-script"))))
 
-  (defun my-csharp-repl ()
-    "Switch to the CSharpRepl buffer, creating it if necessary."
-    (interactive)
-    (let ((repl (or (executable-find "dotnet-script") (executable-find "csharp"))))
-      (when repl
-	      (if-let ((buf (get-buffer "*CSharpRepl*")))
-            (pop-to-buffer buf)
-	        (when-let ((b (make-comint "CSharpRepl" repl)))
-            (switch-to-buffer-other-window b))))))
-  (defun my/csharp-mode-hook ()
-    (setq-local indent-tabs-mode nil)
-    (setq-local comment-column 40)
-    (setq-local c-basic-offset 4))
-  (add-hook 'csharp-mode-hook #'my/csharp-mode-hook)
-  :config
-  (define-key csharp-mode-map (kbd "C-c C-z") 'my-csharp-repl))
+    (defun my-csharp-repl ()
+      "Switch to the CSharpRepl buffer, creating it if necessary."
+      (interactive)
+      (let ((repl (or (executable-find "dotnet-script") (executable-find "csharp"))))
+        (when repl
+	        (if-let ((buf (get-buffer "*CSharpRepl*")))
+              (pop-to-buffer buf)
+	          (when-let ((b (make-comint "CSharpRepl" repl)))
+              (switch-to-buffer-other-window b))))))
+    (defun my/csharp-mode-hook ()
+      (setq-local indent-tabs-mode nil)
+      (setq-local comment-column 40)
+      (setq-local c-basic-offset 4))
+    (add-hook 'csharp-mode-hook #'my/csharp-mode-hook)
+    :config
+    (define-key csharp-mode-map (kbd "C-c C-z") 'my-csharp-repl)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Janet
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package janet-mode)
-(straight-use-package
- '(inf-janet
-   :type git
-   :host github
-   :repo "velkyel/inf-janet"))
-(add-hook 'janet-mode-hook #'inf-janet-minor-mode)
-(add-hook 'janet-mode-hook #'paredit-mode)
+(when (executable-find "janet")
+  (use-package janet-mode)
+  (straight-use-package
+   '(inf-janet
+     :type git
+     :host github
+     :repo "velkyel/inf-janet"))
+  (add-hook 'janet-mode-hook #'inf-janet-minor-mode)
+  (add-hook 'janet-mode-hook #'paredit-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Ruby
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package ruby-mode
-  :init
-  (autoload 'ruby-mode "ruby-mode" "Ruby Mode" t ".rb")
-  (defun my-ruby-mode-hook ()
-    (require 'inf-ruby)
-    (inf-ruby-keys))
-  (defun launch-ruby ()
-    (interactive)
-    (unless (get-buffer "*ruby*")
-      (let ((buf (current-buffer)))
-	      (inf-ruby)
-	      (set-buffer buf))))
-  (defun kill-ruby ()
-    (interactive)
-    (when (get-buffer "*ruby*")
-      (kill-buffer "*ruby*")))
-  (add-hook 'ruby-mode-hook 'my-ruby-mode-hook))
+(when (executable-find "rvm")
+  (use-package ruby-mode
+    :init
+    (autoload 'ruby-mode "ruby-mode" "Ruby Mode" t ".rb")
+    (defun my-ruby-mode-hook ()
+      (require 'inf-ruby)
+      (inf-ruby-keys))
+    (defun launch-ruby ()
+      (interactive)
+      (unless (get-buffer "*ruby*")
+        (let ((buf (current-buffer)))
+	        (inf-ruby)
+	        (set-buffer buf))))
+    (defun kill-ruby ()
+      (interactive)
+      (when (get-buffer "*ruby*")
+        (kill-buffer "*ruby*")))
+    (add-hook 'ruby-mode-hook 'my-ruby-mode-hook))
 
-(use-package inf-ruby)
+  (use-package inf-ruby)
+  (use-package enh-ruby-mode)
 
-(use-package enh-ruby-mode)
+  (use-package projectile-rails
+    :after projectile
+    :init
+    (advice-add 'projectile-rails-console :before #'kill-ruby)
+    (advice-add 'launch-ruby :after #'projectile-rails-on)
+    (advice-add 'kill-ruby :after #'projectile-rails-off))
 
-(use-package projectile-rails
-  :init
-  (advice-add 'projectile-rails-console :before #'kill-ruby)
-  (advice-add 'launch-ruby :after #'projectile-rails-on)
-  (advice-add 'kill-ruby :after #'projectile-rails-off))
-
-(use-package robe
-  :init
-  (advice-add 'launch-ruby :after #'robe-start))
+  (use-package robe
+    :init
+    (advice-add 'launch-ruby :after #'robe-start)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Rust
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package rust-mode)
+(when (executable-find "cargo")
+  (use-package rust-mode)
 
-(use-package flycheck-rust
-  :config (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+  (use-package flycheck-rust
+    :config (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Scheme
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package geiser
-  :config
-  (setq geiser-chicken-binary (or (executable-find "chicken-csi") (executable-find "csi"))))
+(when (-any? #'executable-find
+             '("chicken" "gambit" "racket" "chez" "gauche" "chibi"))
+  (use-package geiser
+    :config
+    (setq geiser-chicken-binary (or (executable-find "chicken-csi") (executable-find "csi")))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Misc
+;; Markdown
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package clojure-mode)
-(use-package css-mode)
-(use-package js2-mode)
-(use-package json-mode)
-(use-package nim-mode)
-(use-package sly)
-(use-package typescript-mode)
-(use-package flatbuffers-mode)
-(use-package meson-mode)
-
-(add-to-list 'auto-mode-alist '("\\.ino?\\'" . c++-mode))
-
-(use-package dockerfile-mode)
 
 (use-package markdown-mode
   :init
   (autoload 'markdown-mode "markdown-mode" "Markdown Mode" t ".md")
   (autoload 'markdown-mode "markdown-mode" "Markdown Mode" t ".markdown"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Web
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package web-mode
   :init
@@ -532,17 +662,9 @@ It will \"remember\" omit state across Dired buffers."
   (autoload 'web-mode "web-mode" "Web Mode" t ".tsx")
   (autoload 'web-mode "web-mode" "Web Mode" t ".jsx"))
 
-(when (executable-find "node")
-  (use-package copilot
-    :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-    :ensure t
-    :bind (("C-TAB" . 'copilot-accept-completion-by-word)
-           ("C-<tab>" . 'copilot-accept-completion-by-word)
-	         :map copilot-completion-map
-           ("<tab>" . 'copilot-accept-completion)
-           ("TAB" . 'copilot-accept-completion))
-    :init
-    (global-copilot-mode)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Org
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package org
   :ensure t
@@ -598,38 +720,11 @@ It will \"remember\" omit state across Dired buffers."
    ("C-c o s" . org-search-view)
    ("C-c o i" . my-org-show-all-inline-images)))
 
-;; (use-package org-bullets
-;;   :after org
-;;   :straight t
-;;   :init
-;;   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-
-(defvar org-roam-directory '())
 (defvar org--inhibit-version-check t)
 
-;; (use-package org-roam
-;;   :straight t
-;;   :ensure t
-;;   :after org
-;;   :hook
-;;   (after-init . org-roam-mode)
-;;   :custom
-;;   (org-roam-directory (file-truename "~/org/roam"))
-;;   :bind
-;;   (("C-c o r" . org-roam)
-;;    ("C-c o f" . org-roam-find-file)
-;;    ("C-c o g" . org-roam-graph))
-;;   :config
-;;   (setq org-roam-capture-templates
-;; 	'(("d" "default" plain (function org-roam--capture-get-point)
-;; 	   "%?"
-;; 	   :file-name "%<%Y%m%d%H%M%S>-${slug}"
-;; 	   :head "#+title: ${title}\n#+roam_tags: \n\n"
-;; 	   :unnarrowed t)))
-;;   (org-roam-db-autosync-mode))
-
-
-(use-package restclient)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Olivetti (Writing)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package olivetti
   :init
@@ -637,19 +732,48 @@ It will \"remember\" omit state across Dired buffers."
               '(menu-item "Olivetti" olivetti-mode
                           :button (:toggle . (and (boundp 'olivetti-mode) olivetti-mode)))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; WriteRoom (Writing)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package writeroom-mode
   :init
   (define-key text-mode-map [menu-bar text writeroom-mode]
               '(menu-item "Writeroom" writeroom-mode
                           :button (:toggle . (and (boundp 'writeroom-mode) writeroom-mode)))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; DarkRoom (Writing)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package darkroom
+  :init
+  (define-key text-mode-map [menu-bar text darkroom-mode]
+              '(menu-item "Darkroom" darkroom-mode
+                          :button (:toggle . (and (boundp 'darkroom-mode) darkroom-mode))))
+  (add-hook 'darkroom-mode-hook #'menu-bar-mode)
+  (add-hook 'darkroom-mode-hook #'visual-line-mode)
+  ;; Enable darkroom-tentative-mode in all text mode buffers
+  ;(add-hook 'text-mode-hook #'darkroom-tentative-mode)
+  ;(add-hook 'darkroom-tentative-mode-hook #'menu-bar-mode)
+  ;(add-hook 'darkroom-tentative-mode-hook #'visual-line-mode)
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; WriteGood
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package writegood-mode
   :init
-  (define-key text-mode-map [menu-bar text writeroom-mode]
+  (define-key text-mode-map [menu-bar text writegood-mode]
               '(menu-item "Writegood" writegood-mode
                           :button (:toggle . (and (boundp 'writegood-mode) writegood-mode))))
   :init
   (add-hook 'text-mode-hook 'writegood-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Dictionary
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package dictionary
   :init
@@ -657,68 +781,19 @@ It will \"remember\" omit state across Dired buffers."
   (define-key-after global-map [menu-bar tools apps dictionary-search]
     '(menu-item "Dictionary" dictionary-search :help "Search dictionary") t))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Thesaurus
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (use-package powerthesaurus
   :init
   (global-set-key "\C-c t" 'powerthesaurus-lookup-word-dwim)
   (define-key-after global-map [menu-bar tools apps powerthesaurus-lookup-word]
     '(menu-item "Thesaurus" powerthesaurus-lookup-word :help "Search thesaurus") t))
 
-(use-package visual-regexp
-  :init
-  (global-set-key "\C-c r" 'vr/replace)
-  (global-set-key "\C-c q" 'vr/query-replace))
-
-(use-package which-key
-  :init
-  ;; Allow C-h to trigger which-key before it is done automatically
-  (setq which-key-show-early-on-C-h t)
-  ;; make sure which-key doesn't show normally but refreshes quickly after it is
-  ;; triggered.
-  (setq which-key-idle-delay 1)
-  (setq which-key-idle-secondary-delay 0.05)
-  (which-key-mode))
-
-(use-package darkroom
-  :init
-  ;; Enable darkroom-tentative-mode in all text mode buffers
-  (add-hook 'text-mode-hook #'darkroom-tentative-mode)
-  ;; Hide menubar when darkroom is active
-  (add-hook 'darkroom-tentative-mode-hook #'menu-bar-mode)
-  ;; Hide linewrap arrows and other indicators when in darkroom mode
-  (add-hook 'darkroom-tentative-mode-hook #'visual-line-mode))
- ;;; 99-minions.el --- minions
-
-(use-package minions
-  :config
-  (minions-mode 1))
-
-(use-package orderless
-  :ensure t
-  :init
-  (icomplete-mode)
-  :custom
-  (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles basic partial-completion))
-				                           (eglot (styles orderless)))))
-
-(use-package rainbow-delimiters
-  :init
-  (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode)
-  (add-hook 'ielm-mode-hook 'rainbow-delimiters-mode)
-  (add-hook 'lisp-interaction-mode-hook 'rainbow-delimiters-mode)
-  (add-hook 'lisp-mode-hook 'rainbow-delimiters-mode)
-
-  (require 'rainbow-delimiters)
-  (set-face-foreground 'rainbow-delimiters-depth-1-face "#c66")  ; red
-  (set-face-foreground 'rainbow-delimiters-depth-2-face "#6c6")  ; green
-  (set-face-foreground 'rainbow-delimiters-depth-3-face "#69f")  ; blue
-  (set-face-foreground 'rainbow-delimiters-depth-4-face "#cc6")  ; yellow
-  (set-face-foreground 'rainbow-delimiters-depth-5-face "#6cc")  ; cyan
-  (set-face-foreground 'rainbow-delimiters-depth-6-face "#c6c")  ; magenta
-  (set-face-foreground 'rainbow-delimiters-depth-7-face "#ccc")  ; light gray
-  (set-face-foreground 'rainbow-delimiters-depth-8-face "#999")  ; medium gray
-  (set-face-foreground 'rainbow-delimiters-depth-9-face "#666")  ; dark gray
-  )
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Themes
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (setq custom-safe-themes t)
 
