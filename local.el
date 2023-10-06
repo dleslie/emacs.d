@@ -33,16 +33,16 @@
     (easy-menu-define my-menu map
       "My Menu"
       '("Mine"
-	;; ("Org"
-	;;  ["Todo" org-todo-list]
-	;;  ["Agenda" org-agenda]
-	;;  ["Capture" org-capture])
-	
-	["Todo" org-todo-list]
-	["Agenda" org-agenda]
-	["Capture" org-capture]
-	"--"
-	["Magit" magit-status]
+	      ;; ("Org"
+	      ;;  ["Todo" org-todo-list]
+	      ;;  ["Agenda" org-agenda]
+	      ;;  ["Capture" org-capture])
+	      
+	      ["Todo" org-todo-list]
+	      ["Agenda" org-agenda]
+	      ["Capture" org-capture]
+	      "--"
+	      ["Magit" magit-status]
         "---"
         ["Shell Here" eshell-here]
         ["dos2unix" dos2unix]
@@ -50,10 +50,10 @@
         ["Smartparens Cheat Sheet" s-cheat-sheet]
         "---"
         ["Change Theme" change-theme]
-	["Next Theme" next-theme]
-	["Random Theme" random-theme]
-	["Random Dark Theme" random-dark-theme]
-	["Random Light Theme" random-light-theme]
+	      ["Next Theme" next-theme]
+	      ["Random Theme" random-theme]
+	      ["Random Dark Theme" random-dark-theme]
+	      ["Random Light Theme" random-light-theme]
         ["Reset Theme" reset-theme]))
     map))
 
@@ -94,7 +94,7 @@
 (global-eldoc-mode t)
 (show-paren-mode t)
 
-;(global-display-line-numbers-mode)
+                                        ;(global-display-line-numbers-mode)
 (global-hl-line-mode t)
 (global-prettify-symbols-mode +1)
 
@@ -236,8 +236,8 @@ It will \"remember\" omit state across Dired buffers."
    :after
    (lambda ()
      (when (string-prefix-p 
-	    "*sly-mrepl for"
-	    (buffer-name (current-buffer)))
+	          "*sly-mrepl for"
+	          (buffer-name (current-buffer)))
        (sly-mrepl-return)))))
 
 (when (executable-find "ag")
@@ -405,7 +405,7 @@ It will \"remember\" omit state across Dired buffers."
   :ensure t
   :init
   (let* ((dotnet (executable-find "dotnet"))
-	 (dotnet-script (executable-find "dotnet-script")))
+	       (dotnet-script (executable-find "dotnet-script")))
     (when (and dotnet (not dotnet-script))
       (shell-command (concat "\"" dotnet "\" tool install -g dotnet-script"))))
 
@@ -414,9 +414,9 @@ It will \"remember\" omit state across Dired buffers."
     (interactive)
     (let ((repl (or (executable-find "dotnet-script") (executable-find "csharp"))))
       (when repl
-	(if-let ((buf (get-buffer "*CSharpRepl*")))
+	      (if-let ((buf (get-buffer "*CSharpRepl*")))
             (pop-to-buffer buf)
-	  (when-let ((b (make-comint "CSharpRepl" repl)))
+	        (when-let ((b (make-comint "CSharpRepl" repl)))
             (switch-to-buffer-other-window b))))))
   (defun my/csharp-mode-hook ()
     (setq-local indent-tabs-mode nil)
@@ -453,8 +453,8 @@ It will \"remember\" omit state across Dired buffers."
     (interactive)
     (unless (get-buffer "*ruby*")
       (let ((buf (current-buffer)))
-	(inf-ruby)
-	(set-buffer buf))))
+	      (inf-ruby)
+	      (set-buffer buf))))
   (defun kill-ruby ()
     (interactive)
     (when (get-buffer "*ruby*")
@@ -538,7 +538,7 @@ It will \"remember\" omit state across Dired buffers."
     :ensure t
     :bind (("C-TAB" . 'copilot-accept-completion-by-word)
            ("C-<tab>" . 'copilot-accept-completion-by-word)
-	   :map copilot-completion-map
+	         :map copilot-completion-map
            ("<tab>" . 'copilot-accept-completion)
            ("TAB" . 'copilot-accept-completion))
     :init
@@ -549,9 +549,9 @@ It will \"remember\" omit state across Dired buffers."
   :straight nil
   :custom
   (org-directory (file-truename "~/org/")
-   org-default-notes-file (concat (file-truename org-directory) "notes.org")
-   org-agenda-files `(,(concat (file-truename org-directory) "todo.org") ,(concat (file-truename org-directory) "agenda.org"))
-   org-agenda-diary-file (concat (expand-file-name org-directory) "diary.org"))
+                 org-default-notes-file (concat (file-truename org-directory) "notes.org")
+                 org-agenda-files `(,(concat (file-truename org-directory) "todo.org") ,(concat (file-truename org-directory) "agenda.org"))
+                 org-agenda-diary-file (concat (expand-file-name org-directory) "diary.org"))
   :init
   (defun my-org-show-all-inline-images ()
     (interactive)
@@ -634,20 +634,20 @@ It will \"remember\" omit state across Dired buffers."
 (use-package olivetti
   :init
   (define-key text-mode-map [menu-bar text olivetti-mode]
-    '(menu-item "Olivetti" olivetti-mode
-                :button (:toggle . (and (boundp 'olivetti-mode) olivetti-mode)))))
+              '(menu-item "Olivetti" olivetti-mode
+                          :button (:toggle . (and (boundp 'olivetti-mode) olivetti-mode)))))
 
 (use-package writeroom-mode
   :init
   (define-key text-mode-map [menu-bar text writeroom-mode]
-    '(menu-item "Writeroom" writeroom-mode
-                :button (:toggle . (and (boundp 'writeroom-mode) writeroom-mode)))))
+              '(menu-item "Writeroom" writeroom-mode
+                          :button (:toggle . (and (boundp 'writeroom-mode) writeroom-mode)))))
 
 (use-package writegood-mode
   :init
   (define-key text-mode-map [menu-bar text writeroom-mode]
-    '(menu-item "Writegood" writegood-mode
-                :button (:toggle . (and (boundp 'writegood-mode) writegood-mode))))
+              '(menu-item "Writegood" writegood-mode
+                          :button (:toggle . (and (boundp 'writegood-mode) writegood-mode))))
   :init
   (add-hook 'text-mode-hook 'writegood-mode))
 
@@ -699,7 +699,7 @@ It will \"remember\" omit state across Dired buffers."
   :custom
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles basic partial-completion))
-				   (eglot (styles orderless)))))
+				                           (eglot (styles orderless)))))
 
 (use-package rainbow-delimiters
   :init
@@ -718,7 +718,7 @@ It will \"remember\" omit state across Dired buffers."
   (set-face-foreground 'rainbow-delimiters-depth-7-face "#ccc")  ; light gray
   (set-face-foreground 'rainbow-delimiters-depth-8-face "#999")  ; medium gray
   (set-face-foreground 'rainbow-delimiters-depth-9-face "#666")  ; dark gray
-)
+  )
 
 (setq custom-safe-themes t)
 
@@ -759,8 +759,8 @@ It will \"remember\" omit state across Dired buffers."
   "Changes to a random theme."
   (interactive)
   (let ((success nil)
-	(current (car custom-enabled-themes))
-	(all-themes (custom-available-themes)))
+	      (current (car custom-enabled-themes))
+	      (all-themes (custom-available-themes)))
     (let ((new-theme (seq-random-elt all-themes)))
       (message (format "Switching to theme %s" new-theme))
       (ignore-errors (change-theme new-theme)))))
@@ -768,41 +768,39 @@ It will \"remember\" omit state across Dired buffers."
 (defun random-dark-theme ()
   "Changes to a random dark theme."
   (interactive)
-  (do
-      ())
   (while
       (progn
-	(random-theme)
-	(not (background-is-dark)))))
+	      (random-theme)
+	      (not (background-is-dark)))))
 
 (defun random-light-theme ()
   "Changes to a random light theme."
   (interactive)
   (while
       (progn
-	(random-theme)
-	(background-is-dark))))
+	      (random-theme)
+	      (background-is-dark))))
 
 (defun next-theme ()
   "Cycles through all available themes."
   (interactive)
   (let* ((current (car custom-enabled-themes))
-	 (all-themes (custom-available-themes)))
+	       (all-themes (custom-available-themes)))
     (if (not current)
-	(change-theme (car all-themes))
+	      (change-theme (car all-themes))
       (let* ((remaining
-	      (seq-drop all-themes
-			(+ 1 (seq-position all-themes current))))
-	     (next (or (car remaining)
-		       (car all-themes))))
-	(change-theme next)))))
+	            (seq-drop all-themes
+			                  (+ 1 (seq-position all-themes current))))
+	           (next (or (car remaining)
+		                   (car all-themes))))
+	      (change-theme next)))))
 
 (defun background-is-dark ()
   "Returns t if the current theme background is dark"
   (interactive)
   (let ((dark 0.33))
     (seq-every-p (lambda (x) (<= x dark))
-		 (color-name-to-rgb (face-attribute 'default :background)))))
+		             (color-name-to-rgb (face-attribute 'default :background)))))
 
 
 (provide 'local)
