@@ -418,7 +418,6 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package orderless
-  :ensure t
   :init
   (icomplete-mode)
   :custom
@@ -460,7 +459,6 @@ It will \"remember\" omit state across Dired buffers."
 (when (executable-find "node")
   (use-package copilot
     :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-    :ensure t
     :bind (("C-TAB" . 'copilot-accept-completion-by-word)
            ("C-<tab>" . 'copilot-accept-completion-by-word)
 	         :map copilot-completion-map
@@ -506,7 +504,6 @@ It will \"remember\" omit state across Dired buffers."
 
 (when (executable-find "dotnet")
   (use-package csharp-mode
-    :ensure t
     :init
     (let* ((dotnet (executable-find "dotnet"))
 	         (dotnet-script (executable-find "dotnet-script")))
@@ -685,7 +682,6 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package org
-  :ensure t
   :straight nil
   :custom
   (org-directory (file-truename "~/org/")
