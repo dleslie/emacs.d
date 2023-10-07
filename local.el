@@ -1,4 +1,4 @@
-;;; local.el --- local configurations
+;; local.el --- local configurations
 
 ;;; Commentary:
 
@@ -67,8 +67,7 @@
 
 (defvar my-mode-map
   (let ((map (make-sparse-keymap)))
-    (easy-menu-define my-menu map
-      "My Menu"
+    (easy-menu-define my-menu map "MyMenu"
       '("Mine"
 	      ;; ("Org"
 	      ;;  ["Todo" org-todo-list]
@@ -78,20 +77,32 @@
 	      ["Todo" org-todo-list]
 	      ["Agenda" org-agenda]
 	      ["Capture" org-capture]
-	      "--"
+	      "---"
 	      ["Magit" magit-status]
         "---"
         ["Shell Here" eshell-here]
         ["dos2unix" dos2unix]
-        "--"
-        ["Smartparens Cheat Sheet" s-cheat-sheet]
         "---"
-        ["Change Theme" change-theme]
-	      ["Next Theme" next-theme]
-	      ["Random Theme" random-theme]
-	      ["Random Dark Theme" random-dark-theme]
-	      ["Random Light Theme" random-light-theme]
-        ["Reset Theme" reset-theme]))
+        ("Writing"
+         ["Dictionary" dictionary-search]
+         ["Thesaurus" powerthesaurus-lookup-word]
+         ["Writegood" writegood-mode
+          :style toggle :selected (and (boundp 'writegood-mode) writegood-mode) :enable t]
+         "---"
+         ["Darkroom" darkroom-mode
+          :style toggle :selected (and (boundp 'darkroom-mode) darkroom-mode) :enable t]
+         ["Olivetti" olivetti-mode
+          :style toggle :selected (and (boundp 'olivetti-mode) olivetti-mode) :enable t]
+         ["Writeroom" writeroom-mode
+          :style toggle :selected (and (boundp 'writeroom-mode) writeroom-mode) :enable t]
+         )
+        ("Themes"
+         ["Change Theme" change-theme]
+	       ["Next Theme" next-theme]
+	       ["Random Theme" random-theme]
+	       ["Random Dark Theme" random-dark-theme]
+	       ["Random Light Theme" random-light-theme]
+         ["Reset Theme" reset-theme])))
     map))
 
 (define-minor-mode my-mode
@@ -254,6 +265,9 @@ It will \"remember\" omit state across Dired buffers."
 (use-package meson-mode)
 (use-package dockerfile-mode)
 (use-package restclient)
+(use-package olivetti)
+(use-package writeroom-mode)
+(use-package darkroom)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Ace Jump
@@ -475,14 +489,14 @@ It will \"remember\" omit state across Dired buffers."
 ;; Projectile
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package projectile
-  :init
-  (projectile-mode +1)
-  :config
+;; (use-package projectile
+;;   :init
+;;   (projectile-mode +1)
+;;   :config
 
-  (when (string-match-p "Microsoft" (shell-command-to-string "uname -a"))
-    (setq projectile-indexing-method 'native))
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
+;;   (when (string-match-p "Microsoft" (shell-command-to-string "uname -a"))
+;;     (setq projectile-indexing-method 'native))
+;;   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Eglot
@@ -722,54 +736,13 @@ It will \"remember\" omit state across Dired buffers."
 
 (defvar org--inhibit-version-check t)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Olivetti (Writing)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package olivetti
-  :init
-  (define-key text-mode-map [menu-bar text olivetti-mode]
-              '(menu-item "Olivetti" olivetti-mode
-                          :button (:toggle . (and (boundp 'olivetti-mode) olivetti-mode)))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; WriteRoom (Writing)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package writeroom-mode
-  :init
-  (define-key text-mode-map [menu-bar text writeroom-mode]
-              '(menu-item "Writeroom" writeroom-mode
-                          :button (:toggle . (and (boundp 'writeroom-mode) writeroom-mode)))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; DarkRoom (Writing)
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package darkroom
-  :init
-  (define-key text-mode-map [menu-bar text darkroom-mode]
-              '(menu-item "Darkroom" darkroom-mode
-                          :button (:toggle . (and (boundp 'darkroom-mode) darkroom-mode))))
-  (add-hook 'darkroom-mode-hook #'menu-bar-mode)
-  (add-hook 'darkroom-mode-hook #'visual-line-mode)
-  ;; Enable darkroom-tentative-mode in all text mode buffers
-  ;(add-hook 'text-mode-hook #'darkroom-tentative-mode)
-  ;(add-hook 'darkroom-tentative-mode-hook #'menu-bar-mode)
-  ;(add-hook 'darkroom-tentative-mode-hook #'visual-line-mode)
-  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; WriteGood
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package writegood-mode
-  :init
-  (define-key text-mode-map [menu-bar text writegood-mode]
-              '(menu-item "Writegood" writegood-mode
-                          :button (:toggle . (and (boundp 'writegood-mode) writegood-mode))))
-  :init
-  (add-hook 'text-mode-hook 'writegood-mode))
+  :hook (text-mode . writegood-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Dictionary
