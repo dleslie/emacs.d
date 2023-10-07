@@ -18,18 +18,7 @@
 (global-set-key "\C-cs" 'eshell-here)
 (global-set-key [f12] 'toggle-frame-fullscreen)
 (global-set-key (kbd "C-;") 'hippie-expand)
-(global-set-key (kbd "C-,") 'company-complete)
 (global-set-key "\C-c\C-t" 'next-theme)
-
-;; Default C style
-(add-hook 'c++-mode-hook (lambda () (eldoc-mode 1) (c-set-style "java")))
-(add-hook 'c-mode-hook (lambda () (eldoc-mode 1) (c-set-style "java")))
-
-;; Extra C/C++ Mode Hooks
-(add-to-list 'auto-mode-alist '("\\.ino?\\'" . c++-mode))
-
-;; Enable truncate lines for all text mode buffers
-(add-hook 'text-mode-hook 'toggle-truncate-lines)
 
 ;; General Emacs Sanity
 (custom-set-variables
@@ -445,7 +434,7 @@ It will \"remember\" omit state across Dired buffers."
   :hook
   (prog-mode . flycheck-mode)
   :init
-	(setq flycheck-idle-change-delay 2))
+	(setq flycheck-idle-change-delay 0.5))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Magit
@@ -499,6 +488,17 @@ It will \"remember\" omit state across Dired buffers."
   (setq which-key-idle-delay 0.25)
   (setq which-key-idle-secondary-delay 0.05)
   (which-key-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; C/C++
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Default C style
+(add-hook 'c++-mode-hook (lambda () (c-set-style "java")))
+(add-hook 'c-mode-hook (lambda () (c-set-style "java")))
+
+;; Extra C/C++ Mode Hooks
+(add-to-list 'auto-mode-alist '("\\.ino?\\'" . c++-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C#
@@ -648,6 +648,39 @@ It will \"remember\" omit state across Dired buffers."
   (use-package typescript-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Writing
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package writegood-mode
+  :hook (text-mode . writegood-mode))
+(use-package olivetti)
+(use-package writeroom-mode)
+(use-package darkroom)
+
+;; Enable truncate lines for all text mode buffers
+(add-hook 'text-mode-hook 'toggle-truncate-lines)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Dictionary
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package dictionary
+  :init
+  (global-set-key "\C-c d" 'dictionary-search)
+  (define-key-after global-map [menu-bar tools apps dictionary-search]
+    '(menu-item "Dictionary" dictionary-search :help "Search dictionary") t))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Thesaurus
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package powerthesaurus
+  :init
+  (global-set-key "\C-c t" 'powerthesaurus-lookup-word-dwim)
+  (define-key-after global-map [menu-bar tools apps powerthesaurus-lookup-word]
+    '(menu-item "Thesaurus" powerthesaurus-lookup-word :help "Search thesaurus") t))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Org
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -707,37 +740,6 @@ It will \"remember\" omit state across Dired buffers."
 
 (defvar org--inhibit-version-check t)
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Writing
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package writegood-mode
-  :hook (text-mode . writegood-mode))
-(use-package olivetti)
-(use-package writeroom-mode)
-(use-package darkroom)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Dictionary
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package dictionary
-  :init
-  (global-set-key "\C-c d" 'dictionary-search)
-  (define-key-after global-map [menu-bar tools apps dictionary-search]
-    '(menu-item "Dictionary" dictionary-search :help "Search dictionary") t))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Thesaurus
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package powerthesaurus
-  :init
-  (global-set-key "\C-c t" 'powerthesaurus-lookup-word-dwim)
-  (define-key-after global-map [menu-bar tools apps powerthesaurus-lookup-word]
-    '(menu-item "Thesaurus" powerthesaurus-lookup-word :help "Search thesaurus") t))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Themes
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -778,7 +780,7 @@ It will \"remember\" omit state across Dired buffers."
   (load-theme theme))
 
 (defun random-theme ()
-  "Changes to a random theme."
+  "Change to a random theme."
   (interactive)
   (let ((success nil)
 	      (current (car custom-enabled-themes))
@@ -788,7 +790,7 @@ It will \"remember\" omit state across Dired buffers."
       (ignore-errors (change-theme new-theme)))))
 
 (defun random-dark-theme ()
-  "Changes to a random dark theme."
+  "Change to a random dark theme."
   (interactive)
   (while
       (progn
@@ -796,7 +798,7 @@ It will \"remember\" omit state across Dired buffers."
 	      (not (background-is-dark)))))
 
 (defun random-light-theme ()
-  "Changes to a random light theme."
+  "Change to a random light theme."
   (interactive)
   (while
       (progn
@@ -804,7 +806,7 @@ It will \"remember\" omit state across Dired buffers."
 	      (background-is-dark))))
 
 (defun next-theme ()
-  "Cycles through all available themes."
+  "Cycle through all available themes."
   (interactive)
   (let* ((current (car custom-enabled-themes))
 	       (all-themes (custom-available-themes)))
@@ -818,7 +820,7 @@ It will \"remember\" omit state across Dired buffers."
 	      (change-theme next)))))
 
 (defun background-is-dark ()
-  "Returns t if the current theme background is dark"
+  "Return t if the current theme background is dark."
   (interactive)
   (let ((dark 0.33))
     (seq-every-p (lambda (x) (<= x dark))
