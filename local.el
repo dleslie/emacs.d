@@ -94,8 +94,7 @@
          ["Olivetti" olivetti-mode
           :style toggle :selected (and (boundp 'olivetti-mode) olivetti-mode) :enable t]
          ["Writeroom" writeroom-mode
-          :style toggle :selected (and (boundp 'writeroom-mode) writeroom-mode) :enable t]
-         )
+          :style toggle :selected (and (boundp 'writeroom-mode) writeroom-mode) :enable t])
         ("Themes"
          ["Change Theme" change-theme]
 	       ["Next Theme" next-theme]
@@ -249,25 +248,11 @@ It will \"remember\" omit state across Dired buffers."
   (auto-package-update-maybe))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Short Package Definitions
+;; Useful Elisp Extensions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package dash)
 (use-package f)
-(use-package clojure-mode)
-(use-package css-mode)
-(use-package js2-mode)
-(use-package json-mode)
-(use-package nim-mode)
-(use-package sly)
-(use-package typescript-mode)
-(use-package flatbuffers-mode)
-(use-package meson-mode)
-(use-package dockerfile-mode)
-(use-package restclient)
-(use-package olivetti)
-(use-package writeroom-mode)
-(use-package darkroom)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Ace Jump
@@ -472,19 +457,6 @@ It will \"remember\" omit state across Dired buffers."
     ("C-c g" . magit-status)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Projectile
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; (use-package projectile
-;;   :init
-;;   (projectile-mode +1)
-;;   :config
-
-;;   (when (string-match-p "Microsoft" (shell-command-to-string "uname -a"))
-;;     (setq projectile-indexing-method 'native))
-;;   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Eglot
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -570,37 +542,43 @@ It will \"remember\" omit state across Dired buffers."
     :straight (:type git :host github :repo "velkyel/inf-janet")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Common Lisp
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package sly)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Nim
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package nim-mode)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Ruby
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (when (executable-find "rvm")
   (use-package ruby-mode
+    :hook (ruby-mode . inf-ruby-keys)
     :init
-    (autoload 'ruby-mode "ruby-mode" "Ruby Mode" t ".rb")
-    (defun my-ruby-mode-hook ()
-      (require 'inf-ruby)
-      (inf-ruby-keys))
-    (defun launch-ruby ()
-      (interactive)
-      (unless (get-buffer "*ruby*")
-        (let ((buf (current-buffer)))
-	        (inf-ruby)
-	        (set-buffer buf))))
-    (defun kill-ruby ()
-      (interactive)
-      (when (get-buffer "*ruby*")
-        (kill-buffer "*ruby*")))
-    (add-hook 'ruby-mode-hook 'my-ruby-mode-hook))
+    (autoload 'ruby-mode "ruby-mode" "Ruby Mode" t ".rb"))
+
+  (defun launch-ruby ()
+    "Launches a ruby process in a buffer named *ruby*."
+    (interactive)
+    (unless (get-buffer "*ruby*")
+      (let ((buf (current-buffer)))
+	      (inf-ruby)
+	      (set-buffer buf))))
+
+  (defun kill-ruby ()
+    "Kills a ruby process in a buffer named *ruby*."
+    (interactive)
+    (when (get-buffer "*ruby*")
+      (kill-buffer "*ruby*")))
 
   (use-package inf-ruby)
   (use-package enh-ruby-mode)
-
-  (use-package projectile-rails
-    :after projectile
-    :init
-    (advice-add 'projectile-rails-console :before #'kill-ruby)
-    (advice-add 'launch-ruby :after #'projectile-rails-on)
-    (advice-add 'kill-ruby :after #'projectile-rails-off))
 
   (use-package robe
     :init
@@ -612,7 +590,6 @@ It will \"remember\" omit state across Dired buffers."
 
 (when (executable-find "cargo")
   (use-package rust-mode)
-
   (use-package flycheck-rust
     :config (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
 
@@ -636,6 +613,14 @@ It will \"remember\" omit state across Dired buffers."
   (autoload 'markdown-mode "markdown-mode" "Markdown Mode" t ".markdown"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Misc Development Modes
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package flatbuffers-mode)
+(use-package meson-mode)
+(use-package dockerfile-mode)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Web
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -655,6 +640,12 @@ It will \"remember\" omit state across Dired buffers."
   (autoload 'web-mode "web-mode" "Web Mode" t ".html")
   (autoload 'web-mode "web-mode" "Web Mode" t ".tsx")
   (autoload 'web-mode "web-mode" "Web Mode" t ".jsx"))
+(use-package css-mode)
+(use-package js2-mode)
+(use-package json-mode)
+(use-package restclient)
+(when (executable-find "tsc")
+  (use-package typescript-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Org
@@ -718,11 +709,14 @@ It will \"remember\" omit state across Dired buffers."
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; WriteGood
+;; Writing
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package writegood-mode
   :hook (text-mode . writegood-mode))
+(use-package olivetti)
+(use-package writeroom-mode)
+(use-package darkroom)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Dictionary
