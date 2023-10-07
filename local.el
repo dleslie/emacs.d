@@ -274,35 +274,32 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package ace-jump-mode
-  :init
-  (global-set-key "\C-c SPC" 'ace-jump-mode)
-  (autoload 'ace-jump-mode "ace-jump-mode" "Emacs quick move minor mode" t))
+  :bind (("C-." . ace-jump-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Dumb Jump
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package dumb-jump
-  :init
-  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+  :hook (xref-backend-functions . dumb-jump-xref-activate))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Paredit
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package paredit
+  :hook ((emacs-lisp-mode . enable-paredit-mode)
+         (eval-expression-minibuffer-setup . enable-paredit-mode)
+         (ielm-mode . enable-paredit-mode)
+         (lisp-interaction-mode . enable-paredit-mode)
+         (lisp-mode . enable-paredit-mode)
+         (sly-mode . enable-paredit-mode))
   :init
-  (add-hook 'emacs-lisp-mode-hook 'enable-paredit-mode)
-  (add-hook 'eval-expression-minibuffer-setup-hook 'enable-paredit-mode)
-  (add-hook 'ielm-mode-hook 'enable-paredit-mode)
-  (add-hook 'lisp-interaction-mode-hook 'enable-paredit-mode)
-  (add-hook 'lisp-mode-hook 'enable-paredit-mode)
-  (add-hook 'sly-mode-hook 'enable-paredit-mode)
-  (advice-add 
+  (advice-add
    'paredit-RET
    :after
    (lambda ()
-     (when (string-prefix-p 
+     (when (string-prefix-p
 	          "*sly-mrepl for"
 	          (buffer-name (current-buffer)))
        (sly-mrepl-return)))))
@@ -312,23 +309,11 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package rainbow-delimiters
-  :init
-  (add-hook 'emacs-lisp-mode-hook 'rainbow-delimiters-mode)
-  (add-hook 'ielm-mode-hook 'rainbow-delimiters-mode)
-  (add-hook 'lisp-interaction-mode-hook 'rainbow-delimiters-mode)
-  (add-hook 'lisp-mode-hook 'rainbow-delimiters-mode)
-
-  (require 'rainbow-delimiters)
-  (set-face-foreground 'rainbow-delimiters-depth-1-face "#c66")  ; red
-  (set-face-foreground 'rainbow-delimiters-depth-2-face "#6c6")  ; green
-  (set-face-foreground 'rainbow-delimiters-depth-3-face "#69f")  ; blue
-  (set-face-foreground 'rainbow-delimiters-depth-4-face "#cc6")  ; yellow
-  (set-face-foreground 'rainbow-delimiters-depth-5-face "#6cc")  ; cyan
-  (set-face-foreground 'rainbow-delimiters-depth-6-face "#c6c")  ; magenta
-  (set-face-foreground 'rainbow-delimiters-depth-7-face "#ccc")  ; light gray
-  (set-face-foreground 'rainbow-delimiters-depth-8-face "#999")  ; medium gray
-  (set-face-foreground 'rainbow-delimiters-depth-9-face "#666")  ; dark gray
-  )
+  :hook
+  ((emacs-lisp-mode . rainbow-delimiters-mode)
+   (ielm-mode . rainbow-delimiters-mode)
+   (lisp-interaction-mode . rainbow-delimiters-mode)
+   (lisp-mode . rainbow-delimiters-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Ag
@@ -346,7 +331,7 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package ido
-  :init
+  :config
   (setq
    ido-create-new-buffer 'always
    ido-enable-flex-matching t
@@ -368,7 +353,7 @@ It will \"remember\" omit state across Dired buffers."
   :bind (("M-A" . marginalia-cycle)
          :map minibuffer-local-map
          ("M-A" . marginalia-cycle))
-  :init
+  :config
   (marginalia-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -376,10 +361,10 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package vertico
-  :init
+  :config
   (vertico-mode)
-  (setq vertico-resize t)
-  (setq vertico-cycle t))
+  (setq vertico-resize t
+        vertico-cycle t))
 
 ;; A few more useful configurations...
 (use-package emacs
@@ -472,8 +457,9 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package flycheck
+  :hook
+  (prog-mode . flycheck-mode)
   :init
-  (add-hook 'prog-mode-hook 'flycheck-mode)
 	(setq flycheck-idle-change-delay 2))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -482,8 +468,8 @@ It will \"remember\" omit state across Dired buffers."
 
 (when (executable-find "git")
   (use-package magit
-    :init
-    (global-set-key "\C-c g" 'magit-status)))
+    :bind
+    ("C-c g" . magit-status)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Projectile
@@ -527,9 +513,9 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package visual-regexp
-  :init
-  (global-set-key "\C-c r" 'vr/replace)
-  (global-set-key "\C-c q" 'vr/query-replace))
+  :bind
+  (("C-c r" . vr/replace)
+   ("C-c q" . vr/query-replace)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Which Key?
@@ -537,11 +523,8 @@ It will \"remember\" omit state across Dired buffers."
 
 (use-package which-key
   :init
-  ;; Allow C-h to trigger which-key before it is done automatically
   (setq which-key-show-early-on-C-h t)
-  ;; make sure which-key doesn't show normally but refreshes quickly after it is
-  ;; triggered.
-  (setq which-key-idle-delay 1)
+  (setq which-key-idle-delay 0.25)
   (setq which-key-idle-secondary-delay 0.05)
   (which-key-mode))
 
@@ -580,14 +563,11 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (when (executable-find "janet")
-  (use-package janet-mode)
-  (straight-use-package
-   '(inf-janet
-     :type git
-     :host github
-     :repo "velkyel/inf-janet"))
-  (add-hook 'janet-mode-hook #'inf-janet-minor-mode)
-  (add-hook 'janet-mode-hook #'paredit-mode))
+  (use-package janet-mode
+    :hook (janet-mode . paredit-mode))
+  (use-package inf-janet
+    :hook (janet-mode . inf-janet-minor-mode)
+    :straight (:type git :host github :repo "velkyel/inf-janet")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Ruby
