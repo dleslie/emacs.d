@@ -542,7 +542,9 @@ It will \"remember\" omit state across Dired buffers."
 ;; Common Lisp
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package sly)
+(use-package sly
+  :bind (:map sly-mode-map
+              ("C-x 3 ." . xref-find-definitions)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Nim
