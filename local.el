@@ -16,6 +16,7 @@
 (global-set-key "\C-c?" 'menu-bar-mode)
 (global-set-key "\C-c\\" 'comment-or-uncomment-region)
 (global-set-key "\C-cs" 'eshell-here)
+(global-set-key "\C-cp" 'toggle-window-dedication)
 (global-set-key [f12] 'toggle-frame-fullscreen)
 (global-set-key (kbd "C-;") 'hippie-expand)
 (global-set-key "\C-c\C-t" 'next-theme)
@@ -45,7 +46,8 @@
  '(tool-bar-mode nil)
  '(backup-by-copying t)
  '(require-final-newline t)
- '(frame-inhibit-implied-resize t))
+ '(frame-inhibit-implied-resize t)
+ '(switch-to-buffer-obey-display-actions t))
 
 (delete-selection-mode 1)
 (global-eldoc-mode t)
@@ -75,6 +77,8 @@
         "---"
         ["Shell Here" eshell-here]
         ["dos2unix" dos2unix]
+        "---"
+        ["Pin Window" toggle-window-dedication]
         "---"
         ("Writing"
          ["Dictionary" dictionary-search]
@@ -135,6 +139,13 @@
   "Enables ANSI color for the entire buffer."
   (interactive)
   (ansi-color-apply-on-region (point-min) (point-max)))
+
+(defun toggle-window-dedication ()
+  "Toggle whether or not Emacs is allowed to display another buffer in current window."
+  (interactive)
+  (set-window-dedicated-p
+   (selected-window)
+   (not (window-dedicated-p (selected-window)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Compilation Mode Improvements
@@ -262,16 +273,40 @@ It will \"remember\" omit state across Dired buffers."
   :hook (xref-backend-functions . dumb-jump-xref-activate))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Neotree
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package neotree
+  :bind (("<f8>" . neotree-project-dir)
+         ("C-x p C-d" . neotree-project-dir))
+  :init
+  (defun neotree-project-dir ()
+    "Open NeoTree using the project.el root."
+    (interactive)
+    (if (neo-global--window-exists-p)
+        (neotree-hide)
+      (let ((project-dir (project-root (project-current)))
+            (file (buffer-file-name)))
+        (if project-dir
+            (progn
+              (neotree-dir project-dir)
+              (neotree-find file))
+          (message "No project is active."))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Paredit
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package paredit
   :hook ((emacs-lisp-mode . enable-paredit-mode)
-         (eval-expression-minibuffer-setup . enable-paredit-mode)
          (ielm-mode . enable-paredit-mode)
          (lisp-interaction-mode . enable-paredit-mode)
          (lisp-mode . enable-paredit-mode)
-         (sly-mode . enable-paredit-mode))
+         (sly-mode . enable-paredit-mode)
+         (janet-mode . enable-paredit-mode)
+         (scheme-mode . enable-paredit-mode)
+         (geiser-repl-mode . enable-paredit-mode)
+         (geiser-mode . enable-paredit-mode))
   :init
   (advice-add
    'paredit-RET
