@@ -863,6 +863,17 @@ It will \"remember\" omit state across Dired buffers."
     (seq-every-p (lambda (x) (<= x dark))
 		             (color-name-to-rgb (face-attribute 'default :background)))))
 
+(defcustom default-theme 'constant
+  "The default theme to load."
+  :type 'symbol
+  :group 'local)
+
+(defun load-default-theme ()
+  "Load the default theme."
+  (interactive)
+  (change-theme default-theme))
+
+(add-hook 'after-init-hook 'load-default-theme)
 
 (provide 'local)
 ;;; local.el ends here
