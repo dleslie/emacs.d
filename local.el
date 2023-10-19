@@ -147,6 +147,10 @@
    (selected-window)
    (not (window-dedicated-p (selected-window)))))
 
+(defun mode-used-p (mode)
+  "Return t if MODE is used by any buffer."
+  (seq-some (lambda (buf) (and (buffer-live-p buf) (eq (buffer-local-value 'major-mode buf) mode))) (buffer-list)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Compilation Mode Improvements
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -280,10 +284,11 @@ It will \"remember\" omit state across Dired buffers."
   :bind (("<f8>" . neotree-project-dir)
          ("C-x p C-d" . neotree-project-dir))
   :init
+
   (defun neotree-project-dir ()
     "Open NeoTree using the project.el root."
     (interactive)
-    (if (neo-global--window-exists-p)
+    (if (mode-used-p 'neotree-mode)
         (neotree-hide)
       (let ((project-dir (project-root (project-current)))
             (file (buffer-file-name)))
@@ -522,7 +527,7 @@ It will \"remember\" omit state across Dired buffers."
 (use-package which-key
   :init
   (setq which-key-show-early-on-C-h t)
-  (setq which-key-idle-delay 0.25)
+  (setq which-key-idle-delay 2)
   (setq which-key-idle-secondary-delay 0.05)
   (which-key-mode))
 
