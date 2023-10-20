@@ -146,9 +146,13 @@
    (selected-window)
    (not (window-dedicated-p (selected-window)))))
 
-(defun mode-used-p (mode)
-  "Return t if MODE is used by any buffer."
-  (seq-some (lambda (buf) (and (buffer-live-p buf) (eq (buffer-local-value 'major-mode buf) mode))) (buffer-list)))
+(defun mode-visible-p (mode)
+  "Return t if MODE is used by any window."
+  (seq-some
+   (lambda (win)
+     (let ((buf (window-buffer win)))
+       (eq (buffer-local-value 'major-mode buf) mode)))
+   (window-list)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Compilation Mode Improvements
@@ -287,7 +291,7 @@ It will \"remember\" omit state across Dired buffers."
   (defun neotree-project-dir ()
     "Open NeoTree using the project.el root."
     (interactive)
-    (if (mode-used-p 'neotree-mode)
+    (if (mode-visible-p 'neotree-mode)
         (neotree-hide)
       (let ((project-dir (project-root (project-current)))
             (file (buffer-file-name)))
