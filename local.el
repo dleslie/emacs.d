@@ -49,7 +49,6 @@
  '(frame-inhibit-implied-resize t)
  '(switch-to-buffer-obey-display-actions t))
 
-(fringe-mode 'minimal)
 (delete-selection-mode 1)
 (global-eldoc-mode t)
 (show-paren-mode t)
