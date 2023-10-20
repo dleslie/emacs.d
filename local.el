@@ -32,7 +32,6 @@
  '(kill-whole-line t)
  '(indent-tabs-mode nil)
  '(indicate-buffer-boundaries 'left)
- '(indicate-empty-lines t)
  '(inhibit-startup-screen t)
  '(js-indent-level 2)
  '(make-backup-files nil)
