@@ -808,6 +808,7 @@ It will \"remember\" omit state across Dired buffers."
 (use-package almost-mono-themes :defer t)
 (use-package quasi-monochrome-theme :defer t)
 (use-package monochrome-theme :defer t)
+(use-package modus-themes :defer t)
 
 (defun reset-theme ()
   "Disable all active themes."
