@@ -32,3 +32,4 @@ irony/
 network-security.data
 projects
 flycheck_local.el
+org-persist/
