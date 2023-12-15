@@ -421,9 +421,12 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package spacious-padding
-  :ensure t
-  :config
-  (spacious-padding-mode 1))
+  :init
+  (defun my/after-make-frame-spacious (frame)
+    "Make FRAME spacious."
+    (with-selected-frame frame
+      (spacious-padding-mode 1)))
+  (add-hook 'after-make-frame-functions #'my/after-make-frame-spacious))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Corfu (Completions)
