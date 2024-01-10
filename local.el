@@ -743,16 +743,18 @@ It will \"remember\" omit state across Dired buffers."
 
 (use-package org
   :straight nil
-  :custom
-  (org-directory (file-truename "~/org/")
-                 org-default-notes-file (concat (file-truename org-directory) "notes.org")
-                 org-agenda-files `(,(concat (file-truename org-directory) "todo.org") ,(concat (file-truename org-directory) "agenda.org"))
-                 org-agenda-diary-file (concat (expand-file-name org-directory) "diary.org"))
   :init
   (defun my-org-show-all-inline-images ()
     (interactive)
     (org-display-inline-images t t))
+  (defun my-org-directory ()
+    (interactive)
+    (find-file org-directory))
+  (defcustom org-directory (file-truename "~/org") "Location of org documents")
   (setq
+   org-default-notes-file (concat (file-truename org-directory) "notes.org")
+   org-agenda-files `(,(concat (file-truename org-directory) "todo.org") ,(concat (file-truename org-directory) "agenda.org"))
+   org-agenda-diary-file (concat (expand-file-name org-directory) "diary.org")
    org-todo-keywords
    '((sequence "TODO(t)" "PROG(p)" "BLCK(b)" "STAL(s)" "|" "DONE(d)" "WONT(w)"))
    org-todo-keyword-faces
@@ -792,6 +794,7 @@ It will \"remember\" omit state across Dired buffers."
    ("C-c o b" . org-iswitchb)
    ("C-c o t" . org-todo-list)
    ("C-c o s" . org-search-view)
+   ("C-c o d" . my-org-directory)
    ("C-c o i" . my-org-show-all-inline-images)))
 
 (defvar org--inhibit-version-check t)
