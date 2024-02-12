@@ -383,7 +383,7 @@ It will \"remember\" omit state across Dired buffers."
 (use-package vertico
   :config
   (vertico-mode)
-  (setq vertico-resize t
+  (setq vertico-resize nil
         vertico-cycle t))
 
 ;; A few more useful configurations...
@@ -421,12 +421,14 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package spacious-padding
+  :hook
+  ((after-make-frame-functions . #'my/after-make-frame-spacious))
   :init
   (defun my/after-make-frame-spacious (frame)
     "Make FRAME spacious."
     (with-selected-frame frame
       (spacious-padding-mode 1)))
-  (add-hook 'after-make-frame-functions #'my/after-make-frame-spacious))
+  (spacious-padding-mode 1))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Corfu (Completions)
@@ -546,6 +548,17 @@ It will \"remember\" omit state across Dired buffers."
   (which-key-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Tree-Sitter
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package tree-sitter
+  :hook (tree-sitter-after-on . tree-sitter-hl-mode)
+  :init
+  (global-tree-sitter-mode))
+(use-package tree-sitter-langs
+  :after tree-sitter)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C/C++
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -590,11 +603,32 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (when (executable-find "janet")
-  (use-package janet-mode
-    :hook (janet-mode . paredit-mode))
-  (use-package inf-janet
-    :hook (janet-mode . inf-janet-minor-mode)
-    :straight (:type git :host github :repo "velkyel/inf-janet")))
+  (when (and (fboundp 'treesit-available-p) (treesit-available-p))
+      (progn
+        (setq treesit-language-source-alist
+              (if (eq 'windows-nt system-type)
+                  '((janet-simple
+                     . ("https://github.com/sogaiu/tree-sitter-janet-simple"
+                        nil nil "gcc.exe")))
+                '((janet-simple
+                   . ("https://github.com/sogaiu/tree-sitter-janet-simple")))))
+
+        (when (not (treesit-language-available-p 'janet-simple))
+          (treesit-install-language-grammar 'janet-simple))))
+
+  (if (treesit-language-available-p 'janet-simple)
+      (progn
+        (use-package janet-ts-mode
+          :straight (:type git :host github :repo "sogaiu/janet-ts-mode" :files ("*.el")))
+        (use-package ajrepl
+          :hook (janet-ts-mode . ajrepl-interaction-mode)
+          :straight (:type git :host github :repo "sogaiu/ajrepl" :files ("*.el" "ajrepl"))))
+    (progn
+      (use-package janet-mode
+        :hook (janet-mode . paredit-mode))
+      (use-package inf-janet
+        :hook (janet-mode . inf-janet-minor-mode)
+        :straight (:type git :host github :repo "velkyel/inf-janet")))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Common Lisp
