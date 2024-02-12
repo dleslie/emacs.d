@@ -628,7 +628,10 @@ It will \"remember\" omit state across Dired buffers."
         :hook (janet-mode . paredit-mode))
       (use-package inf-janet
         :hook (janet-mode . inf-janet-minor-mode)
-        :straight (:type git :host github :repo "velkyel/inf-janet")))))
+        :straight (:type git :host github :repo "velkyel/inf-janet"))))
+
+  (use-package flycheck-janet
+    :straight (:type git :host github :repo "sogaiu/flycheck-janet" :files ("*.el"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Common Lisp
