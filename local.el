@@ -603,7 +603,9 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (when (executable-find "janet")
-  (when (and (fboundp 'treesit-available-p) (treesit-available-p))
+  (when (and (fboundp 'treesit-available-p)
+             (treesit-available-p)
+             (not (eq 'windows-nt system-type)))
       (progn
         (setq treesit-language-source-alist
               (if (eq 'windows-nt system-type)
@@ -616,7 +618,9 @@ It will \"remember\" omit state across Dired buffers."
         (when (not (treesit-language-available-p 'janet-simple))
           (treesit-install-language-grammar 'janet-simple))))
 
-  (if (treesit-language-available-p 'janet-simple)
+  (if (and (not (eq 'windows-nt system-type))
+           (fboundp 'treesit-available-p)
+           (treesit-language-available-p 'janet-simple))
       (progn
         (use-package janet-ts-mode
           :straight (:type git :host github :repo "sogaiu/janet-ts-mode" :files ("*.el")))
