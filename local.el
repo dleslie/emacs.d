@@ -655,11 +655,8 @@ It will \"remember\" omit state across Dired buffers."
 (when (executable-find "node")
   (use-package copilot
     :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-    :bind (("C-S-TAB" . 'copilot-accept-completion-by-word)
-           ("C-S-<tab>" . 'copilot-accept-completion-by-word)
-	         :map copilot-completion-map
-           ("C-<tab>" . 'copilot-accept-completion)
-           ("C-TAB" . 'copilot-accept-completion))
+    :bind (("C-c <tab>" . 'copilot-accept-completion)
+           ("C-c S-<tab>" . 'copilot-accept-completion-by-word))
     :init
     (global-copilot-mode)))
 
