@@ -53,6 +53,7 @@
 (global-hl-line-mode t)
 (global-prettify-symbols-mode +1)
 (prefer-coding-system 'utf-8)
+(set-message-beep 'silent)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Directories
@@ -659,7 +660,8 @@ It will \"remember\" omit state across Dired buffers."
     :bind (("C-c <tab>" . 'copilot-accept-completion)
            ("C-c S-<tab>" . 'copilot-accept-completion-by-word))
     :init
-    (global-copilot-mode)))
+    (global-copilot-mode)
+    (setq copilot-indent-warning-suppress t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Visual Regexp
