@@ -88,6 +88,7 @@
 	      ["Capture" org-capture]
 	      "---"
 	      ["Magit" magit-status]
+        ["SmartParens Guide" sp-cheat-sheet]
         "---"
         ["Shell Here" eshell-here]
         ["dos2unix" dos2unix]
