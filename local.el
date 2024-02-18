@@ -53,7 +53,9 @@
 (global-hl-line-mode t)
 (global-prettify-symbols-mode +1)
 (prefer-coding-system 'utf-8)
-(set-message-beep 'silent)
+
+(when (fboundp 'set-message-beep)
+  (set-message-beep 'silent))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Directories
