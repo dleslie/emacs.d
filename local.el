@@ -935,5 +935,11 @@ It will \"remember\" omit state across Dired buffers."
 
 (add-hook 'after-init-hook 'load-default-theme)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Extra Miscellaneous
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(add-to-list 'auto-mode-alist '("\\.info\\'" . Info-on-current-buffer))
+
 (provide 'local)
 ;;; local.el ends here
