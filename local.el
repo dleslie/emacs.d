@@ -296,7 +296,8 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package dumb-jump
-  :hook (xref-backend-functions . dumb-jump-xref-activate))
+  :hook (xref-backend-functions . dumb-jump-xref-activate)
+  (setq xref-show-definitions-function #'xref-show-definitions-completing-read))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Neotree
@@ -536,9 +537,9 @@ It will \"remember\" omit state across Dired buffers."
   ;; By default `consult-project-function' uses `project-root' from project.el.
   ;; Optionally configure a different project root function.
   ;;;; 1. project.el (the default)
-  (setq consult-project-function #'consult--default-project--function)
+  ;; (setq consult-project-function #'consult--default-project--function)
   ;;;; 2. vc.el (vc-root-dir)
-  ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
+  (setq consult-project-function (lambda (_) (vc-root-dir)))
   ;;;; 3. locate-dominating-file
   ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
   ;;;; 4. projectile.el (projectile-project-root)
@@ -653,6 +654,17 @@ It will \"remember\" omit state across Dired buffers."
   (setq eglot-connect-timeout 240))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Eldoc-box
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package eldoc-box
+  :hook
+  ((emacs-lisp-mode . eldoc-box-hover-at-point-mode)
+   (eglot-managed-mode . eldoc-box-hover-at-point-mode))
+  :init
+  (setq eldoc-box-clear-with-C-g t))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CoPilot
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -715,9 +727,12 @@ It will \"remember\" omit state across Dired buffers."
   (use-package csharp-mode
     :init
     (let* ((dotnet (executable-find "dotnet"))
-	         (dotnet-script (executable-find "dotnet-script")))
+	         (dotnet-script (executable-find "dotnet-script"))
+           (csharp-ls (executable-find "csharp-ls")))
       (when (and dotnet (not dotnet-script))
-        (shell-command (concat "\"" dotnet "\" tool install -g dotnet-script"))))
+        (shell-command (concat "\"" dotnet "\" tool install -g dotnet-script")))
+      (when (and dotnet (not csharp-ls))
+        (shell-command (concat "\"" dotnet "\" tool install -g csharp-ls"))))
 
     (defun my-csharp-repl ()
       "Switch to the CSharpRepl buffer, creating it if necessary."
@@ -733,6 +748,8 @@ It will \"remember\" omit state across Dired buffers."
       (setq-local comment-column 40)
       (setq-local c-basic-offset 4))
     (add-hook 'csharp-mode-hook #'my/csharp-mode-hook)
+    (add-to-list 'eglot-server-programs
+	               '(csharp-mode . ("csharp-ls")))
     :config
     (define-key csharp-mode-map (kbd "C-c C-z") 'my-csharp-repl)))
 
