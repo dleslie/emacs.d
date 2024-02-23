@@ -758,7 +758,7 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (when (executable-find "janet")
-  (when (and (fboundp 'treesit-available-p)
+  (when (and nil (fboundp 'treesit-available-p)
              (treesit-available-p)
              (not (eq 'windows-nt system-type)))
       (progn
