@@ -296,7 +296,9 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package dumb-jump
-  :hook (xref-backend-functions . dumb-jump-xref-activate)
+  :init
+  (remove-hook 'xref-backend-functions #'etags--xref-backend)
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
   (setq xref-show-definitions-function #'xref-show-definitions-completing-read))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -673,8 +675,17 @@ It will \"remember\" omit state across Dired buffers."
     :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
     :bind (("C-c <tab>" . 'copilot-accept-completion)
            ("C-c S-<tab>" . 'copilot-accept-completion-by-word))
+    :hook ((prog-mode . copilot-mode)
+           (text-mode . copilot-mode)
+           (conf-mode . copilot-mode)
+           (yaml-mode . copilot-mode)
+           (json-mode . copilot-mode)
+           (markdown-mode . copilot-mode)
+           (org-mode . copilot-mode)
+           (latex-mode . copilot-mode))
     :init
-    (global-copilot-mode)
+    ;; Breaks minibuffers
+    ;;(global-copilot-mode)
     (setq copilot-indent-warning-suppress t)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
