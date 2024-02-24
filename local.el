@@ -458,8 +458,8 @@ It will \"remember\" omit state across Dired buffers."
          ;; M-g bindings in `goto-map'
          ("M-g e" . consult-compile-error)
          ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
-         ("M-g g" . consult-goto-line)             ;; orig. goto-line
-         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+;         ("M-g g" . consult-goto-line)             ;; orig. goto-line
+;         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
          ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
          ("M-g m" . consult-mark)
          ("M-g k" . consult-global-mark)
@@ -686,7 +686,11 @@ It will \"remember\" omit state across Dired buffers."
     :init
     ;; Breaks minibuffers
     ;;(global-copilot-mode)
-    (setq copilot-indent-warning-suppress t)))
+
+    (setq copilot-indent-warning-suppress t)
+    (add-to-list 'warning-suppress-log-types '(copilot copilot-no-mode-indent))
+    (add-to-list 'warning-suppress-types '(copilot copilot-no-mode-indent))
+))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Visual Regexp
@@ -760,7 +764,7 @@ It will \"remember\" omit state across Dired buffers."
       (setq-local c-basic-offset 4))
     (add-hook 'csharp-mode-hook #'my/csharp-mode-hook)
     (add-to-list 'eglot-server-programs
-	               '(csharp-mode . ("csharp-ls")))
+	               '(csharp-mode . ("csharp-ls" "-l" "error")))
     :config
     (define-key csharp-mode-map (kbd "C-c C-z") 'my-csharp-repl)))
 
