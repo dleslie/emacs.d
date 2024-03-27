@@ -911,8 +911,11 @@ It will \"remember\" omit state across Dired buffers."
 (use-package js2-mode)
 (use-package json-mode)
 (use-package restclient)
-(when (executable-find "tsc")
-  (use-package typescript-mode))
+(use-package typescript-mode)
+(use-package tide
+  :after typescript-mode
+  :hook (typescript-mode . tide-setup)
+  :hook (tide-mode . tide-hl-identifier-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Writing
