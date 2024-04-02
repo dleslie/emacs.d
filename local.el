@@ -953,6 +953,7 @@ It will \"remember\" omit state across Dired buffers."
 
 (use-package org
   :straight nil
+  :hook ((org-mode . org-num-mode))
   :init
   (defun my-org-show-all-inline-images ()
     (interactive)
