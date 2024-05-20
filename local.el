@@ -716,12 +716,12 @@ It will \"remember\" omit state across Dired buffers."
 ;; Tree-Sitter
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package tree-sitter
-  :hook (tree-sitter-after-on . tree-sitter-hl-mode)
-  :init
-  (global-tree-sitter-mode))
-(use-package tree-sitter-langs
-  :after tree-sitter)
+;(use-package tree-sitter
+;  :hook (tree-sitter-after-on . tree-sitter-hl-mode)
+;  :init
+;  (global-tree-sitter-mode))
+;(use-package tree-sitter-langs
+;  :after tree-sitter)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C/C++
