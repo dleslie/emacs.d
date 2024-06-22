@@ -359,12 +359,11 @@ It will \"remember\" omit state across Dired buffers."
 ;; Ag
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (executable-find "ag")
-  (use-package ag
-    :init
-    (define-key-after global-map [menu-bar tools ag]
-      '(menu-item "Search Files (ag)..." ag :help "Search files for strings or regexps (with ag)...")
-      'grep)))
+(use-package ag
+  :init
+  (define-key-after global-map [menu-bar tools ag]
+    '(menu-item "Search Files (ag)..." ag :help "Search files for strings or regexps (with ag)...")
+    'grep))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Ido
@@ -642,10 +641,9 @@ It will \"remember\" omit state across Dired buffers."
 ;; Magit
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (executable-find "git")
-  (use-package magit
-    :bind
-    ("C-c g" . magit-status)))
+(use-package magit
+  :bind
+  ("C-c g" . magit-status))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Eglot
@@ -670,27 +668,26 @@ It will \"remember\" omit state across Dired buffers."
 ;; CoPilot
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (executable-find "node")
-  (use-package copilot
-    :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-    :bind (("C-c <tab>" . 'copilot-accept-completion)
-           ("C-c S-<tab>" . 'copilot-accept-completion-by-word))
-    :hook ((prog-mode . copilot-mode)
-           (text-mode . copilot-mode)
-           (conf-mode . copilot-mode)
-           (yaml-mode . copilot-mode)
-           (json-mode . copilot-mode)
-           (markdown-mode . copilot-mode)
-           (org-mode . copilot-mode)
-           (latex-mode . copilot-mode))
-    :init
-    ;; Breaks minibuffers
-    ;;(global-copilot-mode)
+(use-package copilot
+  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  :bind (("C-c <tab>" . 'copilot-accept-completion)
+         ("C-c S-<tab>" . 'copilot-accept-completion-by-word))
+  :hook ((prog-mode . copilot-mode)
+         (text-mode . copilot-mode)
+         (conf-mode . copilot-mode)
+         (yaml-mode . copilot-mode)
+         (json-mode . copilot-mode)
+         (markdown-mode . copilot-mode)
+         (org-mode . copilot-mode)
+         (latex-mode . copilot-mode))
+  :init
+  ;; Breaks minibuffers
+  ;;(global-copilot-mode)
 
-    (setq copilot-indent-warning-suppress t)
-    (add-to-list 'warning-suppress-log-types '(copilot copilot-no-mode-indent))
-    (add-to-list 'warning-suppress-types '(copilot copilot-no-mode-indent))
-))
+  (setq copilot-indent-warning-suppress t)
+  (add-to-list 'warning-suppress-log-types '(copilot copilot-no-mode-indent))
+  (add-to-list 'warning-suppress-types '(copilot copilot-no-mode-indent))
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Visual Regexp
@@ -738,73 +735,71 @@ It will \"remember\" omit state across Dired buffers."
 ;; C#
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (executable-find "dotnet")
-  (use-package csharp-mode
-    :init
-    (let* ((dotnet (executable-find "dotnet"))
-	         (dotnet-script (executable-find "dotnet-script"))
-           (csharp-ls (executable-find "csharp-ls")))
-      (when (and dotnet (not dotnet-script))
-        (shell-command (concat "\"" dotnet "\" tool install -g dotnet-script")))
-      (when (and dotnet (not csharp-ls))
-        (shell-command (concat "\"" dotnet "\" tool install -g csharp-ls"))))
+(use-package csharp-mode
+  :init
+  (let* ((dotnet (executable-find "dotnet"))
+	       (dotnet-script (executable-find "dotnet-script"))
+         (csharp-ls (executable-find "csharp-ls")))
+    (when (and dotnet (not dotnet-script))
+      (shell-command (concat "\"" dotnet "\" tool install -g dotnet-script")))
+    (when (and dotnet (not csharp-ls))
+      (shell-command (concat "\"" dotnet "\" tool install -g csharp-ls"))))
 
-    (defun my-csharp-repl ()
-      "Switch to the CSharpRepl buffer, creating it if necessary."
-      (interactive)
-      (let ((repl (or (executable-find "dotnet-script") (executable-find "csharp"))))
-        (when repl
-	        (if-let ((buf (get-buffer "*CSharpRepl*")))
-              (pop-to-buffer buf)
-	          (when-let ((b (make-comint "CSharpRepl" repl)))
-              (switch-to-buffer-other-window b))))))
-    (defun my/csharp-mode-hook ()
-      (setq-local indent-tabs-mode nil)
-      (setq-local comment-column 40)
-      (setq-local c-basic-offset 4))
-    (add-hook 'csharp-mode-hook #'my/csharp-mode-hook)
-    (add-to-list 'eglot-server-programs
-	               '(csharp-mode . ("csharp-ls" "-l" "error")))
-    :config
-    (define-key csharp-mode-map (kbd "C-c C-z") 'my-csharp-repl)))
+  (defun my-csharp-repl ()
+    "Switch to the CSharpRepl buffer, creating it if necessary."
+    (interactive)
+    (let ((repl (or (executable-find "dotnet-script") (executable-find "csharp"))))
+      (when repl
+	      (if-let ((buf (get-buffer "*CSharpRepl*")))
+            (pop-to-buffer buf)
+	        (when-let ((b (make-comint "CSharpRepl" repl)))
+            (switch-to-buffer-other-window b))))))
+  (defun my/csharp-mode-hook ()
+    (setq-local indent-tabs-mode nil)
+    (setq-local comment-column 40)
+    (setq-local c-basic-offset 4))
+  (add-hook 'csharp-mode-hook #'my/csharp-mode-hook)
+  (add-to-list 'eglot-server-programs
+	             '(csharp-mode . ("csharp-ls" "-l" "error")))
+  :config
+  (define-key csharp-mode-map (kbd "C-c C-z") 'my-csharp-repl))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Janet
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (executable-find "janet")
-  (when (and nil (fboundp 'treesit-available-p)
-             (treesit-available-p)
-             (not (eq 'windows-nt system-type)))
-      (progn
-        (setq treesit-language-source-alist
-              (if (eq 'windows-nt system-type)
-                  '((janet-simple
-                     . ("https://github.com/sogaiu/tree-sitter-janet-simple"
-                        nil nil "gcc.exe")))
-                '((janet-simple
-                   . ("https://github.com/sogaiu/tree-sitter-janet-simple")))))
+(when (and nil (fboundp 'treesit-available-p)
+           (treesit-available-p)
+           (not (eq 'windows-nt system-type)))
+  (progn
+    (setq treesit-language-source-alist
+          (if (eq 'windows-nt system-type)
+              '((janet-simple
+                 . ("https://github.com/sogaiu/tree-sitter-janet-simple"
+                    nil nil "gcc.exe")))
+            '((janet-simple
+               . ("https://github.com/sogaiu/tree-sitter-janet-simple")))))
 
-        (when (not (treesit-language-available-p 'janet-simple))
-          (treesit-install-language-grammar 'janet-simple))))
+    (when (not (treesit-language-available-p 'janet-simple))
+      (treesit-install-language-grammar 'janet-simple))))
 
-  (if (and (not (eq 'windows-nt system-type))
-           (fboundp 'treesit-available-p)
-           (treesit-language-available-p 'janet-simple))
-      (progn
-        (use-package janet-ts-mode
-          :straight (:type git :host github :repo "sogaiu/janet-ts-mode" :files ("*.el")))
-        (use-package ajrepl
-          :hook (janet-ts-mode . ajrepl-interaction-mode)
-          :straight (:type git :host github :repo "sogaiu/ajrepl" :files ("*.el" "ajrepl"))))
+(if (and (not (eq 'windows-nt system-type))
+         (fboundp 'treesit-available-p)
+         (treesit-language-available-p 'janet-simple))
     (progn
-      (use-package janet-mode)
-      (use-package inf-janet
-        :hook (janet-mode . inf-janet-minor-mode)
-        :straight (:type git :host github :repo "velkyel/inf-janet"))))
+      (use-package janet-ts-mode
+        :straight (:type git :host github :repo "sogaiu/janet-ts-mode" :files ("*.el")))
+      (use-package ajrepl
+        :hook (janet-ts-mode . ajrepl-interaction-mode)
+        :straight (:type git :host github :repo "sogaiu/ajrepl" :files ("*.el" "ajrepl"))))
+  (progn
+    (use-package janet-mode)
+    (use-package inf-janet
+      :hook (janet-mode . inf-janet-minor-mode)
+      :straight (:type git :host github :repo "velkyel/inf-janet"))))
 
-  (use-package flycheck-janet
-    :straight (:type git :host github :repo "sogaiu/flycheck-janet" :files ("*.el"))))
+(use-package flycheck-janet
+  :straight (:type git :host github :repo "sogaiu/flycheck-janet" :files ("*.el")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Common Lisp
@@ -824,51 +819,69 @@ It will \"remember\" omit state across Dired buffers."
 ;; Ruby
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (executable-find "rvm")
-  (use-package ruby-mode
-    :hook (ruby-mode . inf-ruby-keys)
-    :init
-    (autoload 'ruby-mode "ruby-mode" "Ruby Mode" t ".rb"))
+(use-package ruby-mode
+  :hook (ruby-mode . inf-ruby-keys)
+  :init
+  (autoload 'ruby-mode "ruby-mode" "Ruby Mode" t ".rb"))
 
-  (defun launch-ruby ()
-    "Launches a ruby process in a buffer named *ruby*."
-    (interactive)
-    (unless (get-buffer "*ruby*")
-      (let ((buf (current-buffer)))
-	      (inf-ruby)
-	      (set-buffer buf))))
+(defun launch-ruby ()
+  "Launches a ruby process in a buffer named *ruby*."
+  (interactive)
+  (unless (get-buffer "*ruby*")
+    (let ((buf (current-buffer)))
+	    (inf-ruby)
+	    (set-buffer buf))))
 
-  (defun kill-ruby ()
-    "Kills a ruby process in a buffer named *ruby*."
-    (interactive)
-    (when (get-buffer "*ruby*")
-      (kill-buffer "*ruby*")))
+(defun kill-ruby ()
+  "Kills a ruby process in a buffer named *ruby*."
+  (interactive)
+  (when (get-buffer "*ruby*")
+    (kill-buffer "*ruby*")))
 
-  (use-package inf-ruby)
-  (use-package enh-ruby-mode)
+(use-package inf-ruby)
+(use-package enh-ruby-mode)
 
-  (use-package robe
-    :init
-    (advice-add 'launch-ruby :after #'robe-start)))
+(use-package robe
+  :init
+  (advice-add 'launch-ruby :after #'robe-start))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Rust
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (executable-find "cargo")
-  (use-package rust-mode)
-  (use-package flycheck-rust
-    :config (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
+(use-package rust-mode)
+(use-package flycheck-rust
+  :config (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Scheme
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (-any? #'executable-find
-             '("chicken" "gambit" "racket" "chez" "gauche" "chibi"))
-  (use-package geiser
-    :config
-    (setq geiser-chicken-binary (or (executable-find "chicken-csi") (executable-find "csi")))))
+(use-package geiser
+  :config
+  (setq geiser-chicken-binary (or (executable-find "chicken-csi") (executable-find "csi"))))
+
+(use-package geiser-chez
+  :after geiser)
+(use-package geiser-chibi
+  :after geiser)
+(use-package geiser-chicken
+  :after geiser)
+(use-package geiser-gambit
+  :after geiser)
+(use-package geiser-gauche
+  :after geiser)
+(use-package geiser-guile
+  :after geiser)
+(use-package geiser-kawa
+  :after geiser)
+(use-package geiser-mit
+  :after geiser)
+(use-package geiser-racket
+  :after geiser)
+(use-package geiser-stklos
+  :after geiser)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Markdown
