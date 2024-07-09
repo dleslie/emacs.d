@@ -659,12 +659,12 @@ It will \"remember\" omit state across Dired buffers."
 ;; Eldoc-box
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package eldoc-box
-  :hook
-  ((emacs-lisp-mode . eldoc-box-hover-at-point-mode)
-   (eglot-managed-mode . eldoc-box-hover-at-point-mode))
-  :init
-  (setq eldoc-box-clear-with-C-g t))
+;; (use-package eldoc-box
+;;   :hook
+;;   ((emacs-lisp-mode . eldoc-box-hover-at-point-mode)
+;;    (eglot-managed-mode . eldoc-box-hover-at-point-mode))
+;;   :init
+;;   (setq eldoc-box-clear-with-C-g t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CoPilot
@@ -758,6 +758,7 @@ It will \"remember\" omit state across Dired buffers."
               (pop-to-buffer buf)
 	          (when-let ((b (make-comint "CSharpRepl" repl)))
               (switch-to-buffer-other-window b))))))
+
     (defun my/csharp-mode-hook ()
       (setq-local indent-tabs-mode nil)
       (setq-local comment-column 40)
@@ -865,10 +866,22 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (when (-any? #'executable-find
-             '("chicken" "gambit" "racket" "chez" "gauche" "chibi"))
-  (use-package geiser
+             '("chicken" "gambit" "racket" "chez" "gauche" "chibi" "guile" "kawa" "mit" "stklos"))
+  (use-package geiser)
+  (use-package geiser-chez)
+  (use-package geiser-chibi)
+  (use-package geiser-chicken
     :config
-    (setq geiser-chicken-binary (or (executable-find "chicken-csi") (executable-find "csi")))))
+    (setq geiser-chicken-binary (or (executable-find "chicken-csi") (executable-find "csi"))))
+  (use-package geiser-gambit)
+  (use-package geiser-guile)
+  (use-package geiser-kawa)
+  (use-package geiser-mit)
+  (use-package geiser-racket
+    :init
+    (setq geiser-racket-binary (or (executable-find "racket") (executable-find "racket-text"))))
+  (use-package geiser-stklos))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Markdown
