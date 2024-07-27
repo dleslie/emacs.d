@@ -745,7 +745,6 @@ It will \"remember\" omit state across Dired buffers."
     (when (and dotnet (not csharp-ls))
       (shell-command (concat "\"" dotnet "\" tool install -g csharp-ls"))))
 
-<<<<<<< HEAD
     (defun my-csharp-repl ()
       "Switch to the CSharpRepl buffer, creating it if necessary."
       (interactive)
@@ -764,7 +763,7 @@ It will \"remember\" omit state across Dired buffers."
     (add-to-list 'eglot-server-programs
 	               '(csharp-mode . ("csharp-ls" "-l" "error")))
     :config
-    (define-key csharp-mode-map (kbd "C-c C-z") 'my-csharp-repl)))
+    (define-key csharp-mode-map (kbd "C-c C-z") 'my-csharp-repl))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Janet
