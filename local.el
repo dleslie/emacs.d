@@ -766,6 +766,11 @@ It will \"remember\" omit state across Dired buffers."
     :config
     (define-key csharp-mode-map (kbd "C-c C-z") 'my-csharp-repl))
 
+(use-package dotnet
+  :after csharp-mode
+  :config
+  (add-hook 'csharp-mode-hook 'dotnet-mode))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Janet
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
