@@ -707,6 +707,7 @@ It will \"remember\" omit state across Dired buffers."
   (setq which-key-show-early-on-C-h t)
   (setq which-key-idle-delay 2)
   (setq which-key-idle-secondary-delay 0.05)
+  :config
   (which-key-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
