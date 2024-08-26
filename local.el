@@ -740,31 +740,41 @@ It will \"remember\" omit state across Dired buffers."
   :init
   (let* ((dotnet (executable-find "dotnet"))
 	       (dotnet-script (executable-find "dotnet-script"))
+         (omnisharp (executable-find "OmniSharp"))
          (csharp-ls (executable-find "csharp-ls")))
+
     (when (and dotnet (not dotnet-script))
       (shell-command (concat "\"" dotnet "\" tool install -g dotnet-script")))
-    (when (and dotnet (not csharp-ls))
-      (shell-command (concat "\"" dotnet "\" tool install -g csharp-ls"))))
+    (when (and dotnet (not csharp-ls) (not omnisharp))
+      (shell-command (concat "\"" dotnet "\" tool install -g csharp-ls"))
+      (setq csharp-ls (executable-find "csharp-ls")))
 
-    (defun my-csharp-repl ()
-      "Switch to the CSharpRepl buffer, creating it if necessary."
-      (interactive)
-      (let ((repl (or (executable-find "dotnet-script") (executable-find "csharp"))))
-        (when repl
-	        (if-let ((buf (get-buffer "*CSharpRepl*")))
-              (pop-to-buffer buf)
-	          (when-let ((b (make-comint "CSharpRepl" repl)))
-              (switch-to-buffer-other-window b))))))
+    (cond
+     (omnisharp
+      (add-to-list 'eglot-server-programs
+                   `(csharp-mode . (,omnisharp "-lsp"))))
+     (csharp-ls
+      (add-to-list 'eglot-server-programs
+                   `(csharp-mode . (,csharp-ls "-l" "error"))))))
 
-    (defun my/csharp-mode-hook ()
-      (setq-local indent-tabs-mode nil)
-      (setq-local comment-column 40)
-      (setq-local c-basic-offset 4))
-    (add-hook 'csharp-mode-hook #'my/csharp-mode-hook)
-    (add-to-list 'eglot-server-programs
-	               '(csharp-mode . ("csharp-ls" "-l" "error")))
-    :config
-    (define-key csharp-mode-map (kbd "C-c C-z") 'my-csharp-repl))
+  (defun my-csharp-repl ()
+    "Switch to the CSharpRepl buffer, creating it if necessary."
+    (interactive)
+    (let ((repl (or (executable-find "dotnet-script") (executable-find "csharp"))))
+      (when repl
+	      (if-let ((buf (get-buffer "*CSharpRepl*")))
+            (pop-to-buffer buf)
+	        (when-let ((b (make-comint "CSharpRepl" repl)))
+            (switch-to-buffer-other-window b))))))
+
+  (defun my/csharp-mode-hook ()
+    (setq-local indent-tabs-mode nil)
+    (setq-local comment-column 40)
+    (setq-local c-basic-offset 4))
+  (add-hook 'csharp-mode-hook #'my/csharp-mode-hook)
+
+  :config
+  (define-key csharp-mode-map (kbd "C-c C-z") 'my-csharp-repl))
 
 (use-package dotnet
   :after csharp-mode
