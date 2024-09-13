@@ -338,7 +338,6 @@ It will \"remember\" omit state across Dired buffers."
    (scheme-mode . smartparens-strict-mode)
    (geiser-repl-mode . smartparens-strict-mode)
    (geiser-mode . smartparens-strict-mode)
-   (minibuffer-setup . smartparens-strict-mode)
    (minibuffer-setup . show-smartparens-mode))
   :config
   (require 'smartparens-config)
