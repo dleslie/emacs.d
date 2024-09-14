@@ -667,26 +667,26 @@ It will \"remember\" omit state across Dired buffers."
 ;; CoPilot
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package copilot
-  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  :bind (("C-c <tab>" . 'copilot-accept-completion)
-         ("C-c S-<tab>" . 'copilot-accept-completion-by-word))
-  :hook ((prog-mode . copilot-mode)
-         (text-mode . copilot-mode)
-         (conf-mode . copilot-mode)
-         (yaml-mode . copilot-mode)
-         (json-mode . copilot-mode)
-         (markdown-mode . copilot-mode)
-         (org-mode . copilot-mode)
-         (latex-mode . copilot-mode))
-  :init
-  ;; Breaks minibuffers
-  ;;(global-copilot-mode)
+(when (executable-find "node")
+  (use-package copilot
+    :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+    :bind (("C-c <tab>" . 'copilot-accept-completion)
+           ("C-c S-<tab>" . 'copilot-accept-completion-by-word))
+    :hook ((prog-mode . copilot-mode)
+           (text-mode . copilot-mode)
+           (conf-mode . copilot-mode)
+           (yaml-mode . copilot-mode)
+           (json-mode . copilot-mode)
+           (markdown-mode . copilot-mode)
+           (org-mode . copilot-mode)
+           (latex-mode . copilot-mode))
+    :init
+    ;; Breaks minibuffers
+    ;;(global-copilot-mode)
 
-  (setq copilot-indent-warning-suppress t)
-  (add-to-list 'warning-suppress-log-types '(copilot copilot-no-mode-indent))
-  (add-to-list 'warning-suppress-types '(copilot copilot-no-mode-indent))
-  )
+    (setq copilot-indent-warning-suppress t)
+    (add-to-list 'warning-suppress-log-types '(copilot copilot-no-mode-indent))
+    (add-to-list 'warning-suppress-types '(copilot copilot-no-mode-indent))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Visual Regexp
