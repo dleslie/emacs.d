@@ -1132,6 +1132,8 @@ It will \"remember\" omit state across Dired buffers."
 (defun load-default-theme ()
   "Load the default theme."
   (interactive)
+  (custom-set-faces
+   '(show-paren-match ((t (:background "gray15")))))
   (change-theme default-theme))
 
 (add-hook 'after-init-hook 'load-default-theme)
