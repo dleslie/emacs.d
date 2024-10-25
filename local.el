@@ -717,7 +717,8 @@ It will \"remember\" omit state across Dired buffers."
 
 (when (executable-find "node")
   (use-package copilot
-    :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+    :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
+    :ensure t
     :bind (("C-c <tab>" . 'copilot-accept-completion)
            ("C-c S-<tab>" . 'copilot-accept-completion-by-word))
     :hook ((prog-mode . copilot-mode)
@@ -729,7 +730,6 @@ It will \"remember\" omit state across Dired buffers."
            (org-mode . copilot-mode)
            (latex-mode . copilot-mode))
     :init
-    (copilot-install-server)
     ;; Breaks minibuffers
     ;;(global-copilot-mode)
 
