@@ -729,6 +729,7 @@ It will \"remember\" omit state across Dired buffers."
            (org-mode . copilot-mode)
            (latex-mode . copilot-mode))
     :init
+    (copilot-install-server)
     ;; Breaks minibuffers
     ;;(global-copilot-mode)
 
