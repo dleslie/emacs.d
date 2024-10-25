@@ -740,7 +740,8 @@ It will \"remember\" omit state across Dired buffers."
   (let* ((dotnet (executable-find "dotnet"))
 	       (dotnet-script (executable-find "dotnet-script"))
          (omnisharp (executable-find "OmniSharp"))
-         (csharp-ls (executable-find "csharp-ls")))
+         (csharp-ls (executable-find "csharp-ls"))
+         (alternatives '()))
 
     (when (and dotnet (not dotnet-script))
       (shell-command (concat "\"" dotnet "\" tool install -g dotnet-script")))
@@ -748,13 +749,12 @@ It will \"remember\" omit state across Dired buffers."
       (shell-command (concat "\"" dotnet "\" tool install -g csharp-ls"))
       (setq csharp-ls (executable-find "csharp-ls")))
 
-    (cond
-     (omnisharp
-      (add-to-list 'eglot-server-programs
-                   `(csharp-mode . (,omnisharp "-lsp"))))
-     (csharp-ls
-      (add-to-list 'eglot-server-programs
-                   `(csharp-mode . (,csharp-ls "-l" "error"))))))
+    (when csharp-ls
+      (add-to-list 'alternatives `(,csharp-ls "-l" "error")))
+    (when omnisharp
+      (add-to-list 'alternatives `(,omnisharp "-lsp")))
+    (when alternatives
+      (add-to-list 'eglot-server-programs `(csharp-mode . ,(eglot-alternatives alternatives)))))
 
   (defun my-csharp-repl ()
     "Switch to the CSharpRepl buffer, creating it if necessary."
