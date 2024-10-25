@@ -716,6 +716,7 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (when (executable-find "node")
+  (with-eval-after-load
   (use-package copilot
     :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
     :ensure t
@@ -735,7 +736,7 @@ It will \"remember\" omit state across Dired buffers."
 
     (setq copilot-indent-warning-suppress t)
     (add-to-list 'warning-suppress-log-types '(copilot copilot-no-mode-indent))
-    (add-to-list 'warning-suppress-types '(copilot copilot-no-mode-indent))))
+    (add-to-list 'warning-suppress-types '(copilot copilot-no-mode-indent)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Visual Regexp
