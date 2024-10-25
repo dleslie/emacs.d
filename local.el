@@ -664,9 +664,9 @@ It will \"remember\" omit state across Dired buffers."
 
   :hook
   ;; Save breakpoints on quit
-  ((kill-emacs . dape-breakpoint-save)
-   ;; Load breakpoints on startup
-   (after-init . dape-breakpoint-load))
+  ;;((kill-emacs . dape-breakpoint-save)
+  ;; Load breakpoints on startup
+  ;; (after-init . dape-breakpoint-load))
 
   :config
   ;; Turn on global bindings for setting breakpoints with mouse
@@ -715,28 +715,27 @@ It will \"remember\" omit state across Dired buffers."
 ;; CoPilot
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when (executable-find "node")
-  (with-eval-after-load
-  (use-package copilot
-    :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
-    :ensure t
-    :bind (("C-c <tab>" . 'copilot-accept-completion)
-           ("C-c S-<tab>" . 'copilot-accept-completion-by-word))
-    :hook ((prog-mode . copilot-mode)
-           (text-mode . copilot-mode)
-           (conf-mode . copilot-mode)
-           (yaml-mode . copilot-mode)
-           (json-mode . copilot-mode)
-           (markdown-mode . copilot-mode)
-           (org-mode . copilot-mode)
-           (latex-mode . copilot-mode))
-    :init
-    ;; Breaks minibuffers
-    ;;(global-copilot-mode)
+;; (when (executable-find "node")
+;;   (use-package copilot
+;;     :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
+;;     :ensure t
+;;     :bind (("C-c <tab>" . 'copilot-accept-completion)
+;;            ("C-c S-<tab>" . 'copilot-accept-completion-by-word))
+;;     :hook ((prog-mode . copilot-mode)
+;;            (text-mode . copilot-mode)
+;;            (conf-mode . copilot-mode)
+;;            (yaml-mode . copilot-mode)
+;;            (json-mode . copilot-mode)
+;;            (markdown-mode . copilot-mode)
+;;            (org-mode . copilot-mode)
+;;            (latex-mode . copilot-mode))
+;;     :init
+;;     ;; Breaks minibuffers
+;;     ;;(global-copilot-mode)
 
-    (setq copilot-indent-warning-suppress t)
-    (add-to-list 'warning-suppress-log-types '(copilot copilot-no-mode-indent))
-    (add-to-list 'warning-suppress-types '(copilot copilot-no-mode-indent)))))
+;;     (setq copilot-indent-warning-suppress t)
+;;     (add-to-list 'warning-suppress-log-types '(copilot copilot-no-mode-indent))
+;;     (add-to-list 'warning-suppress-types '(copilot copilot-no-mode-indent))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Visual Regexp
