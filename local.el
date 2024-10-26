@@ -741,7 +741,7 @@ Each element is a cons cell of endpoint and key pairs."
   :group 'ai)
 
 (defcustom prefered-openai-model nil
-  "A key of the openai-credentials list"
+  "A key of the openai-credentials list."
   :type 'string
   :group 'ai)
 
@@ -765,16 +765,17 @@ Each element is a cons cell of endpoint and key pairs."
       :host openai-endpoint
       :models '(test)))
 
-  (use-package ancilla
-    :straight (:host github :repo "shouya/ancilla.el")
+  (when (executable-find "ancilla")
+    (use-package ancilla
+      :straight (:host github :repo "shouya/ancilla.el")
 
-    :bind ("C-c a r" . ancilla-generate-or-rewrite)
-    :bind ("C-c a m" . ancilla-transient-menu) ;; provide shorts like intellij copilot plugins
+      :bind ("C-c a r" . ancilla-generate-or-rewrite)
+      :bind ("C-c a m" . ancilla-transient-menu) ;; provide shorts like intellij copilot plugins
 
-    :custom
-    (ancilla-adaptor-chat-model prefered-openai-model)
-    (ancilla-adaptor-chat-openai-api-key openai-key)
-    (ancilla-adaptor-chat-openai-endpoint openai-endpoint)))
+      :custom
+      (ancilla-adaptor-chat-model prefered-openai-model)
+      (ancilla-adaptor-chat-openai-api-key openai-key)
+      (ancilla-adaptor-chat-openai-endpoint openai-endpoint))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Visual Regexp
