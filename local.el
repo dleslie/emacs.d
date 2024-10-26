@@ -712,7 +712,7 @@ It will \"remember\" omit state across Dired buffers."
 ;;   (setq eldoc-box-clear-with-C-g t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; CoPilot
+;; AI
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; (when (executable-find "node")
@@ -733,9 +733,48 @@ It will \"remember\" omit state across Dired buffers."
 ;;     ;; Breaks minibuffers
 ;;     ;;(global-copilot-mode)
 
-;;     (setq copilot-indent-warning-suppress t)
-;;     (add-to-list 'warning-suppress-log-types '(copilot copilot-no-mode-indent))
-;;     (add-to-list 'warning-suppress-types '(copilot copilot-no-mode-indent))))
+;; A defcustom of alist of OPENAI endpoints and keys
+(defcustom openai-credentials nil
+  "A list of OpenAI API credentials.
+Each element is a cons cell of endpoint and key pairs."
+  :type '(alist :key-type string :value-type (cons string string))
+  :group 'ai)
+
+(defcustom prefered-openai-model nil
+  "A key of the openai-credentials list"
+  :type 'string
+  :group 'ai)
+
+(when-let* ((openai-provider-pair (cdr (assoc prefered-openai-model openai-credentials)))
+            (openai-endpoint (car openai-provider-pair))
+            (openai-key (cdr openai-provider-pair)))
+
+  (setenv "OPENAI_API_KEY" openai-key)
+  (setenv "OPENAI_ENDPOINT" openai-endpoint)
+  (setenv "OPENAI_API_BASE" openai-endpoint)
+
+  (use-package gptel
+    :bind ("C-c a s" . gptel-send)
+    :bind ("C-c a c" . gptel)
+    :bind ("C-c a a r" . gptel-add)
+    :bind ("C-c a a f" . gptel-add-file)
+    :init
+    (gptel-make-openai prefered-openai-model
+      :stream t
+      :protocol "http"
+      :host openai-endpoint
+      :models '(test)))
+
+  (use-package ancilla
+    :straight (:host github :repo "shouya/ancilla.el")
+
+    :bind ("C-c a r" . ancilla-generate-or-rewrite)
+    :bind ("C-c a m" . ancilla-transient-menu) ;; provide shorts like intellij copilot plugins
+
+    :custom
+    (ancilla-adaptor-chat-model prefered-openai-model)
+    (ancilla-adaptor-chat-openai-api-key openai-key)
+    (ancilla-adaptor-chat-openai-endpoint openai-endpoint)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Visual Regexp
