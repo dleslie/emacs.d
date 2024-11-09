@@ -239,15 +239,11 @@ It will \"remember\" omit state across Dired buffers."
 ;; Configure package manager
 (require 'package)
 (setq package-archives
-      '(("gnu" . "https://elpa.gnu.org/packages/")
-        ("melpa" . "https://melpa.org/packages/")
-        ("elpy" . "https://jorgenschaefer.github.io/packages/")
-	      ( "jcs-elpa" . "https://jcs-emacs.github.io/jcs-elpa/packages/"))
+      '(("melpa-stable" . "https://stable.melpa.org/packages/") 
+	("gnu" . "https://elpa.gnu.org/packages/"))
       package-archive-priorities
-      '(("elpy" . 90)
-	      ("melpa" . 100)
-	      ("gnu" . 80)
-	      ("jcs-elpa" . 70)))
+      '(("melpa-stable" . 100)
+        ("gnu" . 80)))
 
 ;; Configure straight
 (defvar bootstrap-version)
