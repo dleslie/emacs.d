@@ -239,10 +239,10 @@ It will \"remember\" omit state across Dired buffers."
 ;; Configure package manager
 (require 'package)
 (setq package-archives
-      '(("melpa-stable" . "https://stable.melpa.org/packages/") 
+      '(("melpa" . "https://melpa.org/packages/") 
 	("gnu" . "https://elpa.gnu.org/packages/"))
       package-archive-priorities
-      '(("melpa-stable" . 100)
+      '(("melpa" . 100)
         ("gnu" . 80)))
 
 ;; Configure straight
