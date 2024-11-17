@@ -104,10 +104,6 @@
          ["Writegood" writegood-mode
           :style toggle :selected (and (boundp 'writegood-mode) writegood-mode) :enable t]
          "---"
-         ["Darkroom" darkroom-mode
-          :style toggle :selected (and (boundp 'darkroom-mode) darkroom-mode) :enable t]
-         ["Olivetti" olivetti-mode
-          :style toggle :selected (and (boundp 'olivetti-mode) olivetti-mode) :enable t]
          ["Writeroom" writeroom-mode
           :style toggle :selected (and (boundp 'writeroom-mode) writeroom-mode) :enable t])
         ("Themes"
@@ -1035,9 +1031,18 @@ Each element is a cons cell of endpoint and key pairs."
 
 (use-package writegood-mode
   :hook (text-mode . writegood-mode))
-(use-package olivetti)
-(use-package writeroom-mode)
-(use-package darkroom)
+(use-package writeroom-mode
+  :config
+  (setq writeroom-fringes-outside-margins 0
+        writeroom-extra-line-spacing 0.1)
+  :init
+  (defun my/writeroom-config ()
+    (setq-local word-wrap t)
+    (fringe-mode 0))
+  (defun my/writeroom-disable ()
+    (fringe-mode nil))
+  (add-hook 'writeroom-mode-hook #'my/writeroom-config)
+  (add-hook 'writeroom-mode-disable-hook #'my/writeroom-disable))
 
 ;; Enable truncate lines for all text mode buffers
 (add-hook 'text-mode-hook 'toggle-truncate-lines)
