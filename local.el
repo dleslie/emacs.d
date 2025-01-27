@@ -707,67 +707,51 @@ It will \"remember\" omit state across Dired buffers."
 ;; AI
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; (when (executable-find "node")
-;;   (use-package copilot
-;;     :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
-;;     :ensure t
-;;     :bind (("C-c <tab>" . 'copilot-accept-completion)
-;;            ("C-c S-<tab>" . 'copilot-accept-completion-by-word))
-;;     :hook ((prog-mode . copilot-mode)
-;;            (text-mode . copilot-mode)
-;;            (conf-mode . copilot-mode)
-;;            (yaml-mode . copilot-mode)
-;;            (json-mode . copilot-mode)
-;;            (markdown-mode . copilot-mode)
-;;            (org-mode . copilot-mode)
-;;            (latex-mode . copilot-mode))
-;;     :init
-;;     ;; Breaks minibuffers
-;;     ;;(global-copilot-mode)
-
-;; A defcustom of alist of OPENAI endpoints and keys
-(defcustom openai-credentials nil
-  "A list of OpenAI API credentials.
-Each element is a cons cell of endpoint and key pairs."
-  :type '(alist :key-type string :value-type (cons string string))
-  :group 'ai)
-
-(defcustom prefered-openai-model nil
-  "A key of the openai-credentials list."
-  :type 'string
-  :group 'ai)
-
-(when-let* ((openai-provider-pair (cdr (assoc prefered-openai-model openai-credentials)))
-            (openai-endpoint (car openai-provider-pair))
-            (openai-key (cdr openai-provider-pair)))
-
-  (setenv "OPENAI_API_KEY" openai-key)
-  (setenv "OPENAI_ENDPOINT" openai-endpoint)
-  (setenv "OPENAI_API_BASE" openai-endpoint)
-
-  (use-package gptel
-    :bind ("C-c a s" . gptel-send)
-    :bind ("C-c a c" . gptel)
-    :bind ("C-c a a r" . gptel-add)
-    :bind ("C-c a a f" . gptel-add-file)
+(when (executable-find "node")
+  (use-package copilot
+    :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
+    :ensure t
+    :bind (("C-c <tab>" . 'copilot-accept-completion)
+           ("C-c S-<tab>" . 'copilot-accept-completion-by-word))
+    :hook ((prog-mode . copilot-mode)
+           (text-mode . copilot-mode)
+           (conf-mode . copilot-mode)
+           (yaml-mode . copilot-mode)
+           (json-mode . copilot-mode)
+           (markdown-mode . copilot-mode)
+           (org-mode . copilot-mode)
+           (latex-mode . copilot-mode))
     :init
-    (gptel-make-openai prefered-openai-model
-      :stream t
-      :protocol "http"
-      :host openai-endpoint
-      :models '(test)))
+    ;; Breaks minibuffers
+    ;;(global-copilot-mode)
+    ))
 
-  (when (executable-find "ancilla")
-    (use-package ancilla
-      :straight (:host github :repo "shouya/ancilla.el")
+(use-package gptel
+  :bind ("C-c a s" . gptel-send)
+  :bind ("C-c a c" . gptel)
+  :bind ("C-c a a r" . gptel-add)
+  :bind ("C-c a a f" . gptel-add-file)
+  :init
+  (setq gptel-backend
+        (gptel-make-openai
+            "llama-cpp"
+          :stream t
+          :protocol "http"
+          :host "localhost:8080"
+          :models '(llama-cpp))
+        gptel-model 'llama-cpp))
 
-      :bind ("C-c a r" . ancilla-generate-or-rewrite)
-      :bind ("C-c a m" . ancilla-transient-menu) ;; provide shorts like intellij copilot plugins
+(when (executable-find "ancilla")
+  (use-package ancilla
+    :straight (:host github :repo "shouya/ancilla.el")
 
-      :custom
-      (ancilla-adaptor-chat-model prefered-openai-model)
-      (ancilla-adaptor-chat-openai-api-key openai-key)
-      (ancilla-adaptor-chat-openai-endpoint openai-endpoint))))
+    :bind ("C-c a r" . ancilla-generate-or-rewrite)
+    :bind ("C-c a m" . ancilla-transient-menu) ;; provide shorts like intellij copilot plugins
+
+    :custom
+    (ancilla-adaptor-chat-model prefered-openai-model)
+    (ancilla-adaptor-chat-openai-api-key openai-key)
+    (ancilla-adaptor-chat-openai-endpoint openai-endpoint)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Visual Regexp
