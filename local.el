@@ -975,13 +975,16 @@ It will \"remember\" omit state across Dired buffers."
       "* %(org-contacts-template-name)\n   :PROPERTIES:\n   :EMAIL: %(org-contacts-template-email)\n   :END:\n   %i%?\n")))
   :bind
   (("C-c o c" . org-capture)
+   ("C-c o g" . my-org-magit)
    ("C-c o a" . org-agenda)
    ("C-c o l" . org-store-link)
    ("C-c o b" . org-iswitchb)
    ("C-c o t" . org-todo-list)
    ("C-c o s" . org-search-view)
    ("C-c o d" . my-org-directory)
-   ("C-c o i" . my-org-show-all-inline-images)))
+   ("C-c o i" . my-org-show-all-inline-images))
+  :config
+  (defun my-org-magit () (interactive) (magit-status org-directory)))
 
 (defvar org--inhibit-version-check t)
 
