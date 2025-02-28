@@ -1089,7 +1089,7 @@ It will \"remember\" omit state across Dired buffers."
     (seq-every-p (lambda (x) (<= x dark))
 		             (color-name-to-rgb (face-attribute 'default :background)))))
 
-(defcustom default-theme 'constant
+(defcustom default-theme 'modus-operandi-tinted
   "The default theme to load."
   :type 'symbol
   :group 'local)
