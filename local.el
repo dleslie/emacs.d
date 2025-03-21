@@ -577,9 +577,9 @@ It will \"remember\" omit state across Dired buffers."
             "llama-cpp"
           :stream t
           :protocol "http"
-          :host "localhost:8080"
-          :models '(llama-cpp))
-        gptel-model 'llama-cpp))
+          :host "localhost:1337"
+          :models '(deepseek-coder-1.3b qwen2.5-coder-7b-instruct))
+        gptel-model 'qwen2.5-coder-7b-instruct))
 
 (when (executable-find "ancilla")
   (use-package ancilla
