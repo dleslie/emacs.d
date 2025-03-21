@@ -1023,7 +1023,6 @@ It will \"remember\" omit state across Dired buffers."
 (use-package solarized-theme :defer t)
 (use-package zenburn-theme :defer t)
 (use-package almost-mono-themes :defer t)
-(use-package quasi-monochrome-theme :defer t)
 (use-package monochrome-theme :defer t)
 (use-package modus-themes :defer t)
 
