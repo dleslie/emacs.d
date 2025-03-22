@@ -44,7 +44,8 @@
  '(backup-by-copying nil)
  '(require-final-newline t)
  '(frame-inhibit-implied-resize t)
- '(switch-to-buffer-obey-display-actions t))
+ '(switch-to-buffer-obey-display-actions t)
+ '(warning-minimum-level :emergency))
 
 (delete-selection-mode 1)
 (global-eldoc-mode t)
@@ -561,10 +562,9 @@ It will \"remember\" omit state across Dired buffers."
            (markdown-mode . copilot-mode)
            (org-mode . copilot-mode)
            (latex-mode . copilot-mode))
-    :init
-    ;; Breaks minibuffers
-    ;;(global-copilot-mode)
-    ))
+    :config
+    (add-to-list 'copilot-indentation-alist
+                 '(org-mode 2))))
 
 (use-package gptel
   :bind ("C-c a s" . gptel-send)
