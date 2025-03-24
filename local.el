@@ -674,6 +674,17 @@ It will \"remember\" omit state across Dired buffers."
 ;; Extra C/C++ Mode Hooks
 (add-to-list 'auto-mode-alist '("\\.ino?\\'" . c++-mode))
 
+(with-eval-after-load 'eglot
+  (add-to-list
+   'eglot-server-programs
+   '((c-mode c++-mode c-ts-mode c++-ts-mode)
+     . ("clangd"
+        "--background-index"
+        "--clang-tidy"
+        "--completion-style=detailed"
+        "--all-scopes-completion"
+        "--pch-storage=memory"))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C#
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
