@@ -550,7 +550,6 @@ It will \"remember\" omit state across Dired buffers."
 
 (when (executable-find "node")
   (use-package copilot
-    :straight (:host github :repo "copilot-emacs/copilot.el" :files ("*.el"))
     :ensure t
     :bind (("C-c <tab>" . 'copilot-accept-completion)
            ("C-c S-<tab>" . 'copilot-accept-completion-by-word))
@@ -565,6 +564,9 @@ It will \"remember\" omit state across Dired buffers."
     :config
     (add-to-list 'copilot-indentation-alist
                  '(org-mode 2))))
+
+(use-package copilot-chat
+  :ensure t)
 
 (use-package gptel
   :bind ("C-c a s" . gptel-send)
