@@ -34,3 +34,6 @@ projects
 flycheck_local.el
 org-persist/
 tree-sitter/
+node_modules/
+package.json
+package-lock.json
