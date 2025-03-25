@@ -566,34 +566,41 @@ It will \"remember\" omit state across Dired buffers."
                  '(org-mode 2))))
 
 (use-package copilot-chat
-  :ensure t)
+  :after copilot
+  :ensure t
+  :hook (git-commit-setup-hook . copilot-chat-insert-commit-message)
+  :bind
+  (:map global-map
+        ("C-c a c c" . copilot-chat-display)
+        ("C-c a c a" . copilot-chat-add-current-buffer)
+        ("C-c a c S-a" . copilot-chat-del-current-buffer)
+        ("C-c a c e" . copilot-chat-explain)
+        ("C-c a c d" . copilot-chat-doc)
+        ("C-c a c r" . copilot-chat-review)
+        ("C-c a c f" . copilot-chat-fix)
+        ("C-c a c o" . copilot-chat-optimize)
+        ("C-c a c t" . copilot-chat-test)
+        ("C-c C-y" . copilot-chat-yank)
+        ("C-c M-y" . copilot-chat-yank-pop)
+        ("C-c C-M-y" . (lambda () (interactive) (copilot-chat-yank-pop -1)))))
 
 (use-package gptel
-  :bind ("C-c a s" . gptel-send)
-  :bind ("C-c a c" . gptel)
-  :bind ("C-c a a r" . gptel-add)
-  :bind ("C-c a a f" . gptel-add-file)
+  :bind ("C-c a g s" . gptel-send)
+  :bind ("C-c a g c" . gptel)
+  :bind ("C-c a g a" . gptel-add)
+  :bind ("C-c a g f" . gptel-add-file)
   :init
   (setq gptel-backend
         (gptel-make-openai
-            "llama-cpp"
+            "local"
           :stream t
           :protocol "http"
           :host "localhost:1337"
           :models '(deepseek-coder-1.3b qwen2.5-coder-7b-instruct))
         gptel-model 'qwen2.5-coder-7b-instruct))
 
-(when (executable-find "ancilla")
-  (use-package ancilla
-    :straight (:host github :repo "shouya/ancilla.el")
 
-    :bind ("C-c a r" . ancilla-generate-or-rewrite)
-    :bind ("C-c a m" . ancilla-transient-menu) ;; provide shorts like intellij copilot plugins
-
-    :custom
-    (ancilla-adaptor-chat-model prefered-openai-model)
-    (ancilla-adaptor-chat-openai-api-key openai-key)
-    (ancilla-adaptor-chat-openai-endpoint openai-endpoint)))
+;; To try: ancilla, ellama
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Visual Regexp
