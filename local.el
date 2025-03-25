@@ -568,7 +568,6 @@ It will \"remember\" omit state across Dired buffers."
 (use-package copilot-chat
   :after copilot
   :ensure t
-  :hook (git-commit-setup-hook . copilot-chat-insert-commit-message)
   :bind
   (:map global-map
         ("C-c a c c" . copilot-chat-display)
@@ -580,6 +579,7 @@ It will \"remember\" omit state across Dired buffers."
         ("C-c a c f" . copilot-chat-fix)
         ("C-c a c o" . copilot-chat-optimize)
         ("C-c a c t" . copilot-chat-test)
+        ("C-c a c m" . copilot-chat-insert-commit-message)
         ("C-c C-y" . copilot-chat-yank)
         ("C-c M-y" . copilot-chat-yank-pop)
         ("C-c C-M-y" . (lambda () (interactive) (copilot-chat-yank-pop -1)))))
