@@ -624,10 +624,12 @@ It will \"remember\" omit state across Dired buffers."
   (elysium-window-style 'vertical))
 
 (use-package gptel
-  :bind (("C-c a g s" . gptel-send)
-         ("C-c a g c" . gptel)
+  :bind (("C-c a g c" . gptel)
          ("C-c a g a" . gptel-add)
-         ("C-c a g f" . gptel-add-file))
+         ("C-c a g f" . gptel-add-file)
+         ("C-c a g m" . gptel-menu))
+  :bind (:map markdown-mode-map
+              ("C-c C-c" . gptel-send))
   :init
   (when ollama-models
     (gptel-make-ollama "Ollama"
@@ -664,7 +666,9 @@ It will \"remember\" omit state across Dired buffers."
 
 (when (and (fboundp 'treesit-available-p)
            (treesit-available-p))
-  (setq treesit-language-source-alist '())
+  (when (or (not (boundp 'treesit-language-source-alist))
+            (not (listp treesit-language-source-alist)))
+    (setq treesit-language-source-alist '()))
   ;; From combobulate: https://github.com/mickeynp/combobulate
   ;; Added c/cpp/c# and rust
   (dolist (grammar
@@ -690,6 +694,15 @@ It will \"remember\" omit state across Dired buffers."
     ;; this obviously prevents that from happening.
     (unless (treesit-language-available-p (car grammar))
       (treesit-install-language-grammar (car grammar))))
+
+  (if (eq 'windows-nt system-type)
+      (add-to-list 'treesit-language-source-alist
+                   '((janet-simple . ("https://github.com/sogaiu/tree-sitter-janet-simple" nil nil "gcc.exe"))))
+    (add-to-list 'treesit-language-source-alist
+                 '((janet-simple . ("https://github.com/sogaiu/tree-sitter-janet-simple")))))
+  (when (not (treesit-language-available-p 'janet-simple))
+    (treesit-install-language-grammar 'janet-simple))
+
   (dolist (mapping
            '((python-mode . python-ts-mode)
              (c-mode . c-ts-mode)
@@ -703,6 +716,7 @@ It will \"remember\" omit state across Dired buffers."
              (conf-toml-mode . toml-ts-mode)
              (go-mode . go-ts-mode)
              (css-mode . css-ts-mode)
+             (janet-mode . janet-ts-mode)
              (json-mode . json-ts-mode)
              (js-json-mode . json-ts-mode)))
     (add-to-list 'major-mode-remap-alist mapping)))
@@ -781,21 +795,6 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Janet
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(when (and (fboundp 'treesit-available-p)
-           (treesit-available-p)
-           (not (eq 'windows-nt system-type)))
-  (progn
-    (setq treesit-language-source-alist
-          (if (eq 'windows-nt system-type)
-              '((janet-simple
-                 . ("https://github.com/sogaiu/tree-sitter-janet-simple"
-                    nil nil "gcc.exe")))
-            '((janet-simple
-               . ("https://github.com/sogaiu/tree-sitter-janet-simple")))))
-
-    (when (not (treesit-language-available-p 'janet-simple))
-      (treesit-install-language-grammar 'janet-simple))))
 
 (if (and (not (eq 'windows-nt system-type))
          (fboundp 'treesit-available-p)
@@ -900,6 +899,7 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package markdown-mode
+  :hook (markdown-mode . visual-line-mode)
   :init
   (autoload 'markdown-mode "markdown-mode" "Markdown Mode" t ".md")
   (autoload 'markdown-mode "markdown-mode" "Markdown Mode" t ".markdown"))
