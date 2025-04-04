@@ -801,12 +801,14 @@ It will \"remember\" omit state across Dired buffers."
          (treesit-language-available-p 'janet-simple))
     (progn
       (use-package janet-ts-mode
+        :hook (janet-ts-mode . smartparens-mode)
         :straight (:type git :host github :repo "sogaiu/janet-ts-mode" :files ("*.el")))
       (use-package ajrepl
         :hook (janet-ts-mode . ajrepl-interaction-mode)
         :straight (:type git :host github :repo "sogaiu/ajrepl" :files ("*.el" "ajrepl"))))
   (progn
-    (use-package janet-mode)
+    (use-package janet-mode
+      :hook (janet-mode . smartparens-mode))
     (use-package inf-janet
       :hook (janet-mode . inf-janet-minor-mode)
       :straight (:type git :host github :repo "velkyel/inf-janet"))))
