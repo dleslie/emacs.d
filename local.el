@@ -553,6 +553,31 @@ It will \"remember\" omit state across Dired buffers."
 ;; AI
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defvar ollama-models nil
+  "List of models available from the ollama CLI.")
+
+(when (executable-find "ollama")
+  (defun ollama-list-models ()
+    "List all available models from the ollama CLI"
+    (interactive)
+    (let ((output (shell-command-to-string "ollama list")))
+      (with-temp-buffer
+        (insert output)
+        (goto-char (point-min))
+        (let ((models '()))
+          ;; Split output by whitespace, model is first column
+          (while (re-search-forward "^\\(\\S-+\\)\\s-+" nil t)
+            ;; Skip if model is "NAME"
+            (when (string= (match-string 1) "NAME")
+              (forward-line))
+            ;; Intern model name as symbol
+            (let ((model (intern (match-string 1))))
+              ;; Add model to list if not already present
+              (unless (member model models)
+                (push model models))))
+          models))))
+  (setq ollama-models (ollama-list-models)))
+
 (when (executable-find "node")
   (use-package copilot
     :ensure t
@@ -604,15 +629,11 @@ It will \"remember\" omit state across Dired buffers."
          ("C-c a g a" . gptel-add)
          ("C-c a g f" . gptel-add-file))
   :init
-  (setq gptel-backend
-        (gptel-make-openai
-            "local"
-          :stream t
-          :protocol "http"
-          :host "localhost:1337"
-          :models '(deepseek-coder-1.3b qwen2.5-coder-7b-instruct))
-        gptel-model 'qwen2.5-coder-7b-instruct))
-
+  (when ollama-models
+    (gptel-make-ollama "Ollama"
+      :host "localhost:11434"
+      :stream t
+      :models ollama-models)))
 
 ;; To try: ancilla, ellama
 
