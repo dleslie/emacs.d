@@ -276,6 +276,11 @@ It will \"remember\" omit state across Dired buffers."
 (use-package dash)
 (use-package f)
 
+(use-package smerge-mode
+  :ensure nil
+  :hook
+  (prog-mode . smerge-mode))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Ace Jump
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -584,11 +589,20 @@ It will \"remember\" omit state across Dired buffers."
         ("C-c M-y" . copilot-chat-yank-pop)
         ("C-c C-M-y" . (lambda () (interactive) (copilot-chat-yank-pop -1)))))
 
+(use-package elysium
+  :after gptel
+  :bind (("C-c a e q" . elysium-query)
+         ("C-c a e c" . elysium-add-context)
+         ("C-c a e w" . elysium-toggle-window))
+  :custom
+  (elysium-window-size 0.33)
+  (elysium-window-style 'vertical))
+
 (use-package gptel
-  :bind ("C-c a g s" . gptel-send)
-  :bind ("C-c a g c" . gptel)
-  :bind ("C-c a g a" . gptel-add)
-  :bind ("C-c a g f" . gptel-add-file)
+  :bind (("C-c a g s" . gptel-send)
+         ("C-c a g c" . gptel)
+         ("C-c a g a" . gptel-add)
+         ("C-c a g f" . gptel-add-file))
   :init
   (setq gptel-backend
         (gptel-make-openai
