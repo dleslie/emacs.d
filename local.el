@@ -553,8 +553,15 @@ It will \"remember\" omit state across Dired buffers."
 ;; AI
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defvar ollama-models nil
-  "List of models available from the ollama CLI.")
+(defcustom ollama-models nil
+  "List of models available from the ollama CLI."
+  :type '(repeat symbol)
+  :group 'ollama)
+
+(defcustom ollama-host "localhost:11434"
+  "Host for the ollama server."
+  :type 'string
+  :group 'ollama)
 
 (when (executable-find "ollama")
   (defun ollama-list-models ()
@@ -576,7 +583,11 @@ It will \"remember\" omit state across Dired buffers."
               (unless (member model models)
                 (push model models))))
           models))))
-  (setq ollama-models (ollama-list-models)))
+  (if (or (not ollama-models) (not (listp ollama-models)))
+      (setq ollama-models (ollama-list-models))
+    (setq ollama-models (append ollama-models (ollama-list-models))))
+  ;; Remove duplicates
+  (setq ollama-models (delete-dups ollama-models)))
 
 (when (executable-find "node")
   (use-package copilot
@@ -633,7 +644,7 @@ It will \"remember\" omit state across Dired buffers."
   :init
   (when ollama-models
     (gptel-make-ollama "Ollama"
-      :host "localhost:11434"
+      :host ollama-host
       :stream t
       :models ollama-models)))
 
