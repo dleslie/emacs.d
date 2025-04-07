@@ -1002,14 +1002,14 @@ It will \"remember\" omit state across Dired buffers."
 ;; Org
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defcustom org-directory (file-truename "~/org") "Location of org documents")
+
 (use-package org
-  :straight nil
   :hook ((org-mode . org-num-mode))
   :init
   (defun my-org-show-all-inline-images ()
     (interactive)
     (org-display-inline-images t t))
-  (defcustom org-directory (file-truename "~/org") "Location of org documents")
   (setopt
    org-default-notes-file (concat (file-truename org-directory) "notes.org")
    org-agenda-files `(,(concat (file-truename org-directory) "todo.org") ,(concat (file-truename org-directory) "agenda.org"))
