@@ -1002,9 +1002,10 @@ It will \"remember\" omit state across Dired buffers."
 ;; Org
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defcustom org-directory (file-truename "~/org") "Location of org documents")
+(defcustom org-directory (file-truename "~/org") "Location of org documents.")
 
 (use-package org
+  :ensure t
   :hook ((org-mode . org-num-mode))
   :init
   (defun my-org-show-all-inline-images ()
