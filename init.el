@@ -19,21 +19,14 @@
   (setq w32-pipe-read-delay 0))
 
 ;; Fix TLS on Windows
-(when
+(when  
     (not (or (string-match-p "Microsoft" (shell-command-to-string "uname -a"))
-	           (eq 'windows-nt system-type)))
+	     (eq 'windows-nt system-type)))
   (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
 
 ;; Disable file handler search during load
 (defvar default-file-name-handler-alist file-name-handler-alist)
 (setq file-name-handler-alist nil)
-
-;; Set elpa package dir by version
-(setopt package-user-dir
-        (locate-user-emacs-file
-         (concat
-          (file-name-as-directory "elpa")
-          emacs-version)))
 
 ;; Load local configurations
 (let ((localel (expand-file-name (concat user-emacs-directory "local"))))
