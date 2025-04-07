@@ -561,8 +561,7 @@ It will \"remember\" omit state across Dired buffers."
 (defcustom ollama-host "localhost:11434"
   "Host for the ollama server."
   :type 'string
-  :group 'ollama
-  :default (or (getenv "OLLAMA_HOST") "localhost:11434"))
+  :group 'ollama)
 (setopt ollama-host (or (getenv "OLLAMA_HOST") ollama-host))
 
 (when (executable-find "ollama")
