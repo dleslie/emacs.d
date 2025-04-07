@@ -192,7 +192,7 @@
 
 (require 'dired-x)
 (setq-default dired-omit-files-p t) ; Buffer-local variable
-(setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
+(setopt dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
 (defvar v-dired-omit t
   "If dired-omit-mode enabled by default.  Don't setq me.")
 (defun dired-omit-switch ()
@@ -200,16 +200,16 @@
 It will \"remember\" omit state across Dired buffers."
   (interactive)
   (if (eq v-dired-omit t)
-      (setq v-dired-omit nil)
-    (setq v-dired-omit t))
+      (setopt v-dired-omit nil)
+    (setopt v-dired-omit t))
   (dired-omit-caller)
   (revert-buffer))
 
 (defun dired-omit-caller ()
   "Ensures dired-omit is working."
   (if v-dired-omit
-      (setq dired-omit-mode t)
-    (setq dired-omit-mode nil)))
+      (setopt dired-omit-mode t)
+    (setopt dired-omit-mode nil)))
 
 (define-key dired-mode-map (kbd "C-x M-o") 'dired-omit-switch)
 (add-hook 'dired-mode-hook 'dired-omit-caller)
@@ -234,7 +234,7 @@ It will \"remember\" omit state across Dired buffers."
 
 ;; Configure package manager
 (require 'package)
-(setq package-archives
+(setopt package-archives
       '(("melpa" . "https://melpa.org/packages/") 
 	("gnu" . "https://elpa.gnu.org/packages/"))
       package-archive-priorities
@@ -260,12 +260,12 @@ It will \"remember\" omit state across Dired buffers."
 (require 'use-package)
 (require 'bind-key)
 (require 'use-package-ensure)
-(setq use-package-always-ensure t)
-(setq package-native-compile t)
+(setopt use-package-always-ensure t)
+(setopt package-native-compile t)
 
 (use-package auto-package-update
   :init
-  (setq auto-package-update-delete-old-versions t
+  (setopt auto-package-update-delete-old-versions t
         auto-package-update-hide-results t)
   (auto-package-update-maybe))
 
@@ -296,7 +296,7 @@ It will \"remember\" omit state across Dired buffers."
   :init
   (remove-hook 'xref-backend-functions #'etags--xref-backend)
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
-  (setq xref-show-definitions-function #'xref-show-definitions-completing-read))
+  (setopt xref-show-definitions-function #'xref-show-definitions-completing-read))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Neotree
@@ -367,7 +367,7 @@ It will \"remember\" omit state across Dired buffers."
 
 (use-package ido
   :config
-  (setq
+  (setopt
    ido-create-new-buffer 'always
    ido-enable-flex-matching t
    ido-everywhere t))
@@ -387,7 +387,7 @@ It will \"remember\" omit state across Dired buffers."
 (use-package vertico
   :config
   (vertico-mode 1)
-  (setq vertico-resize nil
+  (setopt vertico-resize nil
         vertico-cycle t))
 
 ;; A few more useful configurations...
@@ -405,12 +405,12 @@ It will \"remember\" omit state across Dired buffers."
   (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
   ;; Do not allow the cursor in the minibuffer prompt
-  (setq minibuffer-prompt-properties
+  (setopt minibuffer-prompt-properties
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
   ;; Enable recursive minibuffers
-  (setq enable-recursive-minibuffers t))
+  (setopt enable-recursive-minibuffers t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Save History (Minibuffer)
@@ -453,7 +453,7 @@ It will \"remember\" omit state across Dired buffers."
 (use-package emacs
   :init
   ;; TAB cycle if there are only few candidates
-  (setq completion-cycle-threshold 3
+  (setopt completion-cycle-threshold 3
 				corfu-auto t
 				corfu-quit-no-match 'separator
 				corfu-popupinfo-delay 0.5
@@ -461,7 +461,7 @@ It will \"remember\" omit state across Dired buffers."
 
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
-  (setq tab-always-indent 'complete))
+  (setopt tab-always-indent 'complete))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Orderless
@@ -483,7 +483,7 @@ It will \"remember\" omit state across Dired buffers."
   :hook
   (prog-mode . flycheck-mode)
   :init
-	(setq flycheck-idle-change-delay 0.5))
+	(setopt flycheck-idle-change-delay 0.5))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Magit
@@ -499,7 +499,7 @@ It will \"remember\" omit state across Dired buffers."
 
 (use-package eglot
   :init
-  (setq eglot-connect-timeout 240))
+  (setopt eglot-connect-timeout 240))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; DAPE
@@ -509,7 +509,7 @@ It will \"remember\" omit state across Dired buffers."
   :preface
   ;; By default dape shares the same keybinding prefix as `gud'
   ;; If you do not want to use any prefix, set it to nil.
-  ;; (setq dape-key-prefix "\C-x\C-a")
+  ;; (setopt dape-key-prefix "\C-x\C-a")
 
   ;:hook
   ;; Save breakpoints on quit
@@ -522,17 +522,17 @@ It will \"remember\" omit state across Dired buffers."
   (dape-breakpoint-global-mode)
 
   ;; Info buffers to the right
-  (setq dape-buffer-window-arrangement 'right)
+  (setopt dape-buffer-window-arrangement 'right)
 
   ;; Info buffers like gud (gdb-mi)
-  ;; (setq dape-buffer-window-arrangement 'gud)
-  ;; (setq dape-info-hide-mode-line nil)
+  ;; (setopt dape-buffer-window-arrangement 'gud)
+  ;; (setopt dape-info-hide-mode-line nil)
 
   ;; Pulse source line (performance hit)
   (add-hook 'dape-display-source-hook 'pulse-momentary-highlight-one-line)
 
   ;; Showing inlay hints
-  (setq dape-inlay-hints t)
+  (setopt dape-inlay-hints t)
 
   ;; Save buffers on startup, useful for interpreted languages
   (add-hook 'dape-start-hook (lambda () (save-some-buffers t t)))
@@ -541,7 +541,7 @@ It will \"remember\" omit state across Dired buffers."
   (add-hook 'dape-compile-hook 'kill-buffer)
 
   ;; Projectile users
-  ;; (setq dape-cwd-fn 'projectile-project-root)
+  ;; (setopt dape-cwd-fn 'projectile-project-root)
   )
 
 ;; Enable repeat mode for more ergonomic `dape' use
@@ -584,10 +584,10 @@ It will \"remember\" omit state across Dired buffers."
                 (push model models))))
           models))))
   (if (or (not ollama-models) (not (listp ollama-models)))
-      (setq ollama-models (ollama-list-models))
-    (setq ollama-models (append ollama-models (ollama-list-models))))
+      (setopt ollama-models (ollama-list-models))
+    (setopt ollama-models (append ollama-models (ollama-list-models))))
   ;; Remove duplicates
-  (setq ollama-models (delete-dups ollama-models)))
+  (setopt ollama-models (delete-dups ollama-models)))
 
 (when (executable-find "node")
   (use-package copilot
@@ -665,9 +665,9 @@ It will \"remember\" omit state across Dired buffers."
 
 (use-package which-key
   :init
-  (setq which-key-show-early-on-C-h t)
-  (setq which-key-idle-delay 2)
-  (setq which-key-idle-secondary-delay 0.05)
+  (setopt which-key-show-early-on-C-h t)
+  (setopt which-key-idle-delay 2)
+  (setopt which-key-idle-secondary-delay 0.05)
   :config
   (which-key-mode))
 
@@ -679,7 +679,7 @@ It will \"remember\" omit state across Dired buffers."
            (treesit-available-p))
   (when (or (not (boundp 'treesit-language-source-alist))
             (not (listp treesit-language-source-alist)))
-    (setq treesit-language-source-alist '()))
+    (setopt treesit-language-source-alist '()))
   ;; From combobulate: https://github.com/mickeynp/combobulate
   ;; Added c/cpp/c# and rust
   (dolist (grammar
@@ -770,7 +770,7 @@ It will \"remember\" omit state across Dired buffers."
       (shell-command (concat "\"" dotnet "\" tool install -g dotnet-script")))
     (when (and dotnet (not csharp-ls) (not omnisharp))
       (shell-command (concat "\"" dotnet "\" tool install -g csharp-ls"))
-      (setq csharp-ls (executable-find "csharp-ls")))
+      (setopt csharp-ls (executable-find "csharp-ls")))
 
     (when csharp-ls
       (add-to-list 'alternatives `(,csharp-ls "-l" "error")))
@@ -891,7 +891,7 @@ It will \"remember\" omit state across Dired buffers."
 (use-package geiser-chicken
   :after geiser
   :config
-  (setq geiser-chicken-binary (or (executable-find "chicken-csi") (executable-find "csi"))))
+  (setopt geiser-chicken-binary (or (executable-find "chicken-csi") (executable-find "csi"))))
 (use-package geiser-gambit
   :after geiser)
 (use-package geiser-gauche
@@ -963,7 +963,7 @@ It will \"remember\" omit state across Dired buffers."
   :hook (text-mode . writegood-mode))
 (use-package writeroom-mode
   :config
-  (setq writeroom-fringes-outside-margins 0
+  (setopt writeroom-fringes-outside-margins 0
         writeroom-extra-line-spacing 0.1)
   :init
   (defun my/writeroom-config ()
@@ -1009,7 +1009,7 @@ It will \"remember\" omit state across Dired buffers."
     (interactive)
     (org-display-inline-images t t))
   (defcustom org-directory (file-truename "~/org") "Location of org documents")
-  (setq
+  (setopt
    org-default-notes-file (concat (file-truename org-directory) "notes.org")
    org-agenda-files `(,(concat (file-truename org-directory) "todo.org") ,(concat (file-truename org-directory) "agenda.org"))
    org-agenda-diary-file (concat (expand-file-name org-directory) "diary.org")
@@ -1074,7 +1074,7 @@ It will \"remember\" omit state across Dired buffers."
 ;; Themes
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(setq custom-safe-themes t)
+(setopt custom-safe-themes t)
 
 (use-package afternoon-theme :defer t)
 (use-package alect-themes :defer t)
