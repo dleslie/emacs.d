@@ -35,12 +35,12 @@
 ;; Make custom file not this one
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
-;; Enable file handler
-(setq file-name-handler-alist default-file-name-handler-alist)
-
 ;; Load custom.el
 (when (file-exists-p custom-file)
   (load custom-file))
+
+;; Enable file handler
+(setq file-name-handler-alist default-file-name-handler-alist)
 
 ;; Enable GC
 (setq gc-cons-threshold 16777216
