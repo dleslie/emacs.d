@@ -425,43 +425,29 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package corfu
-  ;; Optional customizations
-  :custom
-  (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-auto t)                 ;; Enable auto completion
-  (corfu-separator ?\s)          ;; Orderless field separator
-  (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  (corfu-preview-current t)      ;; Disable current candidate preview
-  (corfu-preselect-first nil)    ;; Disable candidate preselection
-  (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-  (corfu-scroll-margin 5)        ;; Use scroll margin
-
-  ;; Enable Corfu only for certain modes.
-  ;; :hook ((prog-mode . corfu-mode)
-  ;;        (shell-mode . corfu-mode)
-  ;;        (eshell-mode . corfu-mode))
-
-  ;; Recommended: Enable Corfu globally.
-  ;; This is recommended since Dabbrev can be used globally (M-/).
-  ;; See also `corfu-excluded-modes'.
   :init
   (global-corfu-mode)
-	(corfu-popupinfo-mode))
-
-;; A few more useful configurations...
-(use-package emacs
-  :init
-  ;; TAB cycle if there are only few candidates
-  (setopt completion-cycle-threshold 3
-				corfu-auto t
-				corfu-quit-no-match 'separator
-				corfu-popupinfo-delay 0.5
-				corfu-preselect-first t)
-
-  ;; Enable indentation+completion using the TAB key.
-  ;; `completion-at-point' is often bound to M-TAB.
-  (setopt tab-always-indent 'complete))
+	(corfu-popupinfo-mode)
+  (corfu-history-mode t)
+  :config
+  (require 'corfu-info)
+  (require 'corfu-history)
+  :custom
+	(corfu-auto t)
+	(corfu-popupinfo-delay 0.5)
+	(corfu-quit-no-match 'separator)
+  (completion-cycle-threshold 3)
+  (corfu-auto t)
+  (corfu-cycle t)
+  (corfu-on-exact-match nil)
+  (corfu-preselect-first t)
+  (corfu-preview-current t)
+  (corfu-quit-at-boundary nil)
+  (corfu-quit-no-match 'separator)
+  (corfu-scroll-margin 5)
+  (corfu-separator ?\s)
+  (tab-always-indent 'complete)
+  (corfu-excluded-modes '(org-mode text-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Orderless
@@ -636,6 +622,7 @@ It will \"remember\" omit state across Dired buffers."
   (elysium-window-style 'vertical))
 
 (use-package gptel
+    :after markdown-mode
   :bind (("C-c a g c" . gptel)
          ("C-c a g a" . gptel-add)
          ("C-c a g f" . gptel-add-file)
