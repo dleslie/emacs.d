@@ -622,19 +622,21 @@ It will \"remember\" omit state across Dired buffers."
   (elysium-window-style 'vertical))
 
 (use-package gptel
-  :after markdown-mode
   :bind (("C-c a g c" . gptel)
          ("C-c a g a" . gptel-add)
          ("C-c a g f" . gptel-add-file)
          ("C-c a g m" . gptel-menu))
-  :bind (:map markdown-mode-map
-              ("C-c C-c" . gptel-send))
   :init
   (when ollama-models
-    (gptel-make-ollama "Ollama"
-      :host ollama-host
-      :stream t
-      :models ollama-models)))
+    (setopt gptel-backend
+            (gptel-make-ollama "Ollama"
+              :host ollama-host
+              :stream t
+              :models ollama-models))
+    (when (or (not (boundp gptel-model))
+              (not gptel-model)
+              (not (member gptel-model ollama-models)))
+      (setopt gptel-model (car ollama-models)))))
 
 ;; To try: ancilla, ellama
 
