@@ -622,7 +622,7 @@ It will \"remember\" omit state across Dired buffers."
   (elysium-window-style 'vertical))
 
 (use-package gptel
-    :after markdown-mode
+  :after markdown-mode
   :bind (("C-c a g c" . gptel)
          ("C-c a g a" . gptel-add)
          ("C-c a g f" . gptel-add-file)
@@ -652,10 +652,10 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package which-key
-  :init
-  (setopt which-key-show-early-on-C-h t)
-  (setopt which-key-idle-delay 2)
-  (setopt which-key-idle-secondary-delay 0.05)
+  :custom
+  (which-key-show-early-on-C-h t)
+  (which-key-idle-delay 2.0)
+  (which-key-idle-secondary-delay 0.05)
   :config
   (which-key-mode))
 
@@ -665,37 +665,38 @@ It will \"remember\" omit state across Dired buffers."
 
 (when (and (fboundp 'treesit-available-p)
            (treesit-available-p))
+
   (use-package treesit-langs
     :straight (:type git :host github :repo "emacs-tree-sitter/treesit-langs")
     :config
-    (treesit-langs-major-mode-setup)))
+    (treesit-langs-major-mode-setup)
 
-  (if (eq 'windows-nt system-type)
+    (if (eq 'windows-nt system-type)
+        (add-to-list 'treesit-language-source-alist
+                     '((janet-simple . ("https://github.com/sogaiu/tree-sitter-janet-simple" nil nil "gcc.exe"))))
       (add-to-list 'treesit-language-source-alist
-                   '((janet-simple . ("https://github.com/sogaiu/tree-sitter-janet-simple" nil nil "gcc.exe"))))
-    (add-to-list 'treesit-language-source-alist
-                 '((janet-simple . ("https://github.com/sogaiu/tree-sitter-janet-simple")))))
-  (when (not (treesit-language-available-p 'janet-simple))
-    (treesit-install-language-grammar 'janet-simple))
+                   '((janet-simple . ("https://github.com/sogaiu/tree-sitter-janet-simple")))))
+    (when (not (treesit-language-available-p 'janet-simple))
+      (treesit-install-language-grammar 'janet-simple))
 
-  (dolist
-      (mapping
-       '((python-mode . python-ts-mode)
-         (c-mode . c-ts-mode)
-         (cpp-mode . cpp-ts-mode)
-         (css-mode . css-ts-mode)
-         (rust-mode . rust-ts-mode)
-         (csharp-mode . csharp-ts-mode)
-         (typescript-mode . typescript-ts-mode)
-         (js2-mode . js-ts-mode)
-         (bash-mode . bash-ts-mode)
-         (conf-toml-mode . toml-ts-mode)
-         (go-mode . go-ts-mode)
-         (css-mode . css-ts-mode)
-         (janet-mode . janet-ts-mode)
-         (json-mode . json-ts-mode)
-         (js-json-mode . json-ts-mode)))
-    (add-to-list 'major-mode-remap-alist mapping)))
+    (dolist
+        (mapping
+         '((python-mode . python-ts-mode)
+           (c-mode . c-ts-mode)
+           (cpp-mode . cpp-ts-mode)
+           (css-mode . css-ts-mode)
+           (rust-mode . rust-ts-mode)
+           (csharp-mode . csharp-ts-mode)
+           (typescript-mode . typescript-ts-mode)
+           (js2-mode . js-ts-mode)
+           (bash-mode . bash-ts-mode)
+           (conf-toml-mode . toml-ts-mode)
+           (go-mode . go-ts-mode)
+           (css-mode . css-ts-mode)
+           (janet-mode . janet-ts-mode)
+           (json-mode . json-ts-mode)
+           (js-json-mode . json-ts-mode)))
+      (add-to-list 'major-mode-remap-alist mapping))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C/C++
