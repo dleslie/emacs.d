@@ -576,9 +576,9 @@ It will \"remember\" omit state across Dired buffers."
   ;; Remove duplicates
   (setopt ollama-models (delete-dups ollama-models)))
 
-(when (executable-find "node")
+(when (and (executable-find "node")
+           (not (eq 'android system-type)))
   (use-package copilot
-    :ensure t
     :bind (("C-c <tab>" . 'copilot-accept-completion)
            ("C-c S-<tab>" . 'copilot-accept-completion-by-word))
     :hook ((prog-mode . copilot-mode)
@@ -591,26 +591,25 @@ It will \"remember\" omit state across Dired buffers."
            (latex-mode . copilot-mode))
     :config
     (add-to-list 'copilot-indentation-alist
-                 '(org-mode 2))))
+                 '(org-mode 2)))
 
-(use-package copilot-chat
-  :after copilot
-  :ensure t
-  :bind
-  (:map global-map
-        ("C-c a c c" . copilot-chat-display)
-        ("C-c a c a" . copilot-chat-add-current-buffer)
-        ("C-c a c S-a" . copilot-chat-del-current-buffer)
-        ("C-c a c e" . copilot-chat-explain)
-        ("C-c a c d" . copilot-chat-doc)
-        ("C-c a c r" . copilot-chat-review)
-        ("C-c a c f" . copilot-chat-fix)
-        ("C-c a c o" . copilot-chat-optimize)
-        ("C-c a c t" . copilot-chat-test)
-        ("C-c a c m" . copilot-chat-insert-commit-message)
-        ("C-c C-y" . copilot-chat-yank)
-        ("C-c M-y" . copilot-chat-yank-pop)
-        ("C-c C-M-y" . (lambda () (interactive) (copilot-chat-yank-pop -1)))))
+  (use-package copilot-chat
+    :after copilot
+    :bind
+    (:map global-map
+          ("C-c a c c" . copilot-chat-display)
+          ("C-c a c a" . copilot-chat-add-current-buffer)
+          ("C-c a c S-a" . copilot-chat-del-current-buffer)
+          ("C-c a c e" . copilot-chat-explain)
+          ("C-c a c d" . copilot-chat-doc)
+          ("C-c a c r" . copilot-chat-review)
+          ("C-c a c f" . copilot-chat-fix)
+          ("C-c a c o" . copilot-chat-optimize)
+          ("C-c a c t" . copilot-chat-test)
+          ("C-c a c m" . copilot-chat-insert-commit-message)
+          ("C-c C-y" . copilot-chat-yank)
+          ("C-c M-y" . copilot-chat-yank-pop)
+          ("C-c C-M-y" . (lambda () (interactive) (copilot-chat-yank-pop -1))))))
 
 (use-package elysium
   :after gptel
