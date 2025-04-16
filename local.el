@@ -968,29 +968,44 @@ It will \"remember\" omit state across Dired buffers."
 ;; Org
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defcustom org-directory (file-truename "~/org") "Location of org documents.")
+(defcustom org-directory (file-truename "~/org") "Location of org documents."
+  :type 'directory
+  :group 'org)
 
 (use-package org
+  :after magit
   :ensure t
-  :hook ((org-mode . org-num-mode))
-  :init
-  (defun my-org-show-all-inline-images ()
-    (interactive)
-    (org-display-inline-images t t))
-  (setopt
-   org-default-notes-file (concat (file-truename org-directory) "notes.org")
-   org-agenda-files `(,(concat (file-truename org-directory) "todo.org") ,(concat (file-truename org-directory) "agenda.org"))
-   org-agenda-diary-file (concat (expand-file-name org-directory) "diary.org")
-   org-todo-keywords
-   '((sequence "TODO(t)" "PROG(p)" "BLCK(b)" "STAL(s)" "|" "DONE(d)" "WONT(w)"))
-   org-todo-keyword-faces
+  :hook
+  ((org-mode . org-num-mode))
+
+  :bind
+  (("C-c o c" . org-capture)
+   ("C-c o a" . org-agenda)
+   ("C-c o l" . org-store-link)
+   ("C-c o b" . org-iswitchb)
+   ("C-c o t" . org-todo-list)
+   ("C-c o s" . org-search-view)
+   ("C-c o m" . org-move-tree)
+   ("C-c o d" . my-org-directory)
+   ("C-c o i" . my-org-show-all-inline-images))
+
+  :custom
+  (org-default-notes-file
+   (concat (file-truename org-directory) "notes.org"))
+  (org-agenda-files
+   `(,(concat (file-truename org-directory) "todo.org") ,(concat (file-truename org-directory) "agenda.org")))
+  (org-agenda-diary-file
+   (concat (expand-file-name org-directory) "diary.org"))
+  (org-todo-keywords
+   '((sequence "TODO(t)" "PROG(p)" "BLCK(b)" "STAL(s)" "|" "DONE(d)" "WONT(w)")))
+  (org-todo-keyword-faces
    '(("TODO" . (:foreground "white" :weight bold))
      ("DOIN" . (:foreground "green" :weight bold))
      ("BLCK" . (:foreground "red" :weight bold))
      ("STAL" . (:foreground "yellow" :weight bold))
      ("WONT" . (:foreground "grey" :weight bold))
-     ("DONE" . (:foreground "grey" :weight bold)))
-   org-capture-templates
+     ("DONE" . (:foreground "grey" :weight bold))))
+  (org-capture-templates
    '(("n" "Note" entry (file+headline "notes.org" "Notes")
       "* %^{topic} %T %^g\n   :CATEGORY: %^{category}\n%i%?\n")
      ("t" "To Do" entry (file+headline "todo.org" "To Do")
@@ -1009,20 +1024,27 @@ It will \"remember\" omit state across Dired buffers."
       "* %^{title} %^g\n     SCHEDULED: %^{when}t\n   %i%?\n")
      ("c" "Contact" entry (file+headline "addresses.org" "Addresses")
       "* %(org-contacts-template-name)\n   :PROPERTIES:\n   :EMAIL: %(org-contacts-template-email)\n   :END:\n   %i%?\n")))
-  :bind
-  (("C-c o c" . org-capture)
-   ("C-c o g" . my-org-magit)
-   ("C-c o a" . org-agenda)
-   ("C-c o l" . org-store-link)
-   ("C-c o b" . org-iswitchb)
-   ("C-c o t" . org-todo-list)
-   ("C-c o s" . org-search-view)
-   ("C-c o d" . my-org-directory)
-   ("C-c o i" . my-org-show-all-inline-images))
-  :config
-  (defun my-org-magit () (interactive) (magit-status org-directory)))
 
-(defvar org--inhibit-version-check t)
+  :init
+  (defun my-org-show-all-inline-images ()
+    (interactive)
+    (org-display-inline-images t t))
+
+  ;; From https://emacs.stackexchange.com/questions/22078/how-to-split-a-long-org-file-into-separate-org-files
+  (defun org-move-tree (file-name)
+    "Move the sub-tree to FILE-NAME and replace it with a link."
+    (interactive "F")
+    (org-mark-subtree)
+    (let*
+        ((title    (car (last (org-get-outline-path t))))
+         (dir      (file-name-directory file-name))
+         (filename (concat dir title ".org"))
+         (content  (buffer-substring (region-beginning) (region-end))))
+      (delete-region (region-beginning) (region-end))
+      (insert (format "** [[file:%s][%s]]\n" filename title))
+      (with-temp-buffer
+        (insert content)
+        (write-file filename)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spacious Padding
