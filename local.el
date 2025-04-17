@@ -672,14 +672,6 @@ It will \"remember\" omit state across Dired buffers."
     :config
     (treesit-langs-major-mode-setup)
 
-    (if (eq 'windows-nt system-type)
-        (add-to-list 'treesit-language-source-alist
-                     '((janet-simple . ("https://github.com/sogaiu/tree-sitter-janet-simple" nil nil "gcc.exe"))))
-      (add-to-list 'treesit-language-source-alist
-                   '((janet-simple . ("https://github.com/sogaiu/tree-sitter-janet-simple")))))
-    (when (not (treesit-language-available-p 'janet-simple))
-      (treesit-install-language-grammar 'janet-simple))
-
     (dolist
         (mapping
          '((python-mode . python-ts-mode)
