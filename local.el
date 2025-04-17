@@ -640,15 +640,6 @@ It will \"remember\" omit state across Dired buffers."
 ;; To try: ancilla, ellama
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Visual Regexp
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package visual-regexp
-  :bind
-  (("C-c r" . vr/replace)
-   ("C-c q" . vr/query-replace)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Which Key?
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -965,21 +956,20 @@ It will \"remember\" omit state across Dired buffers."
   :group 'org)
 
 (use-package org
-  :after magit
   :ensure t
   :hook
-  ((org-mode . org-num-mode))
+  (org-mode . org-num-mode)
 
   :bind
-  (("C-c o c" . org-capture)
-   ("C-c o a" . org-agenda)
-   ("C-c o l" . org-store-link)
-   ("C-c o b" . org-iswitchb)
-   ("C-c o t" . org-todo-list)
-   ("C-c o s" . org-search-view)
-   ("C-c o m" . org-move-tree)
-   ("C-c o d" . my-org-directory)
-   ("C-c o i" . my-org-show-all-inline-images))
+  ("C-c o c" . org-capture)
+  ("C-c o a" . org-agenda)
+  ("C-c o l" . org-store-link)
+  ("C-c o b" . org-iswitchb)
+  ("C-c o t" . org-todo-list)
+  ("C-c o s" . org-search-view)
+  ("C-c o m" . org-move-tree)
+  ("C-c o d" . my-org-directory)
+  ("C-c o i" . my-org-show-all-inline-images)
 
   :custom
   (org-default-notes-file
