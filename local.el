@@ -576,8 +576,7 @@ It will \"remember\" omit state across Dired buffers."
   ;; Remove duplicates
   (setopt ollama-models (delete-dups ollama-models)))
 
-(when (and (executable-find "node")
-           (not (eq 'android system-type)))
+(when (and (executable-find "copilot-language-server"))
   (use-package copilot
     :bind (("C-c <tab>" . 'copilot-accept-completion)
            ("C-c S-<tab>" . 'copilot-accept-completion-by-word))
