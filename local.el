@@ -433,6 +433,7 @@ It will \"remember\" omit state across Dired buffers."
   (require 'corfu-info)
   (require 'corfu-history)
   :custom
+  (global-corfu-modes '((not org-mode) (not text-mode) t))
 	(corfu-auto t)
 	(corfu-popupinfo-delay 0.5)
 	(corfu-quit-no-match 'separator)
@@ -460,6 +461,16 @@ It will \"remember\" omit state across Dired buffers."
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles basic partial-completion))
 				                           (eglot (styles orderless)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Flyspell
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package flyspell
+  :hook
+  (text-mode . flyspell-mode)
+  (prog-mode . flyspell-prog-mode)
+  (org-mode . flyspell-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Flycheck
