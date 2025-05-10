@@ -703,141 +703,167 @@ It will \"remember\" omit state across Dired buffers."
 ;; Extra C/C++ Mode Hooks
 (add-to-list 'auto-mode-alist '("\\.ino?\\'" . c++-mode))
 
-(with-eval-after-load 'eglot
-  (add-to-list
-   'eglot-server-programs
-   '((c-mode c++-mode c-ts-mode c++-ts-mode)
-     . ("clangd"
-        "--background-index"
-        "--clang-tidy"
-        "--completion-style=detailed"
-        "--all-scopes-completion"
-        "--pch-storage=memory"))))
+(when-let (clangd (executable-find "clangd"))
+  (with-eval-after-load 'eglot
+    (add-to-list
+     'eglot-server-programs
+     `((c-mode c++-mode c-ts-mode c++-ts-mode)
+       . (,clangd
+          "--background-index"
+          "--clang-tidy"
+          "--completion-style=detailed"
+          "--all-scopes-completion"
+          "--pch-storage=memory")))
+    (add-hook 'c-mode-hook 'eglot-ensure)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C#
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package csharp-mode
-  :init
-  (let* ((dotnet (executable-find "dotnet"))
-	       (dotnet-script (executable-find "dotnet-script"))
-         (omnisharp (executable-find "OmniSharp"))
-         (csharp-ls (executable-find "csharp-ls"))
-         (alternatives '()))
+(when-let (dotnet (executable-find "dotnet"))
+  (use-package csharp-mode
+    :init
+    (let* ((dotnet-script (executable-find "dotnet-script"))
+           (omnisharp (executable-find "OmniSharp"))
+           (csharp-ls (executable-find "csharp-ls"))
+           (alternatives '()))
 
-    (when (and dotnet (not dotnet-script))
-      (shell-command (concat "\"" dotnet "\" tool install -g dotnet-script")))
-    (when (and dotnet (not csharp-ls) (not omnisharp))
-      (shell-command (concat "\"" dotnet "\" tool install -g csharp-ls"))
-      (setopt csharp-ls (executable-find "csharp-ls")))
+      (when (not dotnet-script)
+        (shell-command (concat "\"" dotnet "\" tool install -g dotnet-script")))
+      (when (and (not csharp-ls) (not omnisharp))
+        (shell-command (concat "\"" dotnet "\" tool install -g csharp-ls"))
+        (setopt csharp-ls (executable-find "csharp-ls")))
 
-    (when csharp-ls
-      (add-to-list 'alternatives `(,csharp-ls "-l" "error")))
-    (when omnisharp
-      (add-to-list 'alternatives `(,omnisharp "-lsp")))
-    (when alternatives
-      (add-to-list 'eglot-server-programs `(csharp-mode . ,(eglot-alternatives alternatives)))))
+      (when csharp-ls
+        (add-to-list 'alternatives `(,csharp-ls "-l" "error")))
+      (when omnisharp
+        (add-to-list 'alternatives `(,omnisharp "-lsp")))
+      (when alternatives
+        (add-to-list 'eglot-server-programs `(csharp-mode . ,(eglot-alternatives alternatives)))
+        (add-hook 'csharp-mode-hook 'eglot-ensure)))
 
-  (defun my-csharp-repl ()
-    "Switch to the CSharpRepl buffer, creating it if necessary."
-    (interactive)
-    (let ((repl (or (executable-find "dotnet-script") (executable-find "csharp"))))
-      (when repl
-	      (if-let ((buf (get-buffer "*CSharpRepl*")))
-            (pop-to-buffer buf)
-	        (when-let ((b (make-comint "CSharpRepl" repl)))
-            (switch-to-buffer-other-window b))))))
+    (defun my-csharp-repl ()
+      "Switch to the CSharpRepl buffer, creating it if necessary."
+      (interactive)
+      (let ((repl (or (executable-find "dotnet-script") (executable-find "csharp"))))
+        (when repl
+	        (if-let ((buf (get-buffer "*CSharpRepl*")))
+              (pop-to-buffer buf)
+	          (when-let ((b (make-comint "CSharpRepl" repl)))
+              (switch-to-buffer-other-window b))))))
 
-  (defun my/csharp-mode-hook ()
-    (setq-local indent-tabs-mode nil)
-    (setq-local comment-column 40)
-    (setq-local c-basic-offset 4))
-  (add-hook 'csharp-mode-hook #'my/csharp-mode-hook)
+    (defun my/csharp-mode-hook ()
+      (setq-local indent-tabs-mode nil)
+      (setq-local comment-column 40)
+      (setq-local c-basic-offset 4))
+    (add-hook 'csharp-mode-hook #'my/csharp-mode-hook)
 
-  :config
-  (define-key csharp-mode-map (kbd "C-c C-z") 'my-csharp-repl))
+    :config
+    (define-key csharp-mode-map (kbd "C-c C-z") 'my-csharp-repl))
 
-(use-package dotnet
-  :after csharp-mode
-  :config
-  (add-hook 'csharp-mode-hook 'dotnet-mode))
+  (use-package dotnet
+    :after csharp-mode
+    :config
+    (add-hook 'csharp-mode-hook 'dotnet-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Janet
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(if (and (not (eq 'windows-nt system-type))
-         (fboundp 'treesit-available-p)
-         (treesit-language-available-p 'janet-simple))
+(when (executable-find "janet")
+  (if (and (not (eq 'windows-nt system-type))
+           (fboundp 'treesit-available-p)
+           (treesit-language-available-p 'janet-simple))
+      (progn
+        (use-package janet-ts-mode
+          :hook (janet-ts-mode . smartparens-mode)
+          :straight (:type git :host github :repo "sogaiu/janet-ts-mode" :files ("*.el")))
+        (use-package ajrepl
+          :hook (janet-ts-mode . ajrepl-interaction-mode)
+          :straight (:type git :host github :repo "sogaiu/ajrepl" :files ("*.el" "ajrepl"))))
     (progn
-      (use-package janet-ts-mode
-        :hook (janet-ts-mode . smartparens-mode)
-        :straight (:type git :host github :repo "sogaiu/janet-ts-mode" :files ("*.el")))
-      (use-package ajrepl
-        :hook (janet-ts-mode . ajrepl-interaction-mode)
-        :straight (:type git :host github :repo "sogaiu/ajrepl" :files ("*.el" "ajrepl"))))
-  (progn
-    (use-package janet-mode
-      :hook (janet-mode . smartparens-mode))
-    (use-package inf-janet
-      :hook (janet-mode . inf-janet-minor-mode)
-      :straight (:type git :host github :repo "velkyel/inf-janet"))))
+      (use-package janet-mode
+        :hook (janet-mode . smartparens-mode))
+      (use-package inf-janet
+        :hook (janet-mode . inf-janet-minor-mode)
+        :straight (:type git :host github :repo "velkyel/inf-janet"))))
 
-(use-package flycheck-janet
-  :straight (:type git :host github :repo "sogaiu/flycheck-janet" :files ("*.el")))
+  (use-package flycheck-janet
+    :straight (:type git :host github :repo "sogaiu/flycheck-janet" :files ("*.el"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Common Lisp
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package sly
-  :bind (:map sly-mode-map
-              ("C-x 3 ." . xref-find-definitions)))
+(when (or (executable-find "sbcl")
+          (executable-find "ccl")
+          (executable-find "ecl"))
+  (use-package sly
+    :bind (:map sly-mode-map
+                ("C-x 3 ." . xref-find-definitions))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Nim
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package nim-mode)
+(when (executable-find "nim")
+  (use-package nim-mode))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Zig
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(when-let (zig (executable-find "zig"))
+  (use-package zig-mode
+    :init
+    (when-let (zls (executable-find "zls"))
+      (with-eval-after-load 'eglot
+        (add-hook 'zig-mode-hook 'eglot-ensure)
+        (add-to-list 'eglot-server-programs
+                     `(zig-mode . (,zls
+                                   :initializationOptions
+                                   (:zig_exe_path ,zig
+                                    :enable_build_on_save t))))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Ruby
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package ruby-mode
-  :hook (ruby-mode . inf-ruby-keys)
-  :init
-  (autoload 'ruby-mode "ruby-mode" "Ruby Mode" t ".rb"))
+(when-let (ruby (executable-find "ruby"))
+  (use-package ruby-mode
+    :hook (ruby-mode . inf-ruby-keys)
+    :init
+    (autoload 'ruby-mode "ruby-mode" "Ruby Mode" t ".rb"))
 
-(defun launch-ruby ()
-  "Launches a ruby process in a buffer named *ruby*."
-  (interactive)
-  (unless (get-buffer "*ruby*")
-    (let ((buf (current-buffer)))
-	    (inf-ruby)
-	    (set-buffer buf))))
+  (defun launch-ruby ()
+    "Launches a ruby process in a buffer named *ruby*."
+    (interactive)
+    (unless (get-buffer "*ruby*")
+      (let ((buf (current-buffer)))
+	      (inf-ruby)
+	      (set-buffer buf))))
 
-(defun kill-ruby ()
-  "Kills a ruby process in a buffer named *ruby*."
-  (interactive)
-  (when (get-buffer "*ruby*")
-    (kill-buffer "*ruby*")))
+  (defun kill-ruby ()
+    "Kills a ruby process in a buffer named *ruby*."
+    (interactive)
+    (when (get-buffer "*ruby*")
+      (kill-buffer "*ruby*")))
 
-(use-package inf-ruby)
-(use-package enh-ruby-mode)
+  (use-package inf-ruby)
+  (use-package enh-ruby-mode)
 
-(use-package robe
-  :init
-  (advice-add 'launch-ruby :after #'robe-start))
+  (use-package robe
+    :init
+    (advice-add 'launch-ruby :after #'robe-start)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Rust
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package rust-mode)
-(use-package flycheck-rust
-  :config (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+(when (executable-find "rustc")
+  (use-package rust-mode)
+  (use-package flycheck-rust
+    :config (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Scheme
