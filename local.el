@@ -436,7 +436,7 @@ It will \"remember\" omit state across Dired buffers."
   (global-corfu-modes '((not org-mode) (not text-mode) t))
 	(corfu-auto t)
 	(corfu-popupinfo-delay 0.5)
-	(corfu-quit-no-match 'separator)
+	(corfu-quit-no-match t)
   (completion-cycle-threshold 3)
   (corfu-auto t)
   (corfu-cycle t)
