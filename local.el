@@ -788,6 +788,11 @@ It will \"remember\" omit state across Dired buffers."
         :hook (janet-mode . inf-janet-minor-mode)
         :straight (:type git :host github :repo "velkyel/inf-janet"))))
 
+  (when-let (janet-lsp (executable-find "janet-lsp"))
+    (add-to-list 'eglot-server-programs
+                 `((janet-ts-mode janet-mode) . (,janet-lsp)))
+    (add-hook 'janet-mode-hook 'eglot-ensure))
+
   (use-package flycheck-janet
     :straight (:type git :host github :repo "sogaiu/flycheck-janet" :files ("*.el"))))
 
