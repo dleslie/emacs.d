@@ -630,6 +630,20 @@ It will \"remember\" omit state across Dired buffers."
   (elysium-window-size 0.33)
   (elysium-window-style 'vertical))
 
+(use-package mcp-hub
+  :after gptel
+  :straight (:type git :host github :repo "lizqwerscott/mcp.el" :files ("*.el"))
+  :hook (after-init-hook . mcp-hub-start-all-server)
+  :init
+  (require 'gptel-integrations)
+  (when-let*
+      ((npx (executable-find "npx"))
+       (github-token (getenv "GITHUB_PERSONAL_ACCESS_TOKEN"))
+       (github-server '("github" . (:command npx :args ("-y" "@modelcontextprotocol/server-github")))))
+    (if mcp-hub-servers
+        (add-to-list mcp-hub-servers github-serve r)
+      (setopt mcp-hub-servers (list github-server)))))
+
 (use-package gptel
   :bind (("C-c a g c" . gptel)
          ("C-c a g a" . gptel-add)
