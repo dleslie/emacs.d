@@ -1067,21 +1067,18 @@ It will \"remember\" omit state across Dired buffers."
     (interactive)
     (org-display-inline-images t t))
 
-  ;; From https://emacs.stackexchange.com/questions/22078/how-to-split-a-long-org-file-into-separate-org-files
   (defun org-move-tree (file-name)
     "Move the sub-tree to FILE-NAME and replace it with a link."
     (interactive "F")
     (org-mark-subtree)
     (let*
         ((title    (car (last (org-get-outline-path t))))
-         (dir      (file-name-directory file-name))
-         (filename (concat dir title ".org"))
          (content  (buffer-substring (region-beginning) (region-end))))
       (delete-region (region-beginning) (region-end))
-      (insert (format "** [[file:%s][%s]]\n" filename title))
+      (insert (format "** [[file:%s][%s]]\n" file-name title))
       (with-temp-buffer
         (insert content)
-        (write-file filename)))))
+        (write-file file-name)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spacious Padding
