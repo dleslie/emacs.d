@@ -7,55 +7,7 @@
 ;;; Code:
 
 ;; Useful bindings
-(global-set-key "\C-w" 'clipboard-kill-region)
-(global-set-key "\M-w" 'clipboard-kill-ring-save)
-(global-set-key "\C-y" 'clipboard-yank)
-(global-set-key "\C-c," 'scroll-bar-mode)
-(global-set-key "\C-c." 'tool-bar-mode)
-(global-set-key "\C-c?" 'menu-bar-mode)
-(global-set-key "\C-c\\" 'comment-or-uncomment-region)
-(global-set-key "\C-cs" 'eshell-here)
-(global-set-key "\C-cp" 'toggle-window-dedication)
-(global-set-key [f12] 'toggle-frame-fullscreen)
-(global-set-key (kbd "C-;") 'hippie-expand)
-(global-set-key "\C-c\C-t" 'next-theme)
 
-;; General Emacs Sanity
-(custom-set-variables
- '(auto-window-vscroll nil)
- '(c-basic-offset 2)
- '(column-number-mode t)
- '(css-indent-offset 2)
- '(debug-on-error nil)
- '(electric-indent-mode nil)
- '(kill-whole-line t)
- '(indent-tabs-mode nil)
- '(inhibit-startup-screen t)
- '(js-indent-level 2)
- '(make-backup-files nil)
- '(scroll-bar-mode nil)
- '(scroll-conservatively 10000)
- '(scroll-step 2)
- '(show-paren-delay 0)
- '(show-trailing-whitespace t)
- '(tab-stop-list (number-sequence 2 120 2))
- '(tab-width 2)
- '(tool-bar-mode nil)
- '(backup-by-copying nil)
- '(require-final-newline t)
- '(frame-inhibit-implied-resize t)
- '(switch-to-buffer-obey-display-actions t)
- '(warning-minimum-level :emergency))
-
-(delete-selection-mode 1)
-(global-eldoc-mode t)
-(show-paren-mode t)
-(global-hl-line-mode t)
-(global-prettify-symbols-mode +1)
-(prefer-coding-system 'utf-8)
-
-(when (fboundp 'set-message-beep)
-  (set-message-beep 'silent))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Directories
@@ -268,6 +220,65 @@ It will \"remember\" omit state across Dired buffers."
   (setopt auto-package-update-delete-old-versions t
         auto-package-update-hide-results t)
   (auto-package-update-maybe))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Emacs Configuration
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package emacs
+  :bind
+  ("\C-w" . clipboard-kill-region)
+  ("\M-w" . clipboard-kill-ring-save)
+  ("\C-y" . clipboard-yank)
+  ("\C-c," . scroll-bar-mode)
+  ("\C-c." . tool-bar-mode)
+  ("\C-c?" . menu-bar-mode)
+  ("\C-c\\" . comment-or-uncomment-region)
+  ("\C-cs" . eshell-here)
+  ("\C-cp" . toggle-window-dedication)
+  ([f12] . toggle-frame-fullscreen)
+  ((kbd "C-;") . hippie-expand)
+  ("\C-c\C-t" . next-theme)
+
+  :custom
+ (auto-window-vscroll nil)
+ (c-basic-offset 2)
+ (column-number-mode t)
+ (css-indent-offset 2)
+ (debug-on-error nil)
+ (electric-indent-mode nil)
+ (kill-whole-line t)
+ (indent-tabs-mode nil)
+ (inhibit-startup-screen t)
+ (js-indent-level 2)
+ (make-backup-files nil)
+ (scroll-bar-mode nil)
+ (scroll-conservatively 10000)
+ (scroll-step 2)
+ (show-paren-delay 0)
+ (show-trailing-whitespace t)
+ (tab-stop-list (number-sequence 2 120 2))
+ (tab-width 2)
+ (tool-bar-mode nil)
+ (backup-by-copying nil)
+ (require-final-newline t)
+ (frame-inhibit-implied-resize t)
+ (switch-to-buffer-obey-display-actions t)
+ (warning-minimum-level :emergency)
+
+ :hook
+ (prog-mode . hl-line-mode)
+ (text-mode-hook . toggle-truncate-lines)
+
+ :init
+ (delete-selection-mode 1)
+ (global-eldoc-mode t)
+ (show-paren-mode t)
+ (global-prettify-symbols-mode +1)
+ (prefer-coding-system 'utf-8)
+
+ (when (fboundp 'set-message-beep)
+   (set-message-beep 'silent)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Useful Elisp Extensions
@@ -979,16 +990,14 @@ It will \"remember\" omit state across Dired buffers."
   (add-hook 'writeroom-mode-hook #'my/writeroom-config)
   (add-hook 'writeroom-mode-disable-hook #'my/writeroom-disable))
 
-;; Enable truncate lines for all text mode buffers
-(add-hook 'text-mode-hook 'toggle-truncate-lines)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Dictionary
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package dictionary
+  :bind
+  (("C-c d" . dictionary-search))
   :init
-  (global-set-key "\C-c d" 'dictionary-search)
   (define-key-after global-map [menu-bar tools apps dictionary-search]
     '(menu-item "Dictionary" dictionary-search :help "Search dictionary") t))
 
@@ -997,8 +1006,9 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package powerthesaurus
+  :bind
+  (("\C-c t" . powerthesaurus-lookup-word-dwim))
   :init
-  (global-set-key "\C-c t" 'powerthesaurus-lookup-word-dwim)
   (define-key-after global-map [menu-bar tools apps powerthesaurus-lookup-word]
     '(menu-item "Thesaurus" powerthesaurus-lookup-word :help "Search thesaurus") t))
 
