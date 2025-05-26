@@ -237,7 +237,7 @@ It will \"remember\" omit state across Dired buffers."
   ("\C-cs" . eshell-here)
   ("\C-cp" . toggle-window-dedication)
   ([f12] . toggle-frame-fullscreen)
-  ((kbd "C-;") . hippie-expand)
+  ("\C-\\;" . hippie-expand)
   ("\C-c\C-t" . next-theme)
 
   :custom
