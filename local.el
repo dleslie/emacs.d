@@ -268,7 +268,7 @@ It will \"remember\" omit state across Dired buffers."
 
  :hook
  (prog-mode . hl-line-mode)
- (text-mode-hook . toggle-truncate-lines)
+ (text-mode . visual-line-mode)
 
  :init
  (delete-selection-mode 1)
@@ -1024,6 +1024,7 @@ It will \"remember\" omit state across Dired buffers."
   :ensure t
   :hook
   (org-mode . org-num-mode)
+  (org-mode . visual-line-mode)
 
   :bind
   ("C-c o c" . org-capture)
