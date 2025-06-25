@@ -21,31 +21,32 @@
 (global-set-key "\C-c\C-t" 'next-theme)
 
 ;; General Emacs Sanity
-(custom-set-variables
- '(auto-window-vscroll nil)
- '(c-basic-offset 2)
- '(column-number-mode t)
- '(css-indent-offset 2)
- '(debug-on-error nil)
- '(electric-indent-mode nil)
- '(kill-whole-line t)
- '(indent-tabs-mode nil)
- '(inhibit-startup-screen t)
- '(js-indent-level 2)
- '(make-backup-files nil)
- '(scroll-bar-mode nil)
- '(scroll-conservatively 10000)
- '(scroll-step 2)
- '(show-paren-delay 0)
- '(show-trailing-whitespace t)
- '(tab-stop-list (number-sequence 2 120 2))
- '(tab-width 2)
- '(tool-bar-mode nil)
- '(backup-by-copying nil)
- '(require-final-newline t)
- '(frame-inhibit-implied-resize t)
- '(switch-to-buffer-obey-display-actions t)
- '(warning-minimum-level :emergency))
+(setopt
+ read-process-output-max (* 1024 1024)
+ auto-window-vscroll nil
+ c-basic-offset 2
+ column-number-mode t
+ css-indent-offset 2
+ debug-on-error nil
+ electric-indent-mode nil
+ kill-whole-line t
+ indent-tabs-mode nil
+ inhibit-startup-screen t
+ js-indent-level 2
+ make-backup-files nil
+ scroll-bar-mode nil
+ scroll-conservatively 10000
+ scroll-step 2
+ show-paren-delay 0
+ show-trailing-whitespace t
+ tab-stop-list (number-sequence 2 120 2)
+ tab-width 2
+ tool-bar-mode nil
+ backup-by-copying nil
+ require-final-newline t
+ frame-inhibit-implied-resize t
+ switch-to-buffer-obey-display-actions t
+ warning-minimum-level :emergency)
 
 (delete-selection-mode 1)
 (global-eldoc-mode t)
@@ -56,22 +57,6 @@
 
 (when (fboundp 'set-message-beep)
   (set-message-beep 'silent))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Directories
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defun my-org-directory ()
-  (interactive)
-  (find-file org-directory))
-
-(defun my-emacs-directory ()
-  (interactive)
-  (find-file user-emacs-directory))
-
-(defun my-home-directory ()
-  (interactive)
-  (find-file "~/"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; My Menu
@@ -126,6 +111,21 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Helpful Functions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun my-org-directory ()
+  "Opens ORG-DIRECTORY in a new buffer."
+  (interactive)
+  (find-file org-directory))
+
+(defun my-emacs-directory ()
+  "Opens the Emacs configuration directory in a new buffer."
+  (interactive)
+  (find-file user-emacs-directory))
+
+(defun my-home-directory ()
+  "Opens the home directory in a new buffer."
+  (interactive)
+  (find-file "~/"))
 
 (defun eshell-here ()
   "Opens up a new shell in the directory of the current buffer's file."

@@ -43,7 +43,7 @@
 (setq file-name-handler-alist default-file-name-handler-alist)
 
 ;; Enable GC
-(setq gc-cons-threshold 16777216
+(setq gc-cons-threshold 104857600
       gc-cons-percentage 0.1)
 (garbage-collect)
 
