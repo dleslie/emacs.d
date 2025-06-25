@@ -6,58 +6,6 @@
 
 ;;; Code:
 
-;; Useful bindings
-(global-set-key "\C-w" 'clipboard-kill-region)
-(global-set-key "\M-w" 'clipboard-kill-ring-save)
-(global-set-key "\C-y" 'clipboard-yank)
-(global-set-key "\C-c," 'scroll-bar-mode)
-(global-set-key "\C-c." 'tool-bar-mode)
-(global-set-key "\C-c?" 'menu-bar-mode)
-(global-set-key "\C-c\\" 'comment-or-uncomment-region)
-(global-set-key "\C-cs" 'eshell-here)
-(global-set-key "\C-cp" 'toggle-window-dedication)
-(global-set-key [f12] 'toggle-frame-fullscreen)
-(global-set-key (kbd "C-;") 'hippie-expand)
-(global-set-key "\C-c\C-t" 'next-theme)
-
-;; General Emacs Sanity
-(setopt
- read-process-output-max (* 1024 1024)
- auto-window-vscroll nil
- c-basic-offset 2
- column-number-mode t
- css-indent-offset 2
- debug-on-error nil
- electric-indent-mode nil
- kill-whole-line t
- indent-tabs-mode nil
- inhibit-startup-screen t
- js-indent-level 2
- make-backup-files nil
- scroll-bar-mode nil
- scroll-conservatively 10000
- scroll-step 2
- show-paren-delay 0
- show-trailing-whitespace t
- tab-stop-list (number-sequence 2 120 2)
- tab-width 2
- tool-bar-mode nil
- backup-by-copying nil
- require-final-newline t
- frame-inhibit-implied-resize t
- switch-to-buffer-obey-display-actions t
- warning-minimum-level :emergency)
-
-(delete-selection-mode 1)
-(global-eldoc-mode t)
-(show-paren-mode t)
-(global-hl-line-mode t)
-(global-prettify-symbols-mode +1)
-(prefer-coding-system 'utf-8)
-
-(when (fboundp 'set-message-beep)
-  (set-message-beep 'silent))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; My Menu
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -235,11 +183,11 @@ It will \"remember\" omit state across Dired buffers."
 ;; Configure package manager
 (require 'package)
 (setopt package-archives
-      '(("melpa" . "https://melpa.org/packages/") 
-	("gnu" . "https://elpa.gnu.org/packages/"))
-      package-archive-priorities
-      '(("melpa" . 100)
-        ("gnu" . 80)))
+        '(("melpa" . "https://melpa.org/packages/") 
+	        ("gnu" . "https://elpa.gnu.org/packages/"))
+        package-archive-priorities
+        '(("melpa" . 100)
+          ("gnu" . 80)))
 
 ;; Configure straight
 (defvar bootstrap-version)
@@ -266,8 +214,68 @@ It will \"remember\" omit state across Dired buffers."
 (use-package auto-package-update
   :init
   (setopt auto-package-update-delete-old-versions t
-        auto-package-update-hide-results t)
+          auto-package-update-hide-results t)
   (auto-package-update-maybe))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Emacs Configuration
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package emacs
+  :bind
+  ("\C-w" . clipboard-kill-region)
+  ("\M-w" . clipboard-kill-ring-save)
+  ("\C-y" . clipboard-yank)
+  ("\C-c," . scroll-bar-mode)
+  ("\C-c." . tool-bar-mode)
+  ("\C-c?" . menu-bar-mode)
+  ("\C-c\\" . comment-or-uncomment-region)
+  ("\C-cs" . eshell-here)
+  ("\C-cp" . toggle-window-dedication)
+  ([f12] . toggle-frame-fullscreen)
+  ("\C-\\;" . hippie-expand)
+  ("\C-c\C-t" . next-theme)
+
+  :custom
+  (read-process-output-max (* 1024 1024))
+  (auto-window-vscroll nil)
+  (c-basic-offset 2)
+  (column-number-mode t)
+  (css-indent-offset 2)
+  (debug-on-error nil)
+  (electric-indent-mode nil)
+  (kill-whole-line t)
+  (indent-tabs-mode nil)
+  (inhibit-startup-screen t)
+  (js-indent-level 2)
+  (make-backup-files nil)
+  (scroll-bar-mode nil)
+  (scroll-conservatively 10000)
+  (scroll-step 2)
+  (show-paren-delay 0)
+  (show-trailing-whitespace t)
+  (tab-stop-list (number-sequence 2 120 2))
+  (tab-width 2)
+  (tool-bar-mode nil)
+  (backup-by-copying nil)
+  (require-final-newline t)
+  (frame-inhibit-implied-resize t)
+  (switch-to-buffer-obey-display-actions t)
+  (warning-minimum-level :emergency)
+
+  :hook
+  (prog-mode . hl-line-mode)
+  (text-mode . visual-line-mode)
+
+  :init
+  (delete-selection-mode 1)
+  (global-eldoc-mode t)
+  (show-paren-mode t)
+  (global-prettify-symbols-mode +1)
+  (prefer-coding-system 'utf-8)
+
+  (when (fboundp 'set-message-beep)
+    (set-message-beep 'silent)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Useful Elisp Extensions
@@ -388,7 +396,7 @@ It will \"remember\" omit state across Dired buffers."
   :config
   (vertico-mode 1)
   (setopt vertico-resize nil
-        vertico-cycle t))
+          vertico-cycle t))
 
 ;; A few more useful configurations...
 (use-package emacs
@@ -406,7 +414,7 @@ It will \"remember\" omit state across Dired buffers."
 
   ;; Do not allow the cursor in the minibuffer prompt
   (setopt minibuffer-prompt-properties
-        '(read-only t cursor-intangible t face minibuffer-prompt))
+          '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
   ;; Enable recursive minibuffers
@@ -508,7 +516,7 @@ It will \"remember\" omit state across Dired buffers."
   ;; If you do not want to use any prefix, set it to nil.
   ;; (setopt dape-key-prefix "\C-x\C-a")
 
-  ;:hook
+                                        ;:hook
   ;; Save breakpoints on quit
   ;;((kill-emacs . dape-breakpoint-save)
   ;; Load breakpoints on startup
@@ -842,7 +850,7 @@ It will \"remember\" omit state across Dired buffers."
                      `(zig-mode . (,zls
                                    :initializationOptions
                                    (:zig_exe_path ,zig
-                                    :enable_build_on_save t))))))))
+                                                  :enable_build_on_save t))))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Ruby
@@ -969,7 +977,7 @@ It will \"remember\" omit state across Dired buffers."
 (use-package writeroom-mode
   :config
   (setopt writeroom-fringes-outside-margins 0
-        writeroom-extra-line-spacing 0.1)
+          writeroom-extra-line-spacing 0.1)
   :init
   (defun my/writeroom-config ()
     (setq-local word-wrap t)
@@ -979,16 +987,14 @@ It will \"remember\" omit state across Dired buffers."
   (add-hook 'writeroom-mode-hook #'my/writeroom-config)
   (add-hook 'writeroom-mode-disable-hook #'my/writeroom-disable))
 
-;; Enable truncate lines for all text mode buffers
-(add-hook 'text-mode-hook 'toggle-truncate-lines)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Dictionary
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package dictionary
+  :bind
+  (("C-c d" . dictionary-search))
   :init
-  (global-set-key "\C-c d" 'dictionary-search)
   (define-key-after global-map [menu-bar tools apps dictionary-search]
     '(menu-item "Dictionary" dictionary-search :help "Search dictionary") t))
 
@@ -997,8 +1003,9 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package powerthesaurus
+  :bind
+  (("\C-c t" . powerthesaurus-lookup-word-dwim))
   :init
-  (global-set-key "\C-c t" 'powerthesaurus-lookup-word-dwim)
   (define-key-after global-map [menu-bar tools apps powerthesaurus-lookup-word]
     '(menu-item "Thesaurus" powerthesaurus-lookup-word :help "Search thesaurus") t))
 
@@ -1014,6 +1021,7 @@ It will \"remember\" omit state across Dired buffers."
   :ensure t
   :hook
   (org-mode . org-num-mode)
+  (org-mode . visual-line-mode)
 
   :bind
   ("C-c o c" . org-capture)
@@ -1067,21 +1075,18 @@ It will \"remember\" omit state across Dired buffers."
     (interactive)
     (org-display-inline-images t t))
 
-  ;; From https://emacs.stackexchange.com/questions/22078/how-to-split-a-long-org-file-into-separate-org-files
   (defun org-move-tree (file-name)
     "Move the sub-tree to FILE-NAME and replace it with a link."
     (interactive "F")
     (org-mark-subtree)
     (let*
         ((title    (car (last (org-get-outline-path t))))
-         (dir      (file-name-directory file-name))
-         (filename (concat dir title ".org"))
          (content  (buffer-substring (region-beginning) (region-end))))
       (delete-region (region-beginning) (region-end))
-      (insert (format "** [[file:%s][%s]]\n" filename title))
+      (insert (format "** [[file:%s][%s]]\n" file-name title))
       (with-temp-buffer
         (insert content)
-        (write-file filename)))))
+        (write-file file-name)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spacious Padding
