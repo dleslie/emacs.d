@@ -558,6 +558,11 @@ It will \"remember\" omit state across Dired buffers."
 ;; AI
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defcustom copilot-models '(gpt-4o gpt-4.1 clause-3.7-sonnet o3-mini)
+  "List of available copilot models."
+  :type '(repeat symbol)
+  :group 'gptel)
+
 (defcustom ollama-models nil
   "List of models available from the ollama CLI."
   :type '(repeat symbol)
@@ -657,18 +662,24 @@ It will \"remember\" omit state across Dired buffers."
          ("C-c a g f" . gptel-add-file)
          ("C-c a g m" . gptel-menu))
   :init
-  (when ollama-models
-    (setopt gptel-backend
-            (gptel-make-ollama "Ollama"
-              :host ollama-host
-              :stream t
-              :models ollama-models))
-    (when (or (not (boundp gptel-model))
-              (not gptel-model)
-              (not (member gptel-model ollama-models)))
-      (setopt gptel-model (car ollama-models)))))
+  (defun gptel-enable-copilot ()
+    "Enables Copilot for GPTel."
+    (interactive)
+    (let ((copilot-backend (gptel-make-gh-copilot "Copilot") ))
+      (setopt gptel-backend copilot-backend)
+      (setopt gptel-model (car copilot-models))))
 
-;; To try: ancilla, ellama
+  (when ollama-models
+    (defun gptel-enable-ollama ()
+      "Enables Ollama for GPTel."
+      (interactive)
+      (let ((ollama-backend
+             (gptel-make-ollama "Ollama"
+               :host ollama-host
+               :stream t
+               :models ollama-models)))
+        (setopt gptel-backend ollama-backend)
+        (setopt gptel-model (car ollama-models))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Which Key?
