@@ -630,13 +630,46 @@ It will \"remember\" omit state across Dired buffers."
   (require 'mcp-hub)
   :custom
   (mcp-hub-servers
-   `(("filesystem" . (:command "npx" :args ("-y" "@modelcontextprotocol/server-filesystem" ,(expand-file-name "~/"))))
-     ("github" . (:command "npx" :args ("-y" "@modelcontextprotocol/server-github")))
+   `(("github" . (:command "npx" :args ("-y" "@modelcontextprotocol/server-github")))
      ("fetch" . (:command "uv" :args ("tool" "run" "mcp-server-fetch")))
      ("git" .(:command "uv" :args ("tool" "run" "mcp-server-git")))
      ("time" .(:command "uv" :args ("tool" "run" "mcp-server-time")))
      ("sequential-thinking" .(:command "npx" :args ("-y" "@modelcontextprotocol/server-sequential-thinking")))
-     ("memory" .(:command "npx" :args ("-y" "@modelcontextprotocol/server-memory"))))))
+     ("memory" .(:command "npx" :args ("-y" "@modelcontextprotocol/server-memory")))))
+  :init
+  (defun mcp-hub-add-filesystem ()
+    "Add a file system server to the MCP Hub."
+    (interactive)
+    ;; Shutdown and remove existing filesystem server if it exists
+    (when (assoc "filesystem" mcp-hub-servers)
+      (mcp-stop-server "filesystem")
+      (setopt mcp-hub-servers
+              (delete (assoc "filesystem" mcp-hub-servers) mcp-hub-servers)))
+    ;; Request path from user using find-file
+    (let ((path (read-directory-name "Enter path to operate from: ")))
+      (if (file-directory-p path)
+          (progn
+            (add-to-list 'mcp-hub-servers
+                         `("filesystem" . (:command "npx" :args ("-y" "@modelcontextprotocol/server-filesystem" ,path)))
+            (message "File System server added at %s" path))
+        (message "Invalid directory: %s" path)))))
+
+  (defun mcp-hub-add-sqlite ()
+    "Add a sqlite server to the MCP Hub."
+    (interactive)
+    ;; Shutdown and remove existing sqlite server if it exists
+    (when (assoc "sqlite" mcp-hub-servers)
+      (mcp-stop-server "sqlite")
+      (setopt mcp-hub-servers
+              (delete (assoc "sqlite" mcp-hub-servers) mcp-hub-servers)))
+    ;; Request path from user using find-file
+    (let ((path (read-file-name "Enter sqlite database to open: ")))
+      (if (file-exists-p path)
+          (progn
+            (add-to-list 'mcp-hub-servers
+                         `("sqlite" . (:command "uvx" :args ("mcp-server-sqlite" "--db-path" ,path)))
+            (message "SQLite server added for %s" path))
+        (message "Invalid location: %s" path))))))
 
 (use-package gptel
   :init
@@ -666,11 +699,12 @@ It will \"remember\" omit state across Dired buffers."
   :bind (("C-c a q" . elysium-query)
          ("C-c a c" . elysium-add-context)
          ("C-c a w" . elysium-toggle-window)
-         ("C-c a h" . mcp-hub)
-         ("C-c a g" . gptel)
+         ("C-c a g" . gptel-menu)
          ("C-c a a" . gptel-add)
          ("C-c a f" . gptel-add-file)
-         ("C-c a m" . gptel-menu)
+         ("C-c a m h" . mcp-hub)
+         ("C-c a m f" . mcp-hub-add-filesystem)
+         ("C-c a m s" . mcp-hub-add-sqlite)
          ("C-c a e c" . 'gptel-enable-copilot)
          ("C-c a e o" . 'gptel-enable-ollama)))
 
