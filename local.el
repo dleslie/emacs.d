@@ -602,8 +602,8 @@ It will \"remember\" omit state across Dired buffers."
 
 (when (and (executable-find "copilot-language-server"))
   (use-package copilot
-    :bind (("C-c <tab>" . 'copilot-accept-completion)
-           ("C-c S-<tab>" . 'copilot-accept-completion-by-word))
+    :bind (("C-c <tab>" . 'copilot-accept-completion-by-paragraph)
+           ("C-c S-<tab>" . 'copilot-accept-completion))
     :hook ((prog-mode . copilot-mode)
            (text-mode . copilot-mode)
            (conf-mode . copilot-mode)
@@ -614,31 +614,10 @@ It will \"remember\" omit state across Dired buffers."
            (latex-mode . copilot-mode))
     :config
     (add-to-list 'copilot-indentation-alist
-                 '(org-mode 2)))
-
-  (use-package copilot-chat
-    :after copilot
-    :bind
-    (:map global-map
-          ("C-c a c c" . copilot-chat-display)
-          ("C-c a c a" . copilot-chat-add-current-buffer)
-          ("C-c a c S-a" . copilot-chat-del-current-buffer)
-          ("C-c a c e" . copilot-chat-explain)
-          ("C-c a c d" . copilot-chat-doc)
-          ("C-c a c r" . copilot-chat-review)
-          ("C-c a c f" . copilot-chat-fix)
-          ("C-c a c o" . copilot-chat-optimize)
-          ("C-c a c t" . copilot-chat-test)
-          ("C-c a c m" . copilot-chat-insert-commit-message)
-          ("C-c C-y" . copilot-chat-yank)
-          ("C-c M-y" . copilot-chat-yank-pop)
-          ("C-c C-M-y" . (lambda () (interactive) (copilot-chat-yank-pop -1))))))
+                 '(org-mode 2))))
 
 (use-package elysium
   :after gptel
-  :bind (("C-c a e q" . elysium-query)
-         ("C-c a e c" . elysium-add-context)
-         ("C-c a e w" . elysium-toggle-window))
   :custom
   (elysium-window-size 0.33)
   (elysium-window-style 'vertical))
@@ -646,28 +625,28 @@ It will \"remember\" omit state across Dired buffers."
 (use-package mcp
   :after gptel
   :ensure t
-  :hook (after-init-hook . mcp-hub-start-all-server)
   :config
   (require 'gptel-integrations)
   (require 'mcp-hub)
-  ;(require 'gptel-integrations)
   :custom
   (mcp-hub-servers
-   `(("github" . (:command "npx" :args ("-y" "@modelcontextprotocol/server-github")))
-     ("fetch" . (:command "uv" :args ("tool" "run" "mcp-server-fetch"))))))
+   `(("filesystem" . (:command "npx" :args ("-y" "@modelcontextprotocol/server-filesystem" ,(expand-file-name "~/"))))
+     ("github" . (:command "npx" :args ("-y" "@modelcontextprotocol/server-github")))
+     ("fetch" . (:command "uv" :args ("tool" "run" "mcp-server-fetch")))
+     ("git" .(:command "uv" :args ("tool" "run" "mcp-server-git")))
+     ("time" .(:command "uv" :args ("tool" "run" "mcp-server-time")))
+     ("sequential-thinking" .(:command "npx" :args ("-y" "@modelcontextprotocol/server-sequential-thinking")))
+     ("memory" .(:command "npx" :args ("-y" "@modelcontextprotocol/server-memory"))))))
 
 (use-package gptel
-  :bind (("C-c a g c" . gptel)
-         ("C-c a g a" . gptel-add)
-         ("C-c a g f" . gptel-add-file)
-         ("C-c a g m" . gptel-menu))
   :init
   (defun gptel-enable-copilot ()
     "Enables Copilot for GPTel."
     (interactive)
     (let ((copilot-backend (gptel-make-gh-copilot "Copilot") ))
       (setopt gptel-backend copilot-backend)
-      (setopt gptel-model (car copilot-models))))
+      (setopt gptel-model (car copilot-models)))
+    (message "Copilot enabled for GPTel."))
 
   (when ollama-models
     (defun gptel-enable-ollama ()
@@ -679,7 +658,21 @@ It will \"remember\" omit state across Dired buffers."
                :stream t
                :models ollama-models)))
         (setopt gptel-backend ollama-backend)
-        (setopt gptel-model (car ollama-models))))))
+        (setopt gptel-model (car ollama-models)))
+      (message "Ollama enabled for GPTel."))))
+
+(use-package emacs
+  :after (elysium mcp gptel)
+  :bind (("C-c a q" . elysium-query)
+         ("C-c a c" . elysium-add-context)
+         ("C-c a w" . elysium-toggle-window)
+         ("C-c a h" . mcp-hub)
+         ("C-c a g" . gptel)
+         ("C-c a a" . gptel-add)
+         ("C-c a f" . gptel-add-file)
+         ("C-c a m" . gptel-menu)
+         ("C-c a e c" . 'gptel-enable-copilot)
+         ("C-c a e o" . 'gptel-enable-ollama)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Which Key?
