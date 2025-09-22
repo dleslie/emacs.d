@@ -315,18 +315,26 @@ It will \"remember\" omit state across Dired buffers."
          ("C-x p C-d" . neotree-project-dir))
   :init
 
+  (defun neotree-dir-prompt ()
+    "Prompt for directory and open NeoTree."
+    (interactive)
+    (let ((dir (read-directory-name "NeoTree directory: ")))
+      (neotree-dir dir)))
+
   (defun neotree-project-dir ()
     "Open NeoTree using the project.el root."
     (interactive)
     (if (mode-visible-p 'neotree-mode)
         (neotree-hide)
-      (let ((project-dir (project-root (project-current)))
+      (let ((project-dir (or (and (project-current) (project-root (project-current)))
+                             (neotree-dir-prompt)))
             (file (buffer-file-name)))
         (if project-dir
             (progn
               (neotree-dir project-dir)
               (neotree-find file))
           (message "No project is active."))))))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Smart Parens
