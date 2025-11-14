@@ -488,6 +488,18 @@ It will \"remember\" omit state across Dired buffers."
   (prog-mode . flyspell-prog-mode)
   (org-mode . flyspell-mode))
 
+(use-package ispell
+  :init
+  (when (and (eq 'windows-nt system-type) (executable-find "hunspell"))
+    (setenv "DICTIONARY" "en_CA,en_US")
+    (let ((dict-dir "C:\\Hunspell\\"))
+      (setq
+       ispell-hunspell-dict-paths-alist `(("en_CA" ,(concat dict-dir "en_CA.dic"))
+                                          ("en_US" ,(concat dict-dir "en_US.dic")))
+       ispell-really-hunspell t
+       ispell-dictionary "en_CA"
+       ispell-program-name (executable-find "hunspell")))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Flycheck
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1097,23 +1109,23 @@ It will \"remember\" omit state across Dired buffers."
      ("DONE" . (:foreground "grey" :weight bold))))
   (org-capture-templates
    '(("n" "Note" entry (file+headline "notes.org" "Notes")
-      "* %^{topic} %T %^g\n   :CATEGORY: %^{category}\n%i%?\n")
+      "\n* %^{topic} %T %^g\n   :CATEGORY: %^{category}\n%i%?\n")
      ("t" "To Do" entry (file+headline "todo.org" "To Do")
-      "* TODO %^{todo} %^g\n   DEADLINE: %^{due}t\n   :CATEGORY: %^{category}\n")
+      "\n* TODO %^{todo} %^g\n   DEADLINE: %^{due}t\n   :CATEGORY: %^{category}\n")
      ("d" "Daily review" entry (file+headline "diary.org" "Daily Review")
       (format
        "* %%T %%^g\n   :CATEGORY: Review\n   %%?%%[%s/template_daily_review.org]\n"
        org-directory))
      ("i" "Idea" entry (file+headline "ideas.org" "Ideas")
-      "* %^{topic} %T %^g\n   :CATEGORY: Idea\n   %i%?\n")
+      "\n* %^{topic} %T %^g\n   :CATEGORY: Idea\n%i%?\n")
      ("j" "Journal" entry (file+headline "diary.org" "Journal")
-      "* %^{topic} %T %^g\n   :CATEGORY: Journal\n   %i%?\n")
+      "\n* %^{topic} %T %^g\n   :CATEGORY: Journal\n%i%?\n")
      ("w" "Work Log" entry (file+headline "work.org" "Work Log")
-      "* %^{topic} %T %^g\n   :CATEGORY: Log\n   %i%?\n")
+      "\n* %^{topic} %T %^g\n   :CATEGORY: Log\n%i%?\n")
      ("e" "Event" entry (file+headline "agenda.org" "Events")
-      "* %^{title} %^g\n     SCHEDULED: %^{when}t\n   %i%?\n")
+      "\n* %^{title} %^g\n     SCHEDULED: %^{when}t\n%i%?\n")
      ("c" "Contact" entry (file+headline "addresses.org" "Addresses")
-      "* %(org-contacts-template-name)\n   :PROPERTIES:\n   :EMAIL: %(org-contacts-template-email)\n   :END:\n   %i%?\n")))
+      "\n* %(org-contacts-template-name)\n   :PROPERTIES:\n   :EMAIL: %(org-contacts-template-email)\n   :END:\n%i%?\n")))
 
   :init
   (defun my-org-show-all-inline-images ()
