@@ -35,6 +35,11 @@
 ;; Make custom file not this one
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
+;; Ensure it exists
+(when (not (file-exists-p custom-file))
+  (with-temp-buffer
+    (write-file custom-file)))
+
 ;; Load custom.el
 (when (file-exists-p custom-file)
   (load custom-file))

@@ -45,7 +45,8 @@
 	       ["Random Theme" random-theme]
 	       ["Random Dark Theme" random-dark-theme]
 	       ["Random Light Theme" random-light-theme]
-         ["Reset Theme" reset-theme])))
+         ["Reset Theme" reset-theme]
+         ["Save Current as Default" set-current-theme-as-default])))
     map))
 
 (define-minor-mode my-mode
@@ -1182,6 +1183,13 @@ It will \"remember\" omit state across Dired buffers."
 (use-package almost-mono-themes :defer t)
 (use-package monochrome-theme :defer t)
 (use-package modus-themes :defer t)
+
+(defun set-current-theme-as-default ()
+  "Save the current theme as the default theme."
+  (interactive)
+  (when custom-enabled-themes
+    (setopt default-theme (car custom-enabled-themes))
+    (message "Set %s as default theme. Remember to save options before exiting." default-theme)))
 
 (defun reset-theme ()
   "Disable all active themes."
