@@ -40,6 +40,10 @@
   (with-temp-buffer
     (write-file custom-file)))
 
+;; Function to prompt for unsaved custom options
+(add-hook 'kill-emacs-query-functions
+          'custom-prompt-customize-unsaved-options)
+
 ;; Load custom.el
 (when (file-exists-p custom-file)
   (load custom-file))

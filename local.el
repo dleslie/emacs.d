@@ -1184,6 +1184,11 @@ It will \"remember\" omit state across Dired buffers."
 (use-package monochrome-theme :defer t)
 (use-package modus-themes :defer t)
 
+(defcustom default-theme 'modus-operandi-tinted
+  "The default theme to load."
+  :type 'symbol
+  :group 'local)
+
 (defun set-current-theme-as-default ()
   "Save the current theme as the default theme."
   (interactive)
@@ -1252,11 +1257,6 @@ It will \"remember\" omit state across Dired buffers."
   (let ((dark 0.33))
     (seq-every-p (lambda (x) (<= x dark))
 		             (color-name-to-rgb (face-attribute 'default :background)))))
-
-(defcustom default-theme 'modus-operandi-tinted
-  "The default theme to load."
-  :type 'symbol
-  :group 'local)
 
 (defun load-default-theme ()
   "Load the default theme."
