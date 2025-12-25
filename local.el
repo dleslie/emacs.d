@@ -234,7 +234,7 @@ It will \"remember\" omit state across Dired buffers."
   ("\C-cs" . eshell-here)
   ("\C-cp" . toggle-window-dedication)
   ([f12] . toggle-frame-fullscreen)
-  ("\C-\\;" . hippie-expand)
+  ("\C-ch" . hippie-expand)
   ("\C-c\C-t" . next-theme)
 
   :custom
@@ -1034,7 +1034,7 @@ It will \"remember\" omit state across Dired buffers."
   :hook (text-mode . writegood-mode))
 (use-package writeroom-mode
   :config
-  (setopt writeroom-fringes-outside-margins 0
+  (setopt writeroom-fringes-outside-margins nil
           writeroom-extra-line-spacing 0.1)
   :init
   (defun my/writeroom-config ()
