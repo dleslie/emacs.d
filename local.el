@@ -45,7 +45,8 @@
 	       ["Random Theme" random-theme]
 	       ["Random Dark Theme" random-dark-theme]
 	       ["Random Light Theme" random-light-theme]
-         ["Reset Theme" reset-theme])))
+         ["Reset Theme" reset-theme]
+         ["Save Current as Default" set-current-theme-as-default])))
     map))
 
 (define-minor-mode my-mode
@@ -233,7 +234,7 @@ It will \"remember\" omit state across Dired buffers."
   ("\C-cs" . eshell-here)
   ("\C-cp" . toggle-window-dedication)
   ([f12] . toggle-frame-fullscreen)
-  ("\C-\\;" . hippie-expand)
+  ("\C-ch" . hippie-expand)
   ("\C-c\C-t" . next-theme)
 
   :custom
@@ -1033,7 +1034,7 @@ It will \"remember\" omit state across Dired buffers."
   :hook (text-mode . writegood-mode))
 (use-package writeroom-mode
   :config
-  (setopt writeroom-fringes-outside-margins 0
+  (setopt writeroom-fringes-outside-margins nil
           writeroom-extra-line-spacing 0.1)
   :init
   (defun my/writeroom-config ()
@@ -1191,6 +1192,18 @@ It will \"remember\" omit state across Dired buffers."
 (use-package monochrome-theme :defer t)
 (use-package modus-themes :defer t)
 
+(defcustom default-theme 'modus-operandi-tinted
+  "The default theme to load."
+  :type 'symbol
+  :group 'local)
+
+(defun set-current-theme-as-default ()
+  "Save the current theme as the default theme."
+  (interactive)
+  (when custom-enabled-themes
+    (setopt default-theme (car custom-enabled-themes))
+    (message "Set %s as default theme. Remember to save options before exiting." default-theme)))
+
 (defun reset-theme ()
   "Disable all active themes."
   (interactive)
@@ -1252,11 +1265,6 @@ It will \"remember\" omit state across Dired buffers."
   (let ((dark 0.33))
     (seq-every-p (lambda (x) (<= x dark))
 		             (color-name-to-rgb (face-attribute 'default :background)))))
-
-(defcustom default-theme 'modus-operandi-tinted
-  "The default theme to load."
-  :type 'symbol
-  :group 'local)
 
 (defun load-default-theme ()
   "Load the default theme."
