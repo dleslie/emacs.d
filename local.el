@@ -1145,6 +1145,14 @@ It will \"remember\" omit state across Dired buffers."
         (insert content)
         (write-file file-name)))))
 
+(use-package org-tree-slide
+  :after org
+  :bind
+  ("C-c o p" . org-tree-slide-mode)
+  (:map org-tree-slide-mode-map
+        ("<f10>" . org-tree-slide-move-next-tree)
+        ("<f9>" . org-tree-slide-move-previous-tree)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Spacious Padding
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
