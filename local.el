@@ -185,7 +185,7 @@ It will \"remember\" omit state across Dired buffers."
 (require 'package)
 (setopt package-archives
         '(("melpa" . "https://melpa.org/packages/") 
-	        ("gnu" . "https://elpa.gnu.org/packages/"))
+	  ("gnu" . "https://elpa.gnu.org/packages/"))
         package-archive-priorities
         '(("melpa" . 100)
           ("gnu" . 80)))
@@ -211,12 +211,6 @@ It will \"remember\" omit state across Dired buffers."
 (require 'use-package-ensure)
 (setopt use-package-always-ensure t)
 (setopt package-native-compile t)
-
-(use-package auto-package-update
-  :init
-  (setopt auto-package-update-delete-old-versions t
-          auto-package-update-hide-results t)
-  (auto-package-update-maybe))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Emacs Configuration
@@ -578,6 +572,13 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; AI
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package agent-shell
+  :ensure t
+  :bind (:map agent-shell-mode-map
+              ("RET" . newline)
+              ("C-c C-c" . shell-maker-submit)
+              ("C-c C-k" . agent-shell-interrupt)))
 
 (defcustom copilot-models '(gpt-4o gpt-4.1 clause-3.7-sonnet o3-mini)
   "List of available copilot models."
