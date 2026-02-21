@@ -189,27 +189,11 @@ It will \"remember\" omit state across Dired buffers."
         package-archive-priorities
         '(("melpa" . 100)
           ("gnu" . 80)))
+(package-initialize)
+(package-refresh-contents t)
 
-;; Configure straight
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-
-(straight-use-package 'use-package)
-
-(require 'use-package)
-(require 'bind-key)
-(require 'use-package-ensure)
-(setopt use-package-always-ensure t)
+(use-package use-package
+  :ensure t)
 (setopt package-native-compile t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -750,7 +734,6 @@ It will \"remember\" omit state across Dired buffers."
            (treesit-available-p))
 
   (use-package treesit-langs
-    :straight (:type git :host github :repo "emacs-tree-sitter/treesit-langs")
     :config
     (treesit-langs-major-mode-setup)
 
@@ -857,25 +840,21 @@ It will \"remember\" omit state across Dired buffers."
            (treesit-language-available-p 'janet-simple))
       (progn
         (use-package janet-ts-mode
-          :hook (janet-ts-mode . smartparens-mode)
-          :straight (:type git :host github :repo "sogaiu/janet-ts-mode" :files ("*.el")))
+          :hook (janet-ts-mode . smartparens-mode))
         (use-package ajrepl
-          :hook (janet-ts-mode . ajrepl-interaction-mode)
-          :straight (:type git :host github :repo "sogaiu/ajrepl" :files ("*.el" "ajrepl"))))
+          :hook (janet-ts-mode . ajrepl-interaction-mode)))
     (progn
       (use-package janet-mode
         :hook (janet-mode . smartparens-mode))
       (use-package inf-janet
-        :hook (janet-mode . inf-janet-minor-mode)
-        :straight (:type git :host github :repo "velkyel/inf-janet"))))
+        :hook (janet-mode . inf-janet-minor-mode))))
 
   (when-let (janet-lsp (executable-find "janet-lsp"))
     (add-to-list 'eglot-server-programs
                  `((janet-ts-mode janet-mode) . (,janet-lsp)))
     (add-hook 'janet-mode-hook 'eglot-ensure))
 
-  (use-package flycheck-janet
-    :straight (:type git :host github :repo "sogaiu/flycheck-janet" :files ("*.el"))))
+  (use-package flycheck-janet))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Common Lisp
