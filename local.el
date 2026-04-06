@@ -573,14 +573,7 @@ It will \"remember\" omit state across Dired buffers."
 ;; AI
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package agent-shell
-  :ensure t
-  :bind (:map agent-shell-mode-map
-              ("RET" . newline)
-              ("C-c C-c" . shell-maker-submit)
-              ("C-c C-k" . agent-shell-interrupt)))
-
-(defcustom copilot-models '(gpt-4o gpt-4.1 clause-3.7-sonnet o3-mini)
+(defcustom copilot-models '(claude-sonnet-4.6 claude-sonnet-4.5 claude-haiku-4.5 claude-opus-4.6 claude-opus-4.6-fast claude-opus-4.5 claude-sonnet-4 gemini-3-pro-preview gpt-5.3-codex gpt-5.2-codex gpt-5.2 gpt-5.1-codex-max gpt-5.1-codex gpt-5.1 gpt-5.1-codex-mini gpt-5-mini gpt-4.1)
   "List of available copilot models."
   :type '(repeat symbol)
   :group 'gptel)
@@ -622,78 +615,28 @@ It will \"remember\" omit state across Dired buffers."
   ;; Remove duplicates
   (setopt ollama-models (delete-dups ollama-models)))
 
-(when (and (executable-find "copilot-language-server"))
-  (use-package copilot
-    :bind (("C-c <tab>" . 'copilot-accept-completion-by-paragraph)
-           ("C-c S-<tab>" . 'copilot-accept-completion))
-    :hook ((prog-mode . copilot-mode)
-           (text-mode . copilot-mode)
-           (conf-mode . copilot-mode)
-           (yaml-mode . copilot-mode)
-           (json-mode . copilot-mode)
-           (markdown-mode . copilot-mode)
-           (org-mode . copilot-mode)
-           (latex-mode . copilot-mode))
-    :config
-    (add-to-list 'copilot-indentation-alist
-                 '(org-mode 2))))
-
-(use-package elysium
-  :after gptel
-  :custom
-  (elysium-window-size 0.33)
-  (elysium-window-style 'vertical))
-
-(use-package mcp
-  :after gptel
-  :ensure t
+(use-package copilot
+  :bind (("C-c <tab>" . 'copilot-accept-completion-by-paragraph)
+         ("C-c S-<tab>" . 'copilot-accept-completion))
+  :hook ((prog-mode . copilot-mode)
+         (text-mode . copilot-mode)
+         (conf-mode . copilot-mode)
+         (yaml-mode . copilot-mode)
+         (json-mode . copilot-mode)
+         (markdown-mode . copilot-mode)
+         (org-mode . copilot-mode)
+         (latex-mode . copilot-mode))
   :config
-  (require 'gptel-integrations)
-  (require 'mcp-hub)
-  :custom
-  (mcp-hub-servers
-   `(("github" . (:command "npx" :args ("-y" "@modelcontextprotocol/server-github")))
-     ("fetch" . (:command "uv" :args ("tool" "run" "mcp-server-fetch")))
-     ("git" .(:command "uv" :args ("tool" "run" "mcp-server-git")))
-     ("time" .(:command "uv" :args ("tool" "run" "mcp-server-time")))
-     ("sequential-thinking" .(:command "npx" :args ("-y" "@modelcontextprotocol/server-sequential-thinking")))
-     ("memory" .(:command "npx" :args ("-y" "@modelcontextprotocol/server-memory")))))
-  :init
-  (defun mcp-hub-add-filesystem ()
-    "Add a file system server to the MCP Hub."
-    (interactive)
-    ;; Shutdown and remove existing filesystem server if it exists
-    (when (assoc "filesystem" mcp-hub-servers)
-      (mcp-stop-server "filesystem")
-      (setopt mcp-hub-servers
-              (delete (assoc "filesystem" mcp-hub-servers) mcp-hub-servers)))
-    ;; Request path from user using find-file
-    (let ((path (read-directory-name "Enter path to operate from: ")))
-      (if (file-directory-p path)
-          (progn
-            (add-to-list 'mcp-hub-servers
-                         `("filesystem" . (:command "npx" :args ("-y" "@modelcontextprotocol/server-filesystem" ,path)))
-            (message "File System server added at %s" path))
-        (message "Invalid directory: %s" path)))))
-
-  (defun mcp-hub-add-sqlite ()
-    "Add a sqlite server to the MCP Hub."
-    (interactive)
-    ;; Shutdown and remove existing sqlite server if it exists
-    (when (assoc "sqlite" mcp-hub-servers)
-      (mcp-stop-server "sqlite")
-      (setopt mcp-hub-servers
-              (delete (assoc "sqlite" mcp-hub-servers) mcp-hub-servers)))
-    ;; Request path from user using find-file
-    (let ((path (read-file-name "Enter sqlite database to open: ")))
-      (if (file-exists-p path)
-          (progn
-            (add-to-list 'mcp-hub-servers
-                         `("sqlite" . (:command "uvx" :args ("mcp-server-sqlite" "--db-path" ,path)))
-            (message "SQLite server added for %s" path))
-        (message "Invalid location: %s" path))))))
+  (add-to-list 'copilot-indentation-alist
+               '(org-mode 2)))
 
 (use-package gptel
+  :bind (("C-c a g" . gptel-send)
+         ("C-c a G" . gptel-menu)
+         ("C-c a a" . gptel-add)
+         ("C-c a f" . gptel-add-file)
+         ("C-c a e c" . 'gptel-enable-copilot)
+         ("C-c a e o" . 'gptel-enable-ollama))
   :init
   (defun gptel-enable-copilot ()
     "Enables Copilot for GPTel."
@@ -715,20 +658,6 @@ It will \"remember\" omit state across Dired buffers."
         (setopt gptel-backend ollama-backend)
         (setopt gptel-model (car ollama-models)))
       (message "Ollama enabled for GPTel."))))
-
-(use-package emacs
-  :after (elysium mcp gptel)
-  :bind (("C-c a q" . elysium-query)
-         ("C-c a c" . elysium-add-context)
-         ("C-c a w" . elysium-toggle-window)
-         ("C-c a g" . gptel-menu)
-         ("C-c a a" . gptel-add)
-         ("C-c a f" . gptel-add-file)
-         ("C-c a m h" . mcp-hub)
-         ("C-c a m f" . mcp-hub-add-filesystem)
-         ("C-c a m s" . mcp-hub-add-sqlite)
-         ("C-c a e c" . 'gptel-enable-copilot)
-         ("C-c a e o" . 'gptel-enable-ollama)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Which Key?
