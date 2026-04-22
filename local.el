@@ -193,6 +193,7 @@ It will \"remember\" omit state across Dired buffers."
           ("gnu" . 80)))
 
 ;; Configure straight
+(setq straight-use-package-by-default t)
 (setq straight-check-for-modifications '(check-on-save find-when-checking))
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -273,7 +274,26 @@ It will \"remember\" omit state across Dired buffers."
   (prefer-coding-system 'utf-8)
 
   (when (fboundp 'set-message-beep)
-    (set-message-beep 'silent)))
+    (set-message-beep 'silent))
+
+  ;; Add prompt indicator to `completing-read-multiple'.
+  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+  (defun crm-indicator (args)
+    (cons (format "[CRM%s] %s"
+                  (replace-regexp-in-string
+                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                   crm-separator)
+                  (car args))
+          (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setopt minibuffer-prompt-properties
+          '(read-only t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+  ;; Enable recursive minibuffers
+  (setopt enable-recursive-minibuffers t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Useful Elisp Extensions
@@ -288,11 +308,11 @@ It will \"remember\" omit state across Dired buffers."
   (prog-mode . smerge-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Ace Jump
+;; Avy
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package ace-jump-mode
-  :bind (("C-." . ace-jump-mode)))
+(use-package avy
+  :bind (("C-." . avy-goto-char)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Dumb Jump
@@ -386,7 +406,8 @@ It will \"remember\" omit state across Dired buffers."
   (setopt
    ido-create-new-buffer 'always
    ido-enable-flex-matching t
-   ido-everywhere t))
+   ido-everywhere t)
+  (ido-mode 1))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Minions (Minor Modes in Modeline)
@@ -406,28 +427,6 @@ It will \"remember\" omit state across Dired buffers."
   (setopt vertico-resize nil
           vertico-cycle t))
 
-;; A few more useful configurations...
-(use-package emacs
-  :init
-  ;; Add prompt indicator to `completing-read-multiple'.
-  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-  (defun crm-indicator (args)
-    (cons (format "[CRM%s] %s"
-                  (replace-regexp-in-string
-                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                   crm-separator)
-                  (car args))
-          (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-  ;; Do not allow the cursor in the minibuffer prompt
-  (setopt minibuffer-prompt-properties
-          '(read-only t cursor-intangible t face minibuffer-prompt))
-  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-  ;; Enable recursive minibuffers
-  (setopt enable-recursive-minibuffers t))
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Save History (Minibuffer)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -441,18 +440,15 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package corfu
-  :init
-  (global-corfu-mode)
-	(corfu-popupinfo-mode)
-  (corfu-history-mode t)
   :config
   (require 'corfu-info)
   (require 'corfu-history)
+  (global-corfu-mode)
+	(corfu-popupinfo-mode)
+  (corfu-history-mode t)
   :custom
   (global-corfu-modes '((not org-mode) (not text-mode) t))
-	(corfu-auto t)
 	(corfu-popupinfo-delay 0.5)
-	(corfu-quit-no-match t)
   (completion-cycle-threshold 3)
   (corfu-auto t)
   (corfu-cycle t)
@@ -485,8 +481,7 @@ It will \"remember\" omit state across Dired buffers."
 (use-package flyspell
   :hook
   (text-mode . flyspell-mode)
-  (prog-mode . flyspell-prog-mode)
-  (org-mode . flyspell-mode))
+  (prog-mode . flyspell-prog-mode))
 
 (use-package ispell
   :init
@@ -634,15 +629,23 @@ It will \"remember\" omit state across Dired buffers."
            (text-mode . copilot-mode)
            (conf-mode . copilot-mode)
            (yaml-mode . copilot-mode)
-           (json-mode . copilot-mode)
+           (json-ts-mode . copilot-mode)
            (markdown-mode . copilot-mode)
            (org-mode . copilot-mode)
            (latex-mode . copilot-mode))
     :bind (("C-c <tab>" . 'copilot-accept-completion-by-paragraph)
            ("C-c S-<tab>" . 'copilot-accept-completion))
     :config
-    (add-to-list 'copilot-indentation-alist
-                 '(org-mode 2))))
+    (mapc (lambda (entry)
+            (add-to-list 'copilot-indentation-alist entry))
+          '((org-mode 2)
+            (text-mode 2)
+            (conf-mode 2)
+            (yaml-mode 2)
+            (json-ts-mode 2)
+            (markdown-mode 2)
+            (latex-mode 2)
+            (prog-mode 2)))))
 
 (use-package gptel
   :bind (("C-c a g" . gptel-send)
@@ -692,29 +695,13 @@ It will \"remember\" omit state across Dired buffers."
 (when (and (fboundp 'treesit-available-p)
            (treesit-available-p))
 
-  (use-package treesit-langs
-    :straight (:type git :host github :repo "emacs-tree-sitter/treesit-langs")
+  (use-package treesit-auto
     :config
-    (treesit-langs-major-mode-setup)
+    (treesit-auto-add-to-auto-mode-alist 'all)
+    (global-treesit-auto-mode))
 
-    (dolist
-        (mapping
-         '((python-mode . python-ts-mode)
-           (c-mode . c-ts-mode)
-           (cpp-mode . cpp-ts-mode)
-           (css-mode . css-ts-mode)
-           (rust-mode . rust-ts-mode)
-           (csharp-mode . csharp-ts-mode)
-           (typescript-mode . typescript-ts-mode)
-           (js2-mode . js-ts-mode)
-           (bash-mode . bash-ts-mode)
-           (conf-toml-mode . toml-ts-mode)
-           (go-mode . go-ts-mode)
-           (css-mode . css-ts-mode)
-           (janet-mode . janet-ts-mode)
-           (json-mode . json-ts-mode)
-           (js-json-mode . json-ts-mode)))
-      (add-to-list 'major-mode-remap-alist mapping))))
+  (with-eval-after-load 'eglot
+    (add-hook 'typescript-ts-mode-hook 'eglot-ensure)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C/C++
@@ -738,15 +725,17 @@ It will \"remember\" omit state across Dired buffers."
           "--completion-style=detailed"
           "--all-scopes-completion"
           "--pch-storage=memory")))
-    (add-hook 'c-mode-hook 'eglot-ensure)))
+    (add-hook 'c-mode-hook 'eglot-ensure)
+    (add-hook 'c++-mode-hook 'eglot-ensure)
+    (add-hook 'c-ts-mode-hook 'eglot-ensure)
+    (add-hook 'c++-ts-mode-hook 'eglot-ensure)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C#
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (when-let (dotnet (executable-find "dotnet"))
-  (use-package csharp-mode
-    :init
+  (with-eval-after-load 'csharp-ts-mode
     (let* ((dotnet-script (executable-find "dotnet-script"))
            (omnisharp (executable-find "OmniSharp"))
            (csharp-ls (executable-find "csharp-ls"))
@@ -763,8 +752,8 @@ It will \"remember\" omit state across Dired buffers."
       (when omnisharp
         (add-to-list 'alternatives `(,omnisharp "-lsp")))
       (when alternatives
-        (add-to-list 'eglot-server-programs `(csharp-mode . ,(eglot-alternatives alternatives)))
-        (add-hook 'csharp-mode-hook 'eglot-ensure)))
+        (add-to-list 'eglot-server-programs `(csharp-ts-mode . ,(eglot-alternatives alternatives)))
+        (add-hook 'csharp-ts-mode-hook 'eglot-ensure)))
 
     (defun my-csharp-repl ()
       "Switch to the CSharpRepl buffer, creating it if necessary."
@@ -776,19 +765,17 @@ It will \"remember\" omit state across Dired buffers."
 	          (when-let ((b (make-comint "CSharpRepl" repl)))
               (switch-to-buffer-other-window b))))))
 
-    (defun my/csharp-mode-hook ()
+    (defun my/csharp-ts-mode-hook ()
       (setq-local indent-tabs-mode nil)
       (setq-local comment-column 40)
       (setq-local c-basic-offset 4))
-    (add-hook 'csharp-mode-hook #'my/csharp-mode-hook)
+    (add-hook 'csharp-ts-mode-hook #'my/csharp-ts-mode-hook)
 
-    :config
-    (define-key csharp-mode-map (kbd "C-c C-z") 'my-csharp-repl))
+    (define-key csharp-ts-mode-map (kbd "C-c C-z") 'my-csharp-repl))
 
   (use-package dotnet
-    :after csharp-mode
     :config
-    (add-hook 'csharp-mode-hook 'dotnet-mode)))
+    (add-hook 'csharp-ts-mode-hook 'dotnet-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Janet
@@ -815,7 +802,8 @@ It will \"remember\" omit state across Dired buffers."
   (when-let (janet-lsp (executable-find "janet-lsp"))
     (add-to-list 'eglot-server-programs
                  `((janet-ts-mode janet-mode) . (,janet-lsp)))
-    (add-hook 'janet-mode-hook 'eglot-ensure))
+    (add-hook 'janet-mode-hook 'eglot-ensure)
+    (add-hook 'janet-ts-mode-hook 'eglot-ensure))
 
   (use-package flycheck-janet
     :straight (:type git :host github :repo "sogaiu/flycheck-janet" :files ("*.el"))))
@@ -844,6 +832,7 @@ It will \"remember\" omit state across Dired buffers."
 
 (when-let (zig (executable-find "zig"))
   (use-package zig-mode
+    :straight (:type git :host codeberg :repo "ziglang/zig-mode")
     :init
     (when-let (zls (executable-find "zls"))
       (with-eval-after-load 'eglot
@@ -861,8 +850,7 @@ It will \"remember\" omit state across Dired buffers."
 (when-let (ruby (executable-find "ruby"))
   (use-package ruby-mode
     :hook (ruby-mode . inf-ruby-keys)
-    :init
-    (autoload 'ruby-mode "ruby-mode" "Ruby Mode" t ".rb"))
+    :mode ("\\.rb\\'" . ruby-mode))
 
   (defun launch-ruby ()
     "Launches a ruby process in a buffer named *ruby*."
@@ -879,11 +867,17 @@ It will \"remember\" omit state across Dired buffers."
       (kill-buffer "*ruby*")))
 
   (use-package inf-ruby)
-  (use-package enh-ruby-mode)
 
   (use-package robe
     :init
-    (advice-add 'launch-ruby :after #'robe-start)))
+    (advice-add 'launch-ruby :after #'robe-start))
+
+  (when-let (ruby-lsp (executable-find "ruby-lsp"))
+    (with-eval-after-load 'eglot
+      (add-to-list 'eglot-server-programs
+                   `((ruby-mode ruby-ts-mode) . (,ruby-lsp)))
+      (add-hook 'ruby-mode-hook 'eglot-ensure)
+      (add-hook 'ruby-ts-mode-hook 'eglot-ensure))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Rust
@@ -891,8 +885,23 @@ It will \"remember\" omit state across Dired buffers."
 
 (when (executable-find "rustc")
   (use-package rust-mode)
-  (use-package flycheck-rust
-    :config (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
+  (when-let (rust-analyzer (executable-find "rust-analyzer"))
+    (with-eval-after-load 'eglot
+      (add-to-list 'eglot-server-programs
+                   `((rust-mode rust-ts-mode) . (,rust-analyzer)))
+      (add-hook 'rust-mode-hook 'eglot-ensure)
+      (add-hook 'rust-ts-mode-hook 'eglot-ensure))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Python
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(when-let (basedpyright (executable-find "basedpyright"))
+  (with-eval-after-load 'eglot
+    (add-to-list 'eglot-server-programs
+                 `((python-mode python-ts-mode) . (,basedpyright "--stdio")))
+    (add-hook 'python-mode-hook 'eglot-ensure)
+    (add-hook 'python-ts-mode-hook 'eglot-ensure)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Scheme
@@ -928,9 +937,8 @@ It will \"remember\" omit state across Dired buffers."
 
 (use-package markdown-mode
   :hook (markdown-mode . visual-line-mode)
-  :init
-  (autoload 'markdown-mode "markdown-mode" "Markdown Mode" t ".md")
-  (autoload 'markdown-mode "markdown-mode" "Markdown Mode" t ".markdown"))
+  :mode (("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc Development Modes
@@ -945,30 +953,22 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package web-mode
-  :init
-  (autoload 'web-mode "web-mode" "Web Mode" t ".phtml")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".tpl")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".php")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".asp")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".gsp")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".jsp")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".aspx")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".ascx")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".erb")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".mustache")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".djhtml")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".html")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".tsx")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".jsx"))
+  :mode (("\\.phtml\\'" . web-mode)
+         ("\\.tpl\\'" . web-mode)
+         ("\\.php\\'" . web-mode)
+         ("\\.asp\\'" . web-mode)
+         ("\\.gsp\\'" . web-mode)
+         ("\\.jsp\\'" . web-mode)
+         ("\\.aspx\\'" . web-mode)
+         ("\\.ascx\\'" . web-mode)
+         ("\\.erb\\'" . web-mode)
+         ("\\.mustache\\'" . web-mode)
+         ("\\.djhtml\\'" . web-mode)
+         ("\\.html\\'" . web-mode)
+         ("\\.tsx\\'" . web-mode)
+         ("\\.jsx\\'" . web-mode)))
 (use-package css-mode)
-(use-package js2-mode)
-(use-package json-mode)
-(use-package restclient)
-(use-package typescript-mode)
-(use-package tide
-  :after typescript-mode
-  :hook (typescript-mode . tide-setup)
-  :hook (tide-mode . tide-hl-identifier-mode))
+(use-package verb)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Writing
