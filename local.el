@@ -273,7 +273,26 @@ It will \"remember\" omit state across Dired buffers."
   (prefer-coding-system 'utf-8)
 
   (when (fboundp 'set-message-beep)
-    (set-message-beep 'silent)))
+    (set-message-beep 'silent))
+
+  ;; Add prompt indicator to `completing-read-multiple'.
+  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+  (defun crm-indicator (args)
+    (cons (format "[CRM%s] %s"
+                  (replace-regexp-in-string
+                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                   crm-separator)
+                  (car args))
+          (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setopt minibuffer-prompt-properties
+          '(read-only t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+  ;; Enable recursive minibuffers
+  (setopt enable-recursive-minibuffers t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Useful Elisp Extensions
@@ -386,7 +405,8 @@ It will \"remember\" omit state across Dired buffers."
   (setopt
    ido-create-new-buffer 'always
    ido-enable-flex-matching t
-   ido-everywhere t))
+   ido-everywhere t)
+  (ido-mode 1))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Minions (Minor Modes in Modeline)
@@ -405,28 +425,6 @@ It will \"remember\" omit state across Dired buffers."
   (vertico-mode 1)
   (setopt vertico-resize nil
           vertico-cycle t))
-
-;; A few more useful configurations...
-(use-package emacs
-  :init
-  ;; Add prompt indicator to `completing-read-multiple'.
-  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-  (defun crm-indicator (args)
-    (cons (format "[CRM%s] %s"
-                  (replace-regexp-in-string
-                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                   crm-separator)
-                  (car args))
-          (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-  ;; Do not allow the cursor in the minibuffer prompt
-  (setopt minibuffer-prompt-properties
-          '(read-only t cursor-intangible t face minibuffer-prompt))
-  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-  ;; Enable recursive minibuffers
-  (setopt enable-recursive-minibuffers t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Save History (Minibuffer)
@@ -450,9 +448,7 @@ It will \"remember\" omit state across Dired buffers."
   (require 'corfu-history)
   :custom
   (global-corfu-modes '((not org-mode) (not text-mode) t))
-	(corfu-auto t)
 	(corfu-popupinfo-delay 0.5)
-	(corfu-quit-no-match t)
   (completion-cycle-threshold 3)
   (corfu-auto t)
   (corfu-cycle t)
@@ -485,8 +481,7 @@ It will \"remember\" omit state across Dired buffers."
 (use-package flyspell
   :hook
   (text-mode . flyspell-mode)
-  (prog-mode . flyspell-prog-mode)
-  (org-mode . flyspell-mode))
+  (prog-mode . flyspell-prog-mode))
 
 (use-package ispell
   :init
@@ -861,8 +856,7 @@ It will \"remember\" omit state across Dired buffers."
 (when-let (ruby (executable-find "ruby"))
   (use-package ruby-mode
     :hook (ruby-mode . inf-ruby-keys)
-    :init
-    (autoload 'ruby-mode "ruby-mode" "Ruby Mode" t ".rb"))
+    :mode ("\\.rb\\'" . ruby-mode))
 
   (defun launch-ruby ()
     "Launches a ruby process in a buffer named *ruby*."
@@ -928,9 +922,8 @@ It will \"remember\" omit state across Dired buffers."
 
 (use-package markdown-mode
   :hook (markdown-mode . visual-line-mode)
-  :init
-  (autoload 'markdown-mode "markdown-mode" "Markdown Mode" t ".md")
-  (autoload 'markdown-mode "markdown-mode" "Markdown Mode" t ".markdown"))
+  :mode (("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Misc Development Modes
@@ -945,21 +938,20 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package web-mode
-  :init
-  (autoload 'web-mode "web-mode" "Web Mode" t ".phtml")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".tpl")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".php")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".asp")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".gsp")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".jsp")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".aspx")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".ascx")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".erb")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".mustache")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".djhtml")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".html")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".tsx")
-  (autoload 'web-mode "web-mode" "Web Mode" t ".jsx"))
+  :mode (("\\.phtml\\'" . web-mode)
+         ("\\.tpl\\'" . web-mode)
+         ("\\.php\\'" . web-mode)
+         ("\\.asp\\'" . web-mode)
+         ("\\.gsp\\'" . web-mode)
+         ("\\.jsp\\'" . web-mode)
+         ("\\.aspx\\'" . web-mode)
+         ("\\.ascx\\'" . web-mode)
+         ("\\.erb\\'" . web-mode)
+         ("\\.mustache\\'" . web-mode)
+         ("\\.djhtml\\'" . web-mode)
+         ("\\.html\\'" . web-mode)
+         ("\\.tsx\\'" . web-mode)
+         ("\\.jsx\\'" . web-mode)))
 (use-package css-mode)
 (use-package js2-mode)
 (use-package json-mode)
