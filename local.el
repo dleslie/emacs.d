@@ -366,15 +366,16 @@ It will \"remember\" omit state across Dired buffers."
    (lisp-mode . rainbow-delimiters-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Ag
+;; Ripgrep
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(use-package ag
-  :defer t
-  :init
-  (define-key-after global-map [menu-bar tools ag]
-    '(menu-item "Search Files (ag)..." ag :help "Search files for strings or regexps (with ag)...")
-    'grep))
+(when (executable-find "rg")
+  (use-package rg
+    :config
+    (rg-enable-default-bindings)
+    (define-key-after global-map [menu-bar tools rg]
+      '(menu-item "Search Files (ripgrep)..." rg :help "Search files for strings or regexps (with ripgrep)...")
+      'grep)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Ido
