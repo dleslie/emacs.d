@@ -183,15 +183,6 @@ It will \"remember\" omit state across Dired buffers."
 ;; Package Management
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Configure package manager
-(require 'package)
-(setopt package-archives
-        '(("melpa" . "https://melpa.org/packages/") 
-	  ("gnu" . "https://elpa.gnu.org/packages/"))
-        package-archive-priorities
-        '(("melpa" . 100)
-          ("gnu" . 80)))
-
 ;; Configure straight
 (setq straight-use-package-by-default t)
 (setq straight-check-for-modifications '(check-on-save find-when-checking))
@@ -209,6 +200,11 @@ It will \"remember\" omit state across Dired buffers."
   (load bootstrap-file nil 'nomessage))
 
 (straight-use-package 'use-package)
+
+;; Use built-in versions of packages that ship with Emacs
+(straight-use-package '(project :type built-in))
+(straight-use-package '(xref :type built-in))
+(straight-use-package '(flymake :type built-in))
 
 (require 'use-package)
 (require 'bind-key)
