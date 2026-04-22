@@ -24,6 +24,18 @@
 	     (eq 'windows-nt system-type)))
   (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3"))
 
+;; Memoize executable-find during init
+(defvar my/executable-find-cache (make-hash-table :test 'equal))
+(advice-add 'executable-find :around
+            (lambda (orig-fun &rest args)
+              (let ((cmd (car args)))
+                (if (gethash cmd my/executable-find-cache)
+                    (gethash cmd my/executable-find-cache)
+                  (let ((result (apply orig-fun args)))
+                    (puthash cmd result my/executable-find-cache)
+                    result))))
+            '((name . "my/memoize-executable-find")))
+
 ;; Disable file handler search during load
 (defvar default-file-name-handler-alist file-name-handler-alist)
 (setq file-name-handler-alist nil)
@@ -47,6 +59,10 @@
 ;; Load custom.el
 (when (file-exists-p custom-file)
   (load custom-file))
+
+;; Remove executable-find memoization
+(advice-remove 'executable-find "my/memoize-executable-find")
+(clrhash my/executable-find-cache)
 
 ;; Enable file handler
 (setq file-name-handler-alist default-file-name-handler-alist)

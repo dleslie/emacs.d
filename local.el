@@ -193,6 +193,7 @@ It will \"remember\" omit state across Dired buffers."
           ("gnu" . 80)))
 
 ;; Configure straight
+(setq straight-check-for-modifications '(check-on-save find-when-checking))
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -369,6 +370,7 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package ag
+  :defer t
   :init
   (define-key-after global-map [menu-bar tools ag]
     '(menu-item "Search Files (ag)..." ag :help "Search files for strings or regexps (with ag)...")
@@ -512,6 +514,7 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package magit
+  :defer t
   :bind
   ("C-c g" . magit-status))
 
