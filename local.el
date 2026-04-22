@@ -517,7 +517,14 @@ It will \"remember\" omit state across Dired buffers."
 (use-package magit
   :defer t
   :bind
-  ("C-c g" . magit-status))
+  ("C-c g" . magit-status)
+  :config
+  ;; Windows performance tweaks
+  (when (eq system-type 'windows-nt)
+    (setq magit-process-connection-type nil))
+  (setq magit-auto-revert-mode nil)
+  (setq magit-refresh-buffers nil)
+  (setq magit-revision-show-gravatars nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Eglot

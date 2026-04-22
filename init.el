@@ -17,6 +17,8 @@
 ;; Windows performance tweaks
 (when (boundp 'w32-pipe-read-delay)
   (setq w32-pipe-read-delay 0))
+(when (boundp 'w32-pipe-buffer-size)
+  (setq w32-pipe-buffer-size (* 64 1024)))
 
 ;; Fix TLS on Windows
 (when  
@@ -42,8 +44,12 @@
             (advice-remove 'executable-find "my/memoize-executable-find")
             (setq my/executable-find-cache nil)
             (setq file-name-handler-alist default-file-name-handler-alist)
-            (setq gc-cons-threshold (* 2 1024 1024))
-            (message "Emacs started in %s" (emacs-init-time))))
+            (setq gc-cons-threshold 104857600
+                  gc-cons-percentage 0.1)
+            (garbage-collect)
+            (message "Emacs ready in %s with %d garbage collections."
+                     (emacs-init-time)
+                     gcs-done)))
 
 ;; Disable file handler search during load
 (defvar default-file-name-handler-alist file-name-handler-alist)
@@ -68,25 +74,6 @@
 ;; Load custom.el
 (when (file-exists-p custom-file)
   (load custom-file))
-
-;; Remove executable-find memoization
-(advice-remove 'executable-find "my/memoize-executable-find")
-(clrhash my/executable-find-cache)
-
-;; Enable file handler
-(setq file-name-handler-alist default-file-name-handler-alist)
-
-;; Enable GC
-(setq gc-cons-threshold 104857600
-      gc-cons-percentage 0.1)
-(garbage-collect)
-
-;; Friendly message
-(message "Emacs ready in %s with %d garbage collections."
-         (format "%.2f seconds"
-                 (float-time
-                  (time-subtract after-init-time before-init-time)))
-         gcs-done)
 
 (provide 'init)
 ;;; init.el ends here
