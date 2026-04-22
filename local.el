@@ -87,7 +87,8 @@
     (split-window-vertically (- height))
     (other-window 1)
     (eshell "new")
-    (rename-buffer (concat "*eshell: " name "*"))))
+    (let ((new-name (generate-new-buffer-name (concat "*eshell: " name "*"))))
+      (rename-buffer new-name))))
 
 (defun dos2unix (buffer)
   "Remove all carriage return from BUFFER."
@@ -97,6 +98,7 @@
     (while (search-forward (string ?\C-m) nil t)
       (replace-match "" nil t))))
 
+(require 'seq)
 (require 'ansi-color)
 (defun display-ansi-colors ()
   "Enables ANSI color for the entire buffer."
@@ -141,7 +143,7 @@
 
 (require 'dired-x)
 (setq-default dired-omit-files-p t) ; Buffer-local variable
-(setopt dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
+(setq dired-omit-files (concat "^\\..+\\|" (default-value 'dired-omit-files)))
 (defvar v-dired-omit t
   "If dired-omit-mode enabled by default.  Don't setq me.")
 (defun dired-omit-switch ()
@@ -615,20 +617,21 @@ It will \"remember\" omit state across Dired buffers."
   ;; Remove duplicates
   (setopt ollama-models (delete-dups ollama-models)))
 
-(use-package copilot
-  :bind (("C-c <tab>" . 'copilot-accept-completion-by-paragraph)
-         ("C-c S-<tab>" . 'copilot-accept-completion))
-  :hook ((prog-mode . copilot-mode)
-         (text-mode . copilot-mode)
-         (conf-mode . copilot-mode)
-         (yaml-mode . copilot-mode)
-         (json-mode . copilot-mode)
-         (markdown-mode . copilot-mode)
-         (org-mode . copilot-mode)
-         (latex-mode . copilot-mode))
-  :config
-  (add-to-list 'copilot-indentation-alist
-               '(org-mode 2)))
+(when (executable-find "copilot-language-server")
+  (use-package copilot
+    :bind (("C-c <tab>" . 'copilot-accept-completion-by-paragraph)
+           ("C-c S-<tab>" . 'copilot-accept-completion))
+    :hook ((prog-mode . copilot-mode)
+           (text-mode . copilot-mode)
+           (conf-mode . copilot-mode)
+           (yaml-mode . copilot-mode)
+           (json-mode . copilot-mode)
+           (markdown-mode . copilot-mode)
+           (org-mode . copilot-mode)
+           (latex-mode . copilot-mode))
+    :config
+    (add-to-list 'copilot-indentation-alist
+                 '(org-mode 2))))
 
 (use-package gptel
   :bind (("C-c a g" . gptel-send)
@@ -1154,18 +1157,24 @@ It will \"remember\" omit state across Dired buffers."
 (defun random-dark-theme ()
   "Change to a random dark theme."
   (interactive)
-  (while
-      (progn
-	      (random-theme)
-	      (not (background-is-dark)))))
+  (let ((attempts 0)
+        (max-attempts 20))
+    (while (and (progn (random-theme) (not (background-is-dark)))
+                (< attempts max-attempts))
+      (setq attempts (1+ attempts)))
+    (when (= attempts max-attempts)
+      (message "Could not find a dark theme after %d attempts." max-attempts))))
 
 (defun random-light-theme ()
   "Change to a random light theme."
   (interactive)
-  (while
-      (progn
-	      (random-theme)
-	      (background-is-dark))))
+  (let ((attempts 0)
+        (max-attempts 20))
+    (while (and (progn (random-theme) (background-is-dark))
+                (< attempts max-attempts))
+      (setq attempts (1+ attempts)))
+    (when (= attempts max-attempts)
+      (message "Could not find a light theme after %d attempts." max-attempts))))
 
 (defun next-theme ()
   "Cycle through all available themes."
@@ -1182,11 +1191,14 @@ It will \"remember\" omit state across Dired buffers."
 	      (change-theme next)))))
 
 (defun background-is-dark ()
-  "Return t if the current theme background is dark."
+  "Return t if the current theme background is dark based on luminance."
   (interactive)
-  (let ((dark 0.33))
-    (seq-every-p (lambda (x) (<= x dark))
-		             (color-name-to-rgb (face-attribute 'default :background)))))
+  (let ((rgb (color-name-to-rgb (face-attribute 'default :background))))
+    (when rgb
+      (let ((luminance (+ (* 0.299 (nth 0 rgb))
+                          (* 0.587 (nth 1 rgb))
+                          (* 0.114 (nth 2 rgb)))))
+        (< luminance 0.5)))))
 
 (defun load-default-theme ()
   "Load the default theme."

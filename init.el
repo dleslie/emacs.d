@@ -29,7 +29,7 @@
 (setq file-name-handler-alist nil)
 
 ;; Load local configurations
-(let ((localel (expand-file-name (concat user-emacs-directory "local"))))
+(let ((localel (expand-file-name "local" user-emacs-directory)))
   (load localel))
 
 ;; Make custom file not this one
