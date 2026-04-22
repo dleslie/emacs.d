@@ -623,8 +623,6 @@ It will \"remember\" omit state across Dired buffers."
 
 (when (executable-find "copilot-language-server")
   (use-package copilot
-    :bind (("C-c <tab>" . 'copilot-accept-completion-by-paragraph)
-           ("C-c S-<tab>" . 'copilot-accept-completion))
     :hook ((prog-mode . copilot-mode)
            (text-mode . copilot-mode)
            (conf-mode . copilot-mode)
@@ -633,6 +631,8 @@ It will \"remember\" omit state across Dired buffers."
            (markdown-mode . copilot-mode)
            (org-mode . copilot-mode)
            (latex-mode . copilot-mode))
+    :bind (("C-c <tab>" . 'copilot-accept-completion-by-paragraph)
+           ("C-c S-<tab>" . 'copilot-accept-completion))
     :config
     (add-to-list 'copilot-indentation-alist
                  '(org-mode 2))))

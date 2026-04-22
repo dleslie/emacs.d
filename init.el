@@ -27,14 +27,23 @@
 ;; Memoize executable-find during init
 (defvar my/executable-find-cache (make-hash-table :test 'equal))
 (advice-add 'executable-find :around
-            (lambda (orig-fun &rest args)
+            (defun my/memoize-executable-find (orig-fun &rest args)
               (let ((cmd (car args)))
-                (if (gethash cmd my/executable-find-cache)
-                    (gethash cmd my/executable-find-cache)
+                (if-let ((result (gethash cmd my/executable-find-cache)))
+                    result
                   (let ((result (apply orig-fun args)))
                     (puthash cmd result my/executable-find-cache)
                     result))))
             '((name . "my/memoize-executable-find")))
+
+;; Cleanup and restore after startup
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (advice-remove 'executable-find "my/memoize-executable-find")
+            (setq my/executable-find-cache nil)
+            (setq file-name-handler-alist default-file-name-handler-alist)
+            (setq gc-cons-threshold (* 2 1024 1024))
+            (message "Emacs started in %s" (emacs-init-time))))
 
 ;; Disable file handler search during load
 (defvar default-file-name-handler-alist file-name-handler-alist)
