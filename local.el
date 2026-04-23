@@ -699,22 +699,28 @@ Defaults to one week (604800 seconds)."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (when-let (dotnet (executable-find "dotnet"))
+  ;; ~/.dotnet/tools is where `dotnet tool install -g` puts binaries.
+  ;; Add it to exec-path so csharp-ls and dotnet-script are findable.
+  (let ((dotnet-tools (expand-file-name "~/.dotnet/tools")))
+    (when (file-directory-p dotnet-tools)
+      (add-to-list 'exec-path dotnet-tools)
+      (setenv "PATH" (concat dotnet-tools path-separator (getenv "PATH")))))
+
   (add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-mode))
 
-  (let* ((dotnet-script (executable-find "dotnet-script"))
-         (omnisharp (executable-find "OmniSharp"))
-         (csharp-ls (executable-find "csharp-ls"))
-         (alternatives
-          (append
-           (when csharp-ls `((,csharp-ls "-l" "error")))
-           (when omnisharp `((,omnisharp "-lsp"))))))
-    (when alternatives
-      (with-eval-after-load 'eglot
+  (with-eval-after-load 'eglot
+    (let* ((csharp-ls (executable-find "csharp-ls"))
+           (omnisharp (executable-find "OmniSharp"))
+           (alternatives
+            (append
+             (when csharp-ls `((,csharp-ls "-l" "error")))
+             (when omnisharp `((,omnisharp "-lsp"))))))
+      (when alternatives
         (add-to-list 'eglot-server-programs
-                     `((csharp-mode) . ,(eglot-alternatives alternatives)))
-        (add-hook 'csharp-mode-hook 'eglot-ensure))))
+                     `((csharp-mode csharp-ts-mode) . ,(eglot-alternatives alternatives))))))
 
   (add-hook 'csharp-mode-hook 'eglot-ensure)
+  (add-hook 'csharp-ts-mode-hook 'eglot-ensure)
 
   (defun my/csharp-mode-hook ()
     (setq-local indent-tabs-mode nil)
