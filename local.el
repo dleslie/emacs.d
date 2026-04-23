@@ -289,6 +289,15 @@ Defaults to one week (604800 seconds)."
   ;; Enable recursive minibuffers
   (setopt enable-recursive-minibuffers t))
 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Tree Sitter
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package tree-sitter :ensure t)
+(use-package tree-sitter-langs :ensure t)
+(use-package tree-sitter-indent :ensure t)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Useful Elisp Extensions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -800,6 +809,11 @@ before grammars are lazily installed."
     (add-hook 'csharp-ts-mode-hook #'my/csharp-ts-mode-hook)
 
     (define-key csharp-ts-mode-map (kbd "C-c C-z") 'my-csharp-repl))
+
+  (use-package csharp-mode
+    :ensure t
+    :config
+    (add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-tree-sitter-mode)))
 
   (use-package dotnet
     :config
