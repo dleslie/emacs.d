@@ -614,6 +614,7 @@ Defaults to one week (604800 seconds)."
            ("C-c S-<tab>" . 'copilot-accept-completion))
     :config
     (setopt copilot-indent-offset-warning-disable t)
+    (setopt copilot-max-char -1)
     (mapc (lambda (entry)
             (add-to-list 'copilot-indentation-alist entry))
           '((org-mode 2)
