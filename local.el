@@ -675,11 +675,56 @@ Defaults to one week (604800 seconds)."
            (treesit-available-p))
 
   (use-package treesit-auto
-    :config
+    :custom
     ;; Auto-install missing grammars only if a C compiler is available.
-    (when (seq-some #'executable-find '("cc" "gcc" "clang" "tcc"))
-      (setopt treesit-auto-install 'prompt))
-    (treesit-auto-add-to-auto-mode-alist 'all)
+    (treesit-auto-install (if (eq system-type 'windows-nt) nil
+                            (if (seq-some #'executable-find '("cc" "gcc" "clang" "tcc")) t nil)))
+    :config
+    ;; Define common languages to pre-install to avoid first-load warnings
+    (defvar my/treesit-common-languages
+      '(c cpp python javascript typescript tsx json yaml bash rust go)
+      "Common language grammars to pre-install during startup.")
+    
+    ;; Add ABI-14 compatible revisions for grammars missing them
+    (when (and (fboundp 'treesit-library-abi-version)
+               (eq (treesit-library-abi-version) 14))
+      (setq treesit-language-source-alist
+            (append
+             '((c "https://github.com/tree-sitter/tree-sitter-c" "v0.21.3" nil nil nil)
+               (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "v0.21.2" "src" nil nil)
+               (rust "https://github.com/tree-sitter/tree-sitter-rust" "v0.21.2" nil nil nil))
+             treesit-language-source-alist)))
+    
+    (defun my/treesit-install-common-grammars ()
+      "Install common TreeSitter grammars if missing.
+This runs during startup to prevent warnings when opening files
+before grammars are lazily installed."
+      (when treesit-auto-install
+        ;; Build the source alist from treesit-auto recipes
+        (let* ((treesit-language-source-alist (treesit-auto--build-treesit-source-alist))
+               (missing-langs (seq-filter
+                               (lambda (lang)
+                                 (not (treesit-language-available-p lang)))
+                               my/treesit-common-languages)))
+          (when missing-langs
+            (message "Installing %d missing TreeSitter grammars: %s"
+                     (length missing-langs)
+                     (mapconcat #'symbol-name missing-langs ", "))
+            (dolist (lang missing-langs)
+              (condition-case err
+                  (progn
+                    (message "  Installing grammar for %s..." lang)
+                    (treesit-install-language-grammar lang)
+                    (message "  ✓ Installed %s" lang))
+                (error (message "  ✗ Failed to install %s: %s" lang (error-message-string err)))))
+            (message "TreeSitter grammar installation complete.")))))
+    
+    ;; Pre-install common grammars before activating auto-mode
+    ;; This prevents warnings on first load
+    (my/treesit-install-common-grammars)
+    
+    ;; Only add modes to auto-mode-alist for languages where the grammar is ready
+    (treesit-auto-add-to-auto-mode-alist)
     (global-treesit-auto-mode))
 
   (with-eval-after-load 'eglot
@@ -791,6 +836,8 @@ Defaults to one week (604800 seconds)."
 
   (when (>= emacs-major-version 30)
     (use-package flycheck-janet
+      :after (flycheck janet-mode)
+      :demand t
       :vc (:url "https://github.com/sogaiu/flycheck-janet"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
