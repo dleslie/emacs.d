@@ -699,53 +699,30 @@ Defaults to one week (604800 seconds)."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (when-let (dotnet (executable-find "dotnet"))
-  ;; dotnet global tools install to ~/.dotnet/tools which is not on exec-path by default
-  (let ((dotnet-tools (expand-file-name "~/.dotnet/tools")))
-    (when (file-directory-p dotnet-tools)
-      (add-to-list 'exec-path dotnet-tools)
-      (setenv "PATH" (concat dotnet-tools path-separator (getenv "PATH")))))
+  (add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-mode))
 
-  ;; Ensure language server tools are installed at startup
-  (unless (executable-find "dotnet-script")
-    (shell-command (concat "\"" dotnet "\" tool install -g dotnet-script")))
-  (unless (or (executable-find "csharp-ls") (executable-find "OmniSharp"))
-    (shell-command (concat "\"" dotnet "\" tool install -g csharp-ls")))
-
-  (use-package csharp-mode
-    :ensure t
-    :mode ("\\.cs\\'" . csharp-mode))
-
-  ;; Eglot is loaded eagerly (:demand t), so register server and hook at startup.
-  (let* ((csharp-ls (executable-find "csharp-ls"))
+  (let* ((dotnet-script (executable-find "dotnet-script"))
          (omnisharp (executable-find "OmniSharp"))
+         (csharp-ls (executable-find "csharp-ls"))
          (alternatives
           (append
            (when csharp-ls `((,csharp-ls "-l" "error")))
            (when omnisharp `((,omnisharp "-lsp"))))))
     (when alternatives
-      (add-to-list 'eglot-server-programs
-                   `(csharp-mode . ,(eglot-alternatives alternatives)))))
+      (with-eval-after-load 'eglot
+        (add-to-list 'eglot-server-programs
+                     `((csharp-mode) . ,(eglot-alternatives alternatives)))
+        (add-hook 'csharp-mode-hook 'eglot-ensure))))
 
   (add-hook 'csharp-mode-hook 'eglot-ensure)
 
+  (defun my/csharp-mode-hook ()
+    (setq-local indent-tabs-mode nil)
+    (setq-local comment-column 40)
+    (setq-local c-basic-offset 4))
+  (add-hook 'csharp-mode-hook #'my/csharp-mode-hook)
+
   (with-eval-after-load 'csharp-mode
-    (defun my-csharp-repl ()
-      "Switch to the CSharpRepl buffer, creating it if necessary."
-      (interactive)
-      (let ((repl (or (executable-find "dotnet-script") (executable-find "csharp"))))
-        (when repl
-          (if-let ((buf (get-buffer "*CSharpRepl*")))
-              (pop-to-buffer buf)
-            (when-let ((b (make-comint "CSharpRepl" repl)))
-              (switch-to-buffer-other-window b))))))
-
-    (defun my/csharp-mode-hook ()
-      ;; C# uses 4-space indent (overrides the global c-basic-offset of 2)
-      (setq-local indent-tabs-mode nil)
-      (setq-local comment-column 40)
-      (setq-local c-basic-offset 4))
-    (add-hook 'csharp-mode-hook #'my/csharp-mode-hook)
-
     (define-key csharp-mode-map (kbd "C-c C-z") 'my-csharp-repl))
 
   (use-package dotnet
