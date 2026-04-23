@@ -674,11 +674,12 @@ Defaults to one week (604800 seconds)."
            (treesit-available-p))
 
   (use-package treesit-auto
-    :config
+    :custom
     ;; Auto-install missing grammars only if a C compiler is available.
-    (when (seq-some #'executable-find '("cc" "gcc" "clang" "tcc"))
-      (setopt treesit-auto-install t))
-    (treesit-auto-add-to-auto-mode-alist 'all)
+    (treesit-auto-install (if (seq-some #'executable-find '("cc" "gcc" "clang" "tcc")) t nil))
+    :config
+    ;; Only add modes to auto-mode-alist for languages where the grammar is ready
+    (treesit-auto-add-to-auto-mode-alist)
     (global-treesit-auto-mode))
 
   (with-eval-after-load 'eglot
@@ -790,7 +791,8 @@ Defaults to one week (604800 seconds)."
 
   (when (>= emacs-major-version 30)
     (use-package flycheck-janet
-      :after flycheck
+      :after (flycheck janet-mode)
+      :demand t
       :vc (:url "https://github.com/sogaiu/flycheck-janet"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
