@@ -183,28 +183,40 @@ It will \"remember\" omit state across Dired buffers."
 ;; Package Management
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Configure straight
-(setq straight-use-package-by-default t)
-(setq straight-check-for-modifications '(check-on-save find-when-checking))
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
-(straight-use-package 'use-package)
+(defcustom my/package-refresh-interval (* 7 24 60 60)
+  "Minimum seconds between automatic package archive refreshes.
+Defaults to one week (604800 seconds)."
+  :type 'integer
+  :group 'package)
 
-;; Use built-in versions of packages that ship with Emacs
-(straight-use-package '(project :type built-in))
-(straight-use-package '(xref :type built-in))
-(straight-use-package '(flymake :type built-in))
+(defun my/package-archives-stale-p ()
+  "Return t if the package archive cache is absent or older than
+`my/package-refresh-interval' seconds."
+  (let ((cache (expand-file-name "archives/melpa/archive-contents" package-user-dir)))
+    (or (not (file-exists-p cache))
+        (> (float-time (time-since (file-attribute-modification-time
+                                    (file-attributes cache))))
+           my/package-refresh-interval))))
+
+(when (my/package-archives-stale-p)
+  (package-refresh-contents))
+
+;; Compat shim: Emacs 29.x has package-vc-install but use-package
+;; doesn't yet have the :vc keyword (added in Emacs 30.1). Wire it up.
+(when (and (< emacs-major-version 30)
+           (fboundp 'package-vc-install))
+  (defun my/use-package-vc-handler (name _keyword arg rest state)
+    (let ((body (use-package-process-keywords name rest state)))
+      (when arg
+        (push `(unless (package-installed-p ',name)
+                 (package-vc-install ,arg))
+              body))
+      body))
+  (defalias 'use-package-normalize/:vc #'use-package-normalize-forms)
+  (defalias 'use-package-handler/:vc #'my/use-package-vc-handler))
 
 (require 'use-package)
 (require 'bind-key)
@@ -784,16 +796,16 @@ It will \"remember\" omit state across Dired buffers."
       (progn
         (use-package janet-ts-mode
           :hook (janet-ts-mode . smartparens-mode)
-          :straight (:type git :host github :repo "sogaiu/janet-ts-mode" :files ("*.el")))
+          :vc (:url "https://github.com/sogaiu/janet-ts-mode"))
         (use-package ajrepl
           :hook (janet-ts-mode . ajrepl-interaction-mode)
-          :straight (:type git :host github :repo "sogaiu/ajrepl" :files ("*.el" "ajrepl"))))
+          :vc (:url "https://github.com/sogaiu/ajrepl")))
     (progn
       (use-package janet-mode
         :hook (janet-mode . smartparens-mode))
       (use-package inf-janet
         :hook (janet-mode . inf-janet-minor-mode)
-        :straight (:type git :host github :repo "velkyel/inf-janet"))))
+        :vc (:url "https://github.com/velkyel/inf-janet"))))
 
   (when-let (janet-lsp (executable-find "janet-lsp"))
     (add-to-list 'eglot-server-programs
@@ -802,7 +814,7 @@ It will \"remember\" omit state across Dired buffers."
     (add-hook 'janet-ts-mode-hook 'eglot-ensure))
 
   (use-package flycheck-janet
-    :straight (:type git :host github :repo "sogaiu/flycheck-janet" :files ("*.el"))))
+    :vc (:url "https://github.com/sogaiu/flycheck-janet")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Common Lisp
@@ -828,7 +840,6 @@ It will \"remember\" omit state across Dired buffers."
 
 (when-let (zig (executable-find "zig"))
   (use-package zig-mode
-    :straight (:type git :host codeberg :repo "ziglang/zig-mode")
     :init
     (when-let (zls (executable-find "zls"))
       (with-eval-after-load 'eglot
