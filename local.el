@@ -676,7 +676,8 @@ Defaults to one week (604800 seconds)."
   (use-package treesit-auto
     :custom
     ;; Auto-install missing grammars only if a C compiler is available.
-    (treesit-auto-install (if (seq-some #'executable-find '("cc" "gcc" "clang" "tcc")) t nil))
+    (treesit-auto-install (if (eq system-type 'windows-nt) nil
+                            (if (seq-some #'executable-find '("cc" "gcc" "clang" "tcc")) t nil)))
     :config
     ;; Define common languages to pre-install to avoid first-load warnings
     (defvar my/treesit-common-languages
