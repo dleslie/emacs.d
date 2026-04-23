@@ -62,9 +62,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun my-org-directory ()
-  "Opens ORG-DIRECTORY in a new buffer."
+  "Opens `my/org-directory' in a new buffer."
   (interactive)
-  (find-file org-directory))
+  (find-file my/org-directory))
 
 (defun my-emacs-directory ()
   "Opens the Emacs configuration directory in a new buffer."
@@ -130,9 +130,9 @@
 
 (defun my-colorize-compilation-buffer ()
   "Enable ansi colors."
-  (read-only-mode nil)
+  (read-only-mode -1)
   (ansi-color-apply-on-region (point-min) (point-max))
-  (read-only-mode t))
+  (read-only-mode 1))
 
 (add-hook 'compilation-mode-hook 'my-compilation-custom-hook)
 (add-hook 'compilation-filter-hook 'my-colorize-compilation-buffer)
@@ -151,16 +151,16 @@
 It will \"remember\" omit state across Dired buffers."
   (interactive)
   (if (eq v-dired-omit t)
-      (setopt v-dired-omit nil)
-    (setopt v-dired-omit t))
+      (setq v-dired-omit nil)
+    (setq v-dired-omit t))
   (dired-omit-caller)
   (revert-buffer))
 
 (defun dired-omit-caller ()
   "Ensures dired-omit is working."
   (if v-dired-omit
-      (setopt dired-omit-mode t)
-    (setopt dired-omit-mode nil)))
+      (dired-omit-mode 1)
+    (dired-omit-mode -1)))
 
 (define-key dired-mode-map (kbd "C-x M-o") 'dired-omit-switch)
 (add-hook 'dired-mode-hook 'dired-omit-caller)
@@ -185,6 +185,7 @@ It will \"remember\" omit state across Dired buffers."
 
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(package-initialize)
 
 (defcustom my/package-refresh-interval (* 7 24 60 60)
   "Minimum seconds between automatic package archive refreshes.
@@ -204,20 +205,6 @@ Defaults to one week (604800 seconds)."
 (when (my/package-archives-stale-p)
   (package-refresh-contents))
 
-;; Compat shim: Emacs 29.x has package-vc-install but use-package
-;; doesn't yet have the :vc keyword (added in Emacs 30.1). Wire it up.
-(when (and (< emacs-major-version 30)
-           (fboundp 'package-vc-install))
-  (defun my/use-package-vc-handler (name _keyword arg rest state)
-    (let ((body (use-package-process-keywords name rest state)))
-      (when arg
-        (push `(unless (package-installed-p ',name)
-                 (package-vc-install ,arg))
-              body))
-      body))
-  (defalias 'use-package-normalize/:vc #'use-package-normalize-forms)
-  (defalias 'use-package-handler/:vc #'my/use-package-vc-handler))
-
 (require 'use-package)
 (require 'bind-key)
 (require 'use-package-ensure)
@@ -227,6 +214,17 @@ Defaults to one week (604800 seconds)."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Emacs Configuration
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Add prompt indicator to `completing-read-multiple'.
+;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+(defun crm-indicator (args)
+  (cons (format "[CRM%s] %s"
+                (replace-regexp-in-string
+                 "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                 crm-separator)
+                (car args))
+        (cdr args)))
+(advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
 (use-package emacs
   :bind
@@ -264,11 +262,10 @@ Defaults to one week (604800 seconds)."
   (tab-stop-list (number-sequence 2 120 2))
   (tab-width 2)
   (tool-bar-mode nil)
-  (backup-by-copying nil)
   (require-final-newline t)
   (frame-inhibit-implied-resize t)
   (switch-to-buffer-obey-display-actions t)
-  (warning-minimum-level :emergency)
+  (warning-minimum-level :warning)
 
   :hook
   (prog-mode . hl-line-mode)
@@ -283,17 +280,6 @@ Defaults to one week (604800 seconds)."
 
   (when (fboundp 'set-message-beep)
     (set-message-beep 'silent))
-
-  ;; Add prompt indicator to `completing-read-multiple'.
-  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-  (defun crm-indicator (args)
-    (cons (format "[CRM%s] %s"
-                  (replace-regexp-in-string
-                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                   crm-separator)
-                  (car args))
-          (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
   ;; Do not allow the cursor in the minibuffer prompt
   (setopt minibuffer-prompt-properties
@@ -313,7 +299,9 @@ Defaults to one week (604800 seconds)."
 (use-package smerge-mode
   :ensure nil
   :hook
-  (prog-mode . smerge-mode))
+  ;; Activate only when a file actually contains conflict markers,
+  ;; rather than scanning every prog-mode buffer unconditionally.
+  (find-file . smerge-start-session))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Avy
@@ -339,7 +327,7 @@ Defaults to one week (604800 seconds)."
 (use-package neotree
   :bind (("<f8>" . neotree-project-dir)
          ("C-x p C-d" . neotree-project-dir))
-  :init
+  :config
 
   (defun neotree-dir-prompt ()
     "Prompt for directory and open NeoTree."
@@ -406,18 +394,6 @@ Defaults to one week (604800 seconds)."
       'grep)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Ido
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package ido
-  :config
-  (setopt
-   ido-create-new-buffer 'always
-   ido-enable-flex-matching t
-   ido-everywhere t)
-  (ido-mode 1))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Minions (Minor Modes in Modeline)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -475,12 +451,10 @@ Defaults to one week (604800 seconds)."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package orderless
-  :init
-  (icomplete-mode)
   :custom
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles basic partial-completion))
-				                           (eglot (styles orderless)))))
+			                           (eglot (styles orderless)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Flyspell
@@ -526,7 +500,6 @@ Defaults to one week (604800 seconds)."
   (when (eq system-type 'windows-nt)
     (setq magit-process-connection-type nil))
   (setq magit-auto-revert-mode nil)
-  (setq magit-refresh-buffers nil)
   (setq magit-revision-show-gravatars nil))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -607,21 +580,17 @@ Defaults to one week (604800 seconds)."
 
 (when (executable-find "ollama")
   (defun ollama-list-models ()
-    "List all available models from the ollama CLI"
+    "List all available models from the ollama CLI."
     (interactive)
     (let ((output (shell-command-to-string "ollama list")))
       (with-temp-buffer
         (insert output)
         (goto-char (point-min))
+        ;; Skip the header line ("NAME   ID   SIZE   MODIFIED")
+        (forward-line 1)
         (let ((models '()))
-          ;; Split output by whitespace, model is first column
           (while (re-search-forward "^\\(\\S-+\\)\\s-+" nil t)
-            ;; Skip if model is "NAME"
-            (when (string= (match-string 1) "NAME")
-              (forward-line))
-            ;; Intern model name as symbol
             (let ((model (intern (match-string 1))))
-              ;; Add model to list if not already present
               (unless (member model models)
                 (push model models))))
           models))))
@@ -644,6 +613,7 @@ Defaults to one week (604800 seconds)."
     :bind (("C-c <tab>" . 'copilot-accept-completion-by-paragraph)
            ("C-c S-<tab>" . 'copilot-accept-completion))
     :config
+    (setopt copilot-indent-offset-warning-disable t)
     (mapc (lambda (entry)
             (add-to-list 'copilot-indentation-alist entry))
           '((org-mode 2)
@@ -705,6 +675,9 @@ Defaults to one week (604800 seconds)."
 
   (use-package treesit-auto
     :config
+    ;; Auto-install missing grammars only if a C compiler is available.
+    (when (seq-some #'executable-find '("cc" "gcc" "clang" "tcc"))
+      (setopt treesit-auto-install 'prompt))
     (treesit-auto-add-to-auto-mode-alist 'all)
     (global-treesit-auto-mode))
 
@@ -774,6 +747,7 @@ Defaults to one week (604800 seconds)."
               (switch-to-buffer-other-window b))))))
 
     (defun my/csharp-ts-mode-hook ()
+      ;; C# uses 4-space indent (overrides the global c-basic-offset of 2)
       (setq-local indent-tabs-mode nil)
       (setq-local comment-column 40)
       (setq-local c-basic-offset 4))
@@ -793,7 +767,7 @@ Defaults to one week (604800 seconds)."
   (if (and (not (eq 'windows-nt system-type))
            (fboundp 'treesit-available-p)
            (treesit-language-available-p 'janet-simple))
-      (progn
+      (when (>= emacs-major-version 30)
         (use-package janet-ts-mode
           :hook (janet-ts-mode . smartparens-mode)
           :vc (:url "https://github.com/sogaiu/janet-ts-mode"))
@@ -803,9 +777,10 @@ Defaults to one week (604800 seconds)."
     (progn
       (use-package janet-mode
         :hook (janet-mode . smartparens-mode))
-      (use-package inf-janet
-        :hook (janet-mode . inf-janet-minor-mode)
-        :vc (:url "https://github.com/velkyel/inf-janet"))))
+      (when (>= emacs-major-version 30)
+        (use-package inf-janet
+          :hook (janet-mode . inf-janet-minor-mode)
+          :vc (:url "https://github.com/velkyel/inf-janet")))))
 
   (when-let (janet-lsp (executable-find "janet-lsp"))
     (add-to-list 'eglot-server-programs
@@ -813,8 +788,9 @@ Defaults to one week (604800 seconds)."
     (add-hook 'janet-mode-hook 'eglot-ensure)
     (add-hook 'janet-ts-mode-hook 'eglot-ensure))
 
-  (use-package flycheck-janet
-    :vc (:url "https://github.com/sogaiu/flycheck-janet")))
+  (when (>= emacs-major-version 30)
+    (use-package flycheck-janet
+      :vc (:url "https://github.com/sogaiu/flycheck-janet"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Common Lisp
@@ -900,43 +876,91 @@ Defaults to one week (604800 seconds)."
       (add-hook 'rust-ts-mode-hook 'eglot-ensure))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Python
+;; TypeScript / JavaScript
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(when-let (basedpyright (executable-find "basedpyright"))
+(when-let (tsls (executable-find "typescript-language-server"))
   (with-eval-after-load 'eglot
     (add-to-list 'eglot-server-programs
-                 `((python-mode python-ts-mode) . (,basedpyright "--stdio")))
-    (add-hook 'python-mode-hook 'eglot-ensure)
-    (add-hook 'python-ts-mode-hook 'eglot-ensure)))
+                 `((typescript-ts-mode tsx-ts-mode js-ts-mode js-mode javascript-mode)
+                   . (,tsls "--stdio")))
+    (add-hook 'typescript-ts-mode-hook 'eglot-ensure)
+    (add-hook 'tsx-ts-mode-hook 'eglot-ensure)
+    (add-hook 'js-ts-mode-hook 'eglot-ensure)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; JSON
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(add-to-list 'auto-mode-alist '("\\.json\\'" . json-ts-mode))
+(when-let (jsonls (executable-find "vscode-json-language-server"))
+  (with-eval-after-load 'eglot
+    (add-to-list 'eglot-server-programs
+                 `((json-ts-mode json-mode) . (,jsonls "--stdio")))
+    (add-hook 'json-ts-mode-hook 'eglot-ensure)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CMake
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package cmake-mode
+  :mode (("CMakeLists\\.txt\\'" . cmake-mode)
+         ("\\.cmake\\'" . cmake-mode)))
+(when-let (cmake-ls (executable-find "cmake-language-server"))
+  (with-eval-after-load 'eglot
+    (add-to-list 'eglot-server-programs
+                 `(cmake-mode . (,cmake-ls)))
+    (add-hook 'cmake-mode-hook 'eglot-ensure)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; GLSL
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package glsl-mode
+  :mode (("\\.vert\\'" . glsl-mode)
+         ("\\.frag\\'" . glsl-mode)
+         ("\\.geom\\'" . glsl-mode)
+         ("\\.comp\\'" . glsl-mode)
+         ("\\.glsl\\'" . glsl-mode)
+         ("\\.glslh\\'" . glsl-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Scheme
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package geiser)
-(use-package geiser-chez
-  :after geiser)
-(use-package geiser-chibi
-  :after geiser)
-(use-package geiser-chicken
-  :after geiser
-  :config
-  (setopt geiser-chicken-binary (or (executable-find "chicken-csi") (executable-find "csi"))))
-(use-package geiser-gambit
-  :after geiser)
-(use-package geiser-gauche
-  :after geiser)
-(use-package geiser-guile
-  :after geiser)
-(use-package geiser-kawa
-  :after geiser)
-(use-package geiser-mit
-  :after geiser)
-(use-package geiser-racket
-  :after geiser)
-(use-package geiser-stklos
-  :after geiser)
+(when (executable-find "chez")
+  (use-package geiser-chez
+    :after geiser))
+(when (executable-find "chibi-scheme")
+  (use-package geiser-chibi
+    :after geiser))
+(when (or (executable-find "chicken-csi") (executable-find "csi"))
+  (use-package geiser-chicken
+    :after geiser
+    :config
+    (setopt geiser-chicken-binary (or (executable-find "chicken-csi") (executable-find "csi")))))
+(when (executable-find "gsi")
+  (use-package geiser-gambit
+    :after geiser))
+(when (executable-find "gosh")
+  (use-package geiser-gauche
+    :after geiser))
+(when (executable-find "guile")
+  (use-package geiser-guile
+    :after geiser))
+(when (executable-find "kawa")
+  (use-package geiser-kawa
+    :after geiser))
+(when (or (executable-find "mit-scheme") (executable-find "scheme"))
+  (use-package geiser-mit
+    :after geiser))
+(when (executable-find "racket")
+  (use-package geiser-racket
+    :after geiser))
+(when (executable-find "stklos")
+  (use-package geiser-stklos
+    :after geiser))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Markdown
@@ -1022,7 +1046,8 @@ Defaults to one week (604800 seconds)."
 ;; Org
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defcustom org-directory (file-truename "~/org") "Location of org documents."
+(defcustom my/org-directory (file-truename "~/org")
+  "Location of org documents."
   :type 'directory
   :group 'org)
 
@@ -1044,12 +1069,14 @@ Defaults to one week (604800 seconds)."
   ("C-c o i" . my-org-show-all-inline-images)
 
   :custom
+  (org-directory my/org-directory)
   (org-default-notes-file
-   (concat (file-truename org-directory) "notes.org"))
+   (expand-file-name "notes.org" my/org-directory))
   (org-agenda-files
-   `(,(concat (file-truename org-directory) "todo.org") ,(concat (file-truename org-directory) "agenda.org")))
+   `(,(expand-file-name "todo.org" my/org-directory)
+     ,(expand-file-name "agenda.org" my/org-directory)))
   (org-agenda-diary-file
-   (concat (expand-file-name org-directory) "diary.org"))
+   (expand-file-name "diary.org" my/org-directory))
   (org-todo-keywords
    '((sequence "TODO(t)" "PROG(p)" "BLCK(b)" "STAL(s)" "|" "DONE(d)" "WONT(w)")))
   (org-todo-keyword-faces
@@ -1060,14 +1087,14 @@ Defaults to one week (604800 seconds)."
      ("WONT" . (:foreground "grey" :weight bold))
      ("DONE" . (:foreground "grey" :weight bold))))
   (org-capture-templates
-   '(("n" "Note" entry (file+headline "notes.org" "Notes")
+   `(("n" "Note" entry (file+headline "notes.org" "Notes")
       "\n* %^{topic} %T %^g\n   :CATEGORY: %^{category}\n%i%?\n")
      ("t" "To Do" entry (file+headline "todo.org" "To Do")
       "\n* TODO %^{todo} %^g\n   DEADLINE: %^{due}t\n   :CATEGORY: %^{category}\n")
      ("d" "Daily review" entry (file+headline "diary.org" "Daily Review")
       (format
        "* %%T %%^g\n   :CATEGORY: Review\n   %%?%%[%s/template_daily_review.org]\n"
-       org-directory))
+       my/org-directory))
      ("i" "Idea" entry (file+headline "ideas.org" "Ideas")
       "\n* %^{topic} %T %^g\n   :CATEGORY: Idea\n%i%?\n")
      ("j" "Journal" entry (file+headline "diary.org" "Journal")
@@ -1165,12 +1192,9 @@ Defaults to one week (604800 seconds)."
 (defun random-theme ()
   "Change to a random theme."
   (interactive)
-  (let ((success nil)
-	      (current (car custom-enabled-themes))
-	      (all-themes (custom-available-themes)))
-    (let ((new-theme (seq-random-elt all-themes)))
-      (message (format "Switching to theme %s" new-theme))
-      (ignore-errors (change-theme new-theme)))))
+  (let ((new-theme (seq-random-elt (custom-available-themes))))
+    (message (format "Switching to theme %s" new-theme))
+    (ignore-errors (change-theme new-theme))))
 
 (defun random-dark-theme ()
   "Change to a random dark theme."
