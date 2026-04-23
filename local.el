@@ -706,6 +706,10 @@ Defaults to one week (604800 seconds)."
       (add-to-list 'exec-path dotnet-tools)
       (setenv "PATH" (concat dotnet-tools path-separator (getenv "PATH")))))
 
+  ;; Load csharp-mode eagerly so csharp-mode and csharp-ts-mode are
+  ;; registered as derived modes and appear in eglot's mode list.
+  (require 'csharp-mode)
+
   (add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-mode))
 
   (with-eval-after-load 'eglot
@@ -715,9 +719,8 @@ Defaults to one week (604800 seconds)."
             (append
              (when csharp-ls `((,csharp-ls "-l" "error")))
              (when omnisharp `((,omnisharp "-lsp"))))))
-      (when alternatives
-        (add-to-list 'eglot-server-programs
-                     `((csharp-mode csharp-ts-mode) . ,(eglot-alternatives alternatives))))))
+      (add-to-list 'eglot-server-programs
+                   `((csharp-mode csharp-ts-mode) . ,(eglot-alternatives alternatives)))))
 
   (add-hook 'csharp-mode-hook 'eglot-ensure)
   (add-hook 'csharp-ts-mode-hook 'eglot-ensure)
