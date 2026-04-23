@@ -291,14 +291,6 @@ Defaults to one week (604800 seconds)."
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Tree Sitter
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(use-package tree-sitter :ensure t)
-(use-package tree-sitter-langs :ensure t)
-(use-package tree-sitter-indent :ensure t)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Useful Elisp Extensions
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -516,6 +508,7 @@ Defaults to one week (604800 seconds)."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package eglot
+  :demand t
   :init
   (setopt eglot-connect-timeout 240))
 
@@ -615,7 +608,7 @@ Defaults to one week (604800 seconds)."
            (text-mode . copilot-mode)
            (conf-mode . copilot-mode)
            (yaml-mode . copilot-mode)
-           (json-ts-mode . copilot-mode)
+           (json-mode . copilot-mode)
            (markdown-mode . copilot-mode)
            (org-mode . copilot-mode)
            (latex-mode . copilot-mode))
@@ -630,7 +623,7 @@ Defaults to one week (604800 seconds)."
             (text-mode 2)
             (conf-mode 2)
             (yaml-mode 2)
-            (json-ts-mode 2)
+            (json-mode 2)
             (markdown-mode 2)
             (latex-mode 2)
             (prog-mode 2)))))
@@ -677,69 +670,6 @@ Defaults to one week (604800 seconds)."
   (which-key-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Treesit
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(when (and (fboundp 'treesit-available-p)
-           (treesit-available-p))
-
-  (use-package treesit-auto
-    :custom
-    ;; Auto-install missing grammars only if a C compiler is available.
-    (treesit-auto-install (if (eq system-type 'windows-nt) nil
-                            (if (seq-some #'executable-find '("cc" "gcc" "clang" "tcc")) t nil)))
-    :config
-    ;; Define common languages to pre-install to avoid first-load warnings
-    (defvar my/treesit-common-languages
-      '(c cpp python javascript typescript tsx json yaml bash rust go)
-      "Common language grammars to pre-install during startup.")
-    
-    ;; Add ABI-14 compatible revisions for grammars missing them
-    (when (and (fboundp 'treesit-library-abi-version)
-               (eq (treesit-library-abi-version) 14))
-      (setq treesit-language-source-alist
-            (append
-             '((c "https://github.com/tree-sitter/tree-sitter-c" "v0.21.3" nil nil nil)
-               (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "v0.21.2" "src" nil nil)
-               (rust "https://github.com/tree-sitter/tree-sitter-rust" "v0.21.2" nil nil nil))
-             treesit-language-source-alist)))
-    
-    (defun my/treesit-install-common-grammars ()
-      "Install common TreeSitter grammars if missing.
-This runs during startup to prevent warnings when opening files
-before grammars are lazily installed."
-      (when treesit-auto-install
-        ;; Build the source alist from treesit-auto recipes
-        (let* ((treesit-language-source-alist (treesit-auto--build-treesit-source-alist))
-               (missing-langs (seq-filter
-                               (lambda (lang)
-                                 (not (treesit-language-available-p lang)))
-                               my/treesit-common-languages)))
-          (when missing-langs
-            (message "Installing %d missing TreeSitter grammars: %s"
-                     (length missing-langs)
-                     (mapconcat #'symbol-name missing-langs ", "))
-            (dolist (lang missing-langs)
-              (condition-case err
-                  (progn
-                    (message "  Installing grammar for %s..." lang)
-                    (treesit-install-language-grammar lang)
-                    (message "  ✓ Installed %s" lang))
-                (error (message "  ✗ Failed to install %s: %s" lang (error-message-string err)))))
-            (message "TreeSitter grammar installation complete.")))))
-    
-    ;; Pre-install common grammars before activating auto-mode
-    ;; This prevents warnings on first load
-    (my/treesit-install-common-grammars)
-    
-    ;; Only add modes to auto-mode-alist for languages where the grammar is ready
-    (treesit-auto-add-to-auto-mode-alist)
-    (global-treesit-auto-mode))
-
-  (with-eval-after-load 'eglot
-    (add-hook 'typescript-ts-mode-hook 'eglot-ensure)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C/C++
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -754,7 +684,7 @@ before grammars are lazily installed."
   (with-eval-after-load 'eglot
     (add-to-list
      'eglot-server-programs
-     `((c-mode c++-mode c-ts-mode c++-ts-mode)
+     `((c-mode c++-mode)
        . (,clangd
           "--background-index"
           "--clang-tidy"
@@ -762,91 +692,82 @@ before grammars are lazily installed."
           "--all-scopes-completion"
           "--pch-storage=memory")))
     (add-hook 'c-mode-hook 'eglot-ensure)
-    (add-hook 'c++-mode-hook 'eglot-ensure)
-    (add-hook 'c-ts-mode-hook 'eglot-ensure)
-    (add-hook 'c++-ts-mode-hook 'eglot-ensure)))
+    (add-hook 'c++-mode-hook 'eglot-ensure)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; C#
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (when-let (dotnet (executable-find "dotnet"))
-  (with-eval-after-load 'csharp-ts-mode
-    (let* ((dotnet-script (executable-find "dotnet-script"))
-           (omnisharp (executable-find "OmniSharp"))
-           (csharp-ls (executable-find "csharp-ls"))
-           (alternatives '()))
+  ;; dotnet global tools install to ~/.dotnet/tools which is not on exec-path by default
+  (let ((dotnet-tools (expand-file-name "~/.dotnet/tools")))
+    (when (file-directory-p dotnet-tools)
+      (add-to-list 'exec-path dotnet-tools)
+      (setenv "PATH" (concat dotnet-tools path-separator (getenv "PATH")))))
 
-      (when (not dotnet-script)
-        (shell-command (concat "\"" dotnet "\" tool install -g dotnet-script")))
-      (when (and (not csharp-ls) (not omnisharp))
-        (shell-command (concat "\"" dotnet "\" tool install -g csharp-ls"))
-        (setopt csharp-ls (executable-find "csharp-ls")))
+  ;; Ensure language server tools are installed at startup
+  (unless (executable-find "dotnet-script")
+    (shell-command (concat "\"" dotnet "\" tool install -g dotnet-script")))
+  (unless (or (executable-find "csharp-ls") (executable-find "OmniSharp"))
+    (shell-command (concat "\"" dotnet "\" tool install -g csharp-ls")))
 
-      (when csharp-ls
-        (add-to-list 'alternatives `(,csharp-ls "-l" "error")))
-      (when omnisharp
-        (add-to-list 'alternatives `(,omnisharp "-lsp")))
-      (when alternatives
-        (add-to-list 'eglot-server-programs `(csharp-ts-mode . ,(eglot-alternatives alternatives)))
-        (add-hook 'csharp-ts-mode-hook 'eglot-ensure)))
+  (use-package csharp-mode
+    :ensure t
+    :mode ("\\.cs\\'" . csharp-mode))
 
+  ;; Eglot is loaded eagerly (:demand t), so register server and hook at startup.
+  (let* ((csharp-ls (executable-find "csharp-ls"))
+         (omnisharp (executable-find "OmniSharp"))
+         (alternatives
+          (append
+           (when csharp-ls `((,csharp-ls "-l" "error")))
+           (when omnisharp `((,omnisharp "-lsp"))))))
+    (when alternatives
+      (add-to-list 'eglot-server-programs
+                   `(csharp-mode . ,(eglot-alternatives alternatives)))))
+
+  (add-hook 'csharp-mode-hook 'eglot-ensure)
+
+  (with-eval-after-load 'csharp-mode
     (defun my-csharp-repl ()
       "Switch to the CSharpRepl buffer, creating it if necessary."
       (interactive)
       (let ((repl (or (executable-find "dotnet-script") (executable-find "csharp"))))
         (when repl
-	        (if-let ((buf (get-buffer "*CSharpRepl*")))
+          (if-let ((buf (get-buffer "*CSharpRepl*")))
               (pop-to-buffer buf)
-	          (when-let ((b (make-comint "CSharpRepl" repl)))
+            (when-let ((b (make-comint "CSharpRepl" repl)))
               (switch-to-buffer-other-window b))))))
 
-    (defun my/csharp-ts-mode-hook ()
+    (defun my/csharp-mode-hook ()
       ;; C# uses 4-space indent (overrides the global c-basic-offset of 2)
       (setq-local indent-tabs-mode nil)
       (setq-local comment-column 40)
       (setq-local c-basic-offset 4))
-    (add-hook 'csharp-ts-mode-hook #'my/csharp-ts-mode-hook)
+    (add-hook 'csharp-mode-hook #'my/csharp-mode-hook)
 
-    (define-key csharp-ts-mode-map (kbd "C-c C-z") 'my-csharp-repl))
-
-  (use-package csharp-mode
-    :ensure t
-    :config
-    (add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-tree-sitter-mode)))
+    (define-key csharp-mode-map (kbd "C-c C-z") 'my-csharp-repl))
 
   (use-package dotnet
     :config
-    (add-hook 'csharp-ts-mode-hook 'dotnet-mode)))
+    (add-hook 'csharp-mode-hook 'dotnet-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Janet
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (when (executable-find "janet")
-  (if (and (not (eq 'windows-nt system-type))
-           (fboundp 'treesit-available-p)
-           (treesit-language-available-p 'janet-simple))
-      (when (>= emacs-major-version 30)
-        (use-package janet-ts-mode
-          :hook (janet-ts-mode . smartparens-mode)
-          :vc (:url "https://github.com/sogaiu/janet-ts-mode"))
-        (use-package ajrepl
-          :hook (janet-ts-mode . ajrepl-interaction-mode)
-          :vc (:url "https://github.com/sogaiu/ajrepl")))
-    (progn
-      (use-package janet-mode
-        :hook (janet-mode . smartparens-mode))
-      (when (>= emacs-major-version 30)
-        (use-package inf-janet
-          :hook (janet-mode . inf-janet-minor-mode)
-          :vc (:url "https://github.com/velkyel/inf-janet")))))
+  (use-package janet-mode
+    :hook (janet-mode . smartparens-mode))
+  (when (>= emacs-major-version 30)
+    (use-package inf-janet
+      :hook (janet-mode . inf-janet-minor-mode)
+      :vc (:url "https://github.com/velkyel/inf-janet")))
 
   (when-let (janet-lsp (executable-find "janet-lsp"))
     (add-to-list 'eglot-server-programs
-                 `((janet-ts-mode janet-mode) . (,janet-lsp)))
-    (add-hook 'janet-mode-hook 'eglot-ensure)
-    (add-hook 'janet-ts-mode-hook 'eglot-ensure))
+                 `(janet-mode . (,janet-lsp)))
+    (add-hook 'janet-mode-hook 'eglot-ensure))
 
   (when (>= emacs-major-version 30)
     (use-package flycheck-janet
@@ -920,9 +841,8 @@ before grammars are lazily installed."
   (when-let (ruby-lsp (executable-find "ruby-lsp"))
     (with-eval-after-load 'eglot
       (add-to-list 'eglot-server-programs
-                   `((ruby-mode ruby-ts-mode) . (,ruby-lsp)))
-      (add-hook 'ruby-mode-hook 'eglot-ensure)
-      (add-hook 'ruby-ts-mode-hook 'eglot-ensure))))
+                   `(ruby-mode . (,ruby-lsp)))
+      (add-hook 'ruby-mode-hook 'eglot-ensure))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Rust
@@ -933,33 +853,35 @@ before grammars are lazily installed."
   (when-let (rust-analyzer (executable-find "rust-analyzer"))
     (with-eval-after-load 'eglot
       (add-to-list 'eglot-server-programs
-                   `((rust-mode rust-ts-mode) . (,rust-analyzer)))
-      (add-hook 'rust-mode-hook 'eglot-ensure)
-      (add-hook 'rust-ts-mode-hook 'eglot-ensure))))
+                   `(rust-mode . (,rust-analyzer)))
+      (add-hook 'rust-mode-hook 'eglot-ensure))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; TypeScript / JavaScript
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(use-package typescript-mode
+  :mode ("\\.ts\\'" "\\.tsx\\'"))
+
 (when-let (tsls (executable-find "typescript-language-server"))
   (with-eval-after-load 'eglot
     (add-to-list 'eglot-server-programs
-                 `((typescript-ts-mode tsx-ts-mode js-ts-mode js-mode javascript-mode)
+                 `((typescript-mode js-mode javascript-mode)
                    . (,tsls "--stdio")))
-    (add-hook 'typescript-ts-mode-hook 'eglot-ensure)
-    (add-hook 'tsx-ts-mode-hook 'eglot-ensure)
-    (add-hook 'js-ts-mode-hook 'eglot-ensure)))
+    (add-hook 'typescript-mode-hook 'eglot-ensure)
+    (add-hook 'js-mode-hook 'eglot-ensure)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; JSON
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(add-to-list 'auto-mode-alist '("\\.json\\'" . json-ts-mode))
+(use-package json-mode
+  :mode ("\\.json\\'"))
 (when-let (jsonls (executable-find "vscode-json-language-server"))
   (with-eval-after-load 'eglot
     (add-to-list 'eglot-server-programs
-                 `((json-ts-mode json-mode) . (,jsonls "--stdio")))
-    (add-hook 'json-ts-mode-hook 'eglot-ensure)))
+                 `(json-mode . (,jsonls "--stdio")))
+    (add-hook 'json-mode-hook 'eglot-ensure)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CMake
