@@ -628,6 +628,20 @@ Defaults to one week (604800 seconds)."
             (latex-mode 2)
             (prog-mode 2)))))
 
+;; (use-package minuet
+;;   :hook ((prog-mode . minuet-mode)
+;;          (text-mode . minuet-mode)
+;;          (conf-mode . minuet-mode)
+;;          (yaml-mode . minuet-mode)
+;;          (json-mode . minuet-mode)
+;;          (markdown-mode . minuet-mode)
+;;          (org-mode . minuet-mode)
+;;          (latex-mode . minuet-mode))
+;;   :bind (("C-c M-<tab>" . minuet-accept-completion)
+;;          ("C-c M-S-<tab>" . minuet-accept-completion-by-paragraph))
+;;   :config
+;;   (setopt minuet-provider 'openai-compatible))
+
 (use-package gptel
   :bind (("C-c a g" . gptel-send)
          ("C-c a G" . gptel-menu)
