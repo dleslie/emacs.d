@@ -7,6 +7,19 @@
 ;;; Code:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Version-Specific Macros
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defmacro when-emacs>= (version &rest body)
+  "Execute BODY only if Emacs major version is >= VERSION.
+This is a compile-time check, so BODY is only included in the
+compiled output when the current Emacs version satisfies the condition.
+This prevents evaluation errors from version-specific features."
+  (declare (indent 1))
+  (when (>= emacs-major-version version)
+    `(progn ,@body)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; My Menu
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -759,7 +772,7 @@ Defaults to one week (604800 seconds)."
 (when (executable-find "janet")
   (use-package janet-mode
     :hook (janet-mode . smartparens-mode))
-  (when (>= emacs-major-version 30)
+  (when-emacs>= 30
     (use-package inf-janet
       :hook (janet-mode . inf-janet-minor-mode)
       :vc (:url "https://github.com/velkyel/inf-janet")))
@@ -769,7 +782,7 @@ Defaults to one week (604800 seconds)."
                  `(janet-mode . (,janet-lsp)))
     (add-hook 'janet-mode-hook 'eglot-ensure))
 
-  (when (>= emacs-major-version 30)
+  (when-emacs>= 30
     (use-package flycheck-janet
       :after (flycheck janet-mode)
       :demand t
