@@ -1043,6 +1043,11 @@ Defaults to one week (604800 seconds)."
 ;; Org
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Workaround for track-changes assertion errors in Emacs 30.1
+;; See: https://debbugs.gnu.org/cgi/bugreport.cgi?bug=74706
+(when-emacs>= 30
+  (setq track-changes-check-errors nil))
+
 (defcustom my/org-directory (file-truename "~/org")
   "Location of org documents."
   :type 'directory
