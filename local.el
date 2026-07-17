@@ -1090,23 +1090,23 @@ Defaults to one week (604800 seconds)."
      ("DONE" . (:foreground "grey" :weight bold))))
   (org-capture-templates
    `(("n" "Note" entry (file+headline "notes.org" "Notes")
-      "\n* %^{topic} %T %^g\n   :CATEGORY: %^{category}\n%i%?\n")
+      "\n\n* %^{topic} %T %^g\n   :CATEGORY: %^{category}\n%i%?\n")
      ("t" "To Do" entry (file+headline "todo.org" "To Do")
-      "\n* TODO %^{todo} %^g\n   DEADLINE: %^{due}t\n   :CATEGORY: %^{category}\n")
+      "\n\n* TODO %^{todo} %^g\n   DEADLINE: %^{due}t\n   :CATEGORY: %^{category}\n")
      ("d" "Daily review" entry (file+headline "diary.org" "Daily Review")
       (format
-       "* %%T %%^g\n   :CATEGORY: Review\n   %%?%%[%s/template_daily_review.org]\n"
+       "\n\n* %%T %%^g\n   :CATEGORY: Review\n   %%?%%[%s/template_daily_review.org]\n"
        my/org-directory))
      ("i" "Idea" entry (file+headline "ideas.org" "Ideas")
-      "\n* %^{topic} %T %^g\n   :CATEGORY: Idea\n%i%?\n")
+      "\n\n* %^{topic} %T %^g\n   :CATEGORY: Idea\n%i%?\n")
      ("j" "Journal" entry (file+headline "diary.org" "Journal")
-      "\n* %^{topic} %T %^g\n   :CATEGORY: Journal\n%i%?\n")
+      "\n\n* %^{topic} %T %^g\n   :CATEGORY: Journal\n%i%?\n")
      ("w" "Work Log" entry (file+headline "work.org" "Work Log")
-      "\n* %^{topic} %T %^g\n   :CATEGORY: Log\n%i%?\n")
+      "\n\n* %^{topic} %T %^g\n   :CATEGORY: Log\n%i%?\n")
      ("e" "Event" entry (file+headline "agenda.org" "Events")
-      "\n* %^{title} %^g\n     SCHEDULED: %^{when}t\n%i%?\n")
+      "\n\n* %^{title} %^g\n     SCHEDULED: %^{when}t\n%i%?\n")
      ("c" "Contact" entry (file+headline "addresses.org" "Addresses")
-      "\n* %(org-contacts-template-name)\n   :PROPERTIES:\n   :EMAIL: %(org-contacts-template-email)\n   :END:\n%i%?\n")))
+      "\n\n* %(org-contacts-template-name)\n   :PROPERTIES:\n   :EMAIL: %(org-contacts-template-email)\n   :END:\n%i%?\n")))
 
   :init
   (defun my-org-show-all-inline-images ()
