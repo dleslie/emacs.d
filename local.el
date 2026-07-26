@@ -267,6 +267,8 @@ Defaults to one week (604800 seconds)."
   (inhibit-startup-screen t)
   (js-indent-level 2)
   (make-backup-files nil)
+  (auto-save-default nil)
+  (create-lockfiles nil)
   (scroll-bar-mode nil)
   (scroll-conservatively 10000)
   (scroll-step 2)
