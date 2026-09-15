@@ -328,16 +328,14 @@ Defaults to one week (604800 seconds)."
 
 (when (not (eq 'windows-nt system-type))
   (use-package ghostel
-    :ensure t)
-
-  (use-package ghostel-eshell
-    :hook (eshell-load . ghostel-eshell-visual-command-mode))
-
-  (use-package ghostel-compile
-    :hook (after-init . ghostel-compile-global-mode))
-
-  (use-package ghostel-comint
-    :hook (after-init . ghostel-comint-global-mode)))
+    :ensure t
+    :hook ((eshell-load . ghostel-eshell-visual-command-mode)
+           (after-init . ghostel-compile-global-mode)
+           (after-init . ghostel-comint-global-mode)))
+    :config
+    (require 'ghostel-eshell)
+    (require 'ghostel-compile)
+    (require 'ghostel-comint))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Avy
