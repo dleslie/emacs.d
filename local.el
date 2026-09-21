@@ -197,7 +197,7 @@ It will \"remember\" omit state across Dired buffers."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'package)
-(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
 (defcustom my/package-refresh-interval (* 7 24 60 60)
@@ -304,9 +304,6 @@ Defaults to one week (604800 seconds)."
   ;; Enable recursive minibuffers
   (setopt enable-recursive-minibuffers t))
 
-(when-emacs>= 31
-  (treesit-auto-install-grammar 'ask)
-  (treesit-enabled-modes t))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Useful Elisp Extensions
@@ -321,23 +318,6 @@ Defaults to one week (604800 seconds)."
   ;; Activate only when a file actually contains conflict markers,
   ;; rather than scanning every prog-mode buffer unconditionally.
   (find-file . smerge-start-session))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Ghostel
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(when (not (eq 'windows-nt system-type))
-  (use-package ghostel
-    :ensure t)
-
-  (use-package ghostel-eshell
-    :hook (eshell-load . ghostel-eshell-visual-command-mode))
-
-  (use-package ghostel-compile
-    :hook (after-init . ghostel-compile-global-mode))
-
-  (use-package ghostel-comint
-    :hook (after-init . ghostel-comint-global-mode)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Avy
