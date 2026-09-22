@@ -40,4 +40,4 @@ tree-sitter/
 node_modules/
 package.json
 package-lock.json
-projects.eld
+*.eld
