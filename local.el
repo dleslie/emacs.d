@@ -511,6 +511,12 @@ Defaults to one week (604800 seconds)."
 ;; Magit
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; vc.el's own Git backend shells out to git.exe on every file visit/save to
+;; refresh mode-line VC state, duplicating what Magit already does. Windows'
+;; process-creation cost makes that redundant spawn expensive, so drop Git
+;; from vc.el and let Magit handle it exclusively.
+(setq vc-handled-backends (delq 'Git vc-handled-backends))
+
 (use-package magit
   :defer t
   :bind
@@ -521,6 +527,19 @@ Defaults to one week (604800 seconds)."
     (setq magit-process-connection-type nil))
   (setq magit-auto-revert-mode nil)
   (setq magit-revision-show-gravatars nil))
+
+(defun my/windows-git-improvement ()
+  "Apply the git config settings Magit's manual recommends for Windows.
+
+`git status`/`diff` are dominated by NTFS stat() cost on Windows; these
+settings cache filesystem metadata and space out automatic gc so it doesn't
+stall interactive use. Safe to re-run; each call just overwrites the same
+global git config values."
+  (interactive)
+  (dolist (setting '(("core.fscache" . "true")
+                      ("core.preloadindex" . "true")
+                      ("gc.auto" . "256")))
+    (call-process "git" nil nil nil "config" "--global" (car setting) (cdr setting))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Eglot
