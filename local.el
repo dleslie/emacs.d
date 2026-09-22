@@ -1045,11 +1045,6 @@ Defaults to one week (604800 seconds)."
 ;; Org
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; Workaround for track-changes assertion errors in Emacs 30.1
-;; See: https://debbugs.gnu.org/cgi/bugreport.cgi?bug=74706
-(when-emacs>= 30
-  (setq track-changes-check-errors nil))
-
 (defcustom my/org-directory (file-truename "~/org")
   "Location of org documents."
   :type 'directory
@@ -1073,6 +1068,11 @@ Defaults to one week (604800 seconds)."
   ("C-c o i" . my-org-show-all-inline-images)
 
   :custom
+  ;; Element cache uses track-changes.el to invalidate itself, and that
+  ;; library desyncs on the batched edits org-capture-finalize does against
+  ;; large target files, crashing with a cl-assert failure. No supported way
+  ;; to suppress the assert exists upstream, so disable the cache instead.
+  (org-element-use-cache nil)
   (org-directory my/org-directory)
   (org-default-notes-file
    (expand-file-name "notes.org" my/org-directory))
