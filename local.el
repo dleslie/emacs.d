@@ -7,50 +7,6 @@
 ;;; Code:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Windows Shell Environment
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Emacs launched outside a Git Bash shell inherits the machine PATH, where
-;; C:\Windows\System32 precedes Git's bin directories. Several System32
-;; tools shadow GNU tools of the same name that Git for Windows ships
-;; (find, sort, etc.), and the two are not command-line compatible --
-;; project.el's own `find-program' invocation fails outright if System32's
-;; find.exe answers instead of GNU findutils'. Rather than special-case
-;; each shadowed tool as it's discovered, put Git's bin directories ahead
-;; of System32 for both Emacs' own subprocess resolution (`exec-path') and
-;; any shell it spawns (the `PATH' environment variable), so Git Bash's
-;; toolset is what answers, matching what running Emacs from inside Git
-;; Bash would already give.
-;;
-;; `shell-file-name' defaults to bash here too, rather than cmd.exe/cmdproxy,
-;; since cmd's quoting and command syntax can't run the GNU tools above.
-;; `w32-shell-dos-semantics' keys off `shell-file-name', so
-;; `shell-quote-argument' and friends switch to POSIX quoting automatically
-;; once it points at bash -- confirmed by running project.el's actual find
-;; invocation through it. `shell-command-switch' ("-c") and
-;; `w32-quote-process-args' (t) already default correctly for a non-system
-;; shell; `w32-check-shell-configuration' (w32-fns.el) warns after init if
-;; that ever stops being true.
-(when (eq system-type 'windows-nt)
-  (when-let* ((git (executable-find "git"))
-              ;; git.exe may resolve from cmd/, mingw64/bin/, or usr/bin/
-              ;; depending on how PATH was already set up, so find the Git
-              ;; root by walking up to whichever ancestor owns usr/bin
-              ;; rather than assuming a fixed directory depth.
-              (git-root (locate-dominating-file (file-name-directory git) "usr/bin"))
-              (git-bin-dirs (seq-filter #'file-directory-p
-                                        (list (expand-file-name "usr/bin" git-root)
-                                              (expand-file-name "cmd" git-root)))))
-    (dolist (dir (reverse git-bin-dirs))
-      (add-to-list 'exec-path dir))
-    (setenv "PATH" (concat (mapconcat #'identity git-bin-dirs path-separator)
-                            path-separator (getenv "PATH")))
-    (let ((bash (expand-file-name "bin/bash.exe" git-root)))
-      (when (file-exists-p bash)
-        (setq shell-file-name bash
-              explicit-shell-file-name bash)))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Version-Specific Macros
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -559,72 +515,18 @@ Defaults to one week (604800 seconds)."
 ;; refresh mode-line VC state, duplicating what Magit already does. Windows'
 ;; process-creation cost makes that redundant spawn expensive, so drop Git
 ;; from vc.el and let Magit handle it exclusively.
-(when (eq system-type 'windows-nt)
-  (setq vc-handled-backends (delq 'Git vc-handled-backends)))
+(setq vc-handled-backends (delq 'Git vc-handled-backends))
 
 (use-package magit
   :defer t
   :bind
   ("C-c g" . magit-status)
-  :init
-  ;; Dropping Git from `vc-handled-backends' above means `vc-mode' never
-  ;; populates for git-controlled buffers, so the mode line loses branch info
-  ;; entirely. This restores it independent of vc.el's dispatcher: it asks
-  ;; Magit for the branch if Magit is already loaded, otherwise it shells out
-  ;; directly. None of it is needed if Git is ever put back into
-  ;; `vc-handled-backends', since native `vc-mode' covers the mode line again.
-  (unless (memq 'Git vc-handled-backends)
-    (defvar my/vc-branch-cache (make-hash-table :test 'equal)
-      "Git branch per repository root, keyed by root.
-Only consulted on Windows, where spawning git.exe is expensive; elsewhere
-the branch is recomputed on every refresh trigger instead of cached.")
-
-    (defvar-local my/vc-branch nil
-      "Formatted git branch of this buffer's repository, for the mode line.
-Nil when the buffer isn't in a git repository.")
-
-    (defun my/vc-branch-fetch (root)
-      "Return the current git branch name for repository ROOT, or nil."
-      (let ((default-directory root))
-        (if (fboundp 'magit-get-current-branch)
-            (magit-get-current-branch)
-          (with-temp-buffer
-            (when (zerop (call-process "git" nil t nil "symbolic-ref" "--short" "HEAD"))
-              (string-trim (buffer-string)))))))
-
-    (defun my/vc-branch-refresh ()
-      "Recompute `my/vc-branch' for the current buffer."
-      (setq my/vc-branch
-            (when-let ((root (vc-find-root default-directory ".git")))
-              (let ((branch (if (eq system-type 'windows-nt)
-                                 (or (gethash root my/vc-branch-cache)
-                                     (puthash root (my/vc-branch-fetch root) my/vc-branch-cache))
-                               (my/vc-branch-fetch root))))
-                (when branch (concat " Git:" branch))))))
-
-    (defun my/vc-branch-invalidate (&rest _)
-      "Refresh every buffer's cached branch after a Magit checkout.
-Bound to Magit's post-checkout hook so a branch switch shows up immediately
-instead of waiting on each buffer's next visit/save/revert."
-      (clrhash my/vc-branch-cache)
-      (dolist (buf (buffer-list))
-        (with-current-buffer buf
-          (my/vc-branch-refresh))))
-
-    (add-hook 'find-file-hook 'my/vc-branch-refresh)
-    (add-hook 'dired-after-readin-hook 'my/vc-branch-refresh)
-    (add-hook 'after-save-hook 'my/vc-branch-refresh)
-    (add-hook 'after-revert-hook 'my/vc-branch-refresh)
-    (add-to-list 'mode-line-misc-info '(my/vc-branch (my/vc-branch my/vc-branch))))
   :config
   ;; Windows performance tweaks
   (when (eq system-type 'windows-nt)
     (setq magit-process-connection-type nil))
   (setq magit-auto-revert-mode nil)
-  (setq magit-revision-show-gravatars nil)
-
-  (unless (memq 'Git vc-handled-backends)
-    (add-hook 'magit-post-checkout-hook 'my/vc-branch-invalidate)))
+  (setq magit-revision-show-gravatars nil))
 
 (defun my/windows-git-improvement ()
   "Apply the git config settings Magit's manual recommends for Windows.
