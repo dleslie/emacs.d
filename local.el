@@ -319,6 +319,10 @@ Defaults to one week (604800 seconds)."
   ;; rather than scanning every prog-mode buffer unconditionally.
   (find-file . smerge-start-session))
 
+(use-package unicode-fonts
+  :config
+  (unicode-fonts-setup))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Avy
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -617,6 +621,8 @@ Defaults to one week (604800 seconds)."
   ;; Remove duplicates
   (setopt ollama-models (delete-dups ollama-models)))
 
+;; Install with:
+;; npm install @github/copilot-language-server
 (when (executable-find "copilot-language-server")
   (use-package copilot
     :hook ((prog-mode . copilot-mode)
@@ -642,20 +648,6 @@ Defaults to one week (604800 seconds)."
             (markdown-mode 2)
             (latex-mode 2)
             (prog-mode 2)))))
-
-;; (use-package minuet
-;;   :hook ((prog-mode . minuet-mode)
-;;          (text-mode . minuet-mode)
-;;          (conf-mode . minuet-mode)
-;;          (yaml-mode . minuet-mode)
-;;          (json-mode . minuet-mode)
-;;          (markdown-mode . minuet-mode)
-;;          (org-mode . minuet-mode)
-;;          (latex-mode . minuet-mode))
-;;   :bind (("C-c M-<tab>" . minuet-accept-completion)
-;;          ("C-c M-S-<tab>" . minuet-accept-completion-by-paragraph))
-;;   :config
-;;   (setopt minuet-provider 'openai-compatible))
 
 (use-package gptel
   :bind (("C-c a g" . gptel-send)
@@ -685,6 +677,14 @@ Defaults to one week (604800 seconds)."
         (setopt gptel-backend ollama-backend)
         (setopt gptel-model (car ollama-models)))
       (message "Ollama enabled for GPTel."))))
+
+(use-package agent-shell
+  :ensure t
+  :custom
+  (agent-shell-session-strategy 'prompt)
+  (agent-shell-header-style 'text)
+  :hook
+  (agent-shell-mode . iimage-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Which Key?
