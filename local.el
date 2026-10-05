@@ -515,7 +515,8 @@ Defaults to one week (604800 seconds)."
 ;; refresh mode-line VC state, duplicating what Magit already does. Windows'
 ;; process-creation cost makes that redundant spawn expensive, so drop Git
 ;; from vc.el and let Magit handle it exclusively.
-(setq vc-handled-backends (delq 'Git vc-handled-backends))
+(when (eq system-type 'windows-nt)
+  (setq vc-handled-backends (delq 'Git vc-handled-backends)))
 
 (use-package magit
   :defer t
@@ -602,7 +603,7 @@ global git config values."
 ;; AI
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defcustom copilot-models '(claude-sonnet-4.6 claude-sonnet-4.5 claude-haiku-4.5 claude-opus-4.6 claude-opus-4.6-fast claude-opus-4.5 claude-sonnet-4 gemini-3-pro-preview gpt-5.3-codex gpt-5.2-codex gpt-5.2 gpt-5.1-codex-max gpt-5.1-codex gpt-5.1 gpt-5.1-codex-mini gpt-5-mini gpt-4.1)
+(defcustom copilot-models '(gpt-4.1 claude-fable-5.1 claude-fable-5 claude-opus-4.8-fast claude-opus-4.8 claude-opus-5.5 claude-opus-5 claude-sonnet-5.5 claude-sonnet-5 copilot-search-a copilot-search-b copilot-search-c exec-agent-a exec-agent-b exec-agent-c gemini-3.7-flash gemini-3.8-flash gpt-5.3-codex gpt-5.4-mini gpt-5.4 gpt-5.5 gpt-5.6-luna gpt-5.6-sol gpt-5.6-terra gpt-6.1-sol gpt-6-astra gpt-6-luna gpt-6-sol grok-4.5 grok-4.6 grok-4.7 kimi-k3-base kimi-k3-copilot kimi-k3 mai-code-1.1-flash mai-code-1-flash-4th mai-code-1-flash-secondary mai-code-1-flash-tertiary mai-code-1-flash trajectory-compaction gpt-5-mini gpt-3.5-turbo gpt-3.5-turbo-0613 gpt-4o-mini gpt-4o-mini-2024-07-18 copilot-preview-4o-mini-a1cfd608 gpt-4 gpt-4-0613 gpt-4-0125-preview copilot-preview-gpt4-centralus gpt-4o gpt-4o-2024-11-20 gpt-4o-2024-05-13 gpt-4-o-preview gpt-4o-japanwest copilot-preview-gpt4o-centralus gpt-4o-2024-08-06 claude-haiku-4.5 gpt-4.1-2025-04-14 goldeneye-secondary gpt-5.2)
   "List of available copilot models."
   :type '(repeat symbol)
   :group 'gptel)
@@ -1130,6 +1131,12 @@ global git config values."
       "\n\n* %(org-contacts-template-name)\n   :PROPERTIES:\n   :EMAIL: %(org-contacts-template-email)\n   :END:\n%i%?\n")))
 
   :init
+  ;; Disable vc-mode in org-mode buffers
+  (defun my-disable-vc-mode ()
+    "Disable vc-mode."
+    (vc-mode -1))
+  (add-hook 'org-mode-hook #'my-disable-vc-mode)
+
   (defun my-org-show-all-inline-images ()
     (interactive)
     (org-display-inline-images t t))
