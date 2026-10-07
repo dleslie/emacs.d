@@ -508,6 +508,29 @@ Defaults to one week (604800 seconds)."
 	(setopt flycheck-idle-change-delay 0.5))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Stupid Windows Shit
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; (when (eq system-type 'windows-nt)
+;;   (let* ((git (executable-find "git.exe"))
+;;          (git-root (file-name-directory (concat (file-name-directory git) "../")))
+;;          (bash (concat git-root "usr/bin/bash.exe"))
+;;          (usr-bin (concat git-root "usr/bin"))
+;;          (bin (concat git-root "bin")))
+;;     (when (file-exists-p bash)
+;;       (setenv "SHELL" bash)
+;;       (setq shell-file-name bash)
+;;       (setq explicit-shell-file-name bash)
+;;       (setq explicit-bash.exe-args '("--login" "-i"))
+;;       (add-to-list 'exec-path (file-name-directory bash))
+;;       (add-to-list 'exec-path usr-bin)
+;;       (add-to-list 'exec-path bin)
+;;       (setenv "PATH" (concat (file-name-directory bash) path-separator
+;;                      usr-bin path-separator
+;;                      bin path-separator
+;;                      (getenv "PATH"))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Magit
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -702,6 +725,7 @@ global git config values."
   :custom
   (agent-shell-session-strategy 'prompt)
   (agent-shell-header-style 'text)
+  (agent-shell-show-cost-indicator t)
   :hook
   (agent-shell-mode . iimage-mode))
 
