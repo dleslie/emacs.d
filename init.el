@@ -1,4 +1,4 @@
-;;; init.el --- Startup Script
+;;; init.el --- Startup Script  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 

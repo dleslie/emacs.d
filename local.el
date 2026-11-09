@@ -1,4 +1,4 @@
-;; local.el --- local configurations
+;; local.el --- local configurations  -*- lexical-binding: t; -*-
 ;;; Commentary:
 
 ;; Emacs configuration of Dan Leslie.
@@ -623,114 +623,6 @@ global git config values."
   (repeat-mode))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; AI
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defcustom copilot-models '(gpt-4.1 claude-fable-5.1 claude-fable-5 claude-opus-4.8-fast claude-opus-4.8 claude-opus-5.5 claude-opus-5 claude-sonnet-5.5 claude-sonnet-5 copilot-search-a copilot-search-b copilot-search-c exec-agent-a exec-agent-b exec-agent-c gemini-3.7-flash gemini-3.8-flash gpt-5.3-codex gpt-5.4-mini gpt-5.4 gpt-5.5 gpt-5.6-luna gpt-5.6-sol gpt-5.6-terra gpt-6.1-sol gpt-6-astra gpt-6-luna gpt-6-sol grok-4.5 grok-4.6 grok-4.7 kimi-k3-base kimi-k3-copilot kimi-k3 mai-code-1.1-flash mai-code-1-flash-4th mai-code-1-flash-secondary mai-code-1-flash-tertiary mai-code-1-flash trajectory-compaction gpt-5-mini gpt-3.5-turbo gpt-3.5-turbo-0613 gpt-4o-mini gpt-4o-mini-2024-07-18 copilot-preview-4o-mini-a1cfd608 gpt-4 gpt-4-0613 gpt-4-0125-preview copilot-preview-gpt4-centralus gpt-4o gpt-4o-2024-11-20 gpt-4o-2024-05-13 gpt-4-o-preview gpt-4o-japanwest copilot-preview-gpt4o-centralus gpt-4o-2024-08-06 claude-haiku-4.5 gpt-4.1-2025-04-14 goldeneye-secondary gpt-5.2)
-  "List of available copilot models."
-  :type '(repeat symbol)
-  :group 'gptel)
-
-(defcustom ollama-models nil
-  "List of models available from the ollama CLI."
-  :type '(repeat symbol)
-  :group 'ollama)
-
-(defcustom ollama-host "localhost:11434"
-  "Host for the ollama server."
-  :type 'string
-  :group 'ollama)
-(setopt ollama-host (or (getenv "OLLAMA_HOST") ollama-host))
-
-(when (executable-find "ollama")
-  (defun ollama-list-models ()
-    "List all available models from the ollama CLI."
-    (interactive)
-    (let ((output (shell-command-to-string "ollama list")))
-      (with-temp-buffer
-        (insert output)
-        (goto-char (point-min))
-        ;; Skip the header line ("NAME   ID   SIZE   MODIFIED")
-        (forward-line 1)
-        (let ((models '()))
-          (while (re-search-forward "^\\(\\S-+\\)\\s-+" nil t)
-            (let ((model (intern (match-string 1))))
-              (unless (member model models)
-                (push model models))))
-          models))))
-  (if (or (not ollama-models) (not (listp ollama-models)))
-      (setopt ollama-models (ollama-list-models))
-    (setopt ollama-models (append ollama-models (ollama-list-models))))
-  ;; Remove duplicates
-  (setopt ollama-models (delete-dups ollama-models)))
-
-;; Install with:
-;; npm install @github/copilot-language-server
-(when (executable-find "copilot-language-server")
-  (use-package copilot
-    :hook ((prog-mode . copilot-mode)
-           (text-mode . copilot-mode)
-           (conf-mode . copilot-mode)
-           (yaml-mode . copilot-mode)
-           (json-mode . copilot-mode)
-           (markdown-mode . copilot-mode)
-           (org-mode . copilot-mode)
-           (latex-mode . copilot-mode))
-    :bind (("C-c <tab>" . 'copilot-accept-completion-by-paragraph)
-           ("C-c S-<tab>" . 'copilot-accept-completion))
-    :config
-    (setopt copilot-indent-offset-warning-disable t)
-    (setopt copilot-max-char -1)
-    (mapc (lambda (entry)
-            (add-to-list 'copilot-indentation-alist entry))
-          '((org-mode 2)
-            (text-mode 2)
-            (conf-mode 2)
-            (yaml-mode 2)
-            (json-mode 2)
-            (markdown-mode 2)
-            (latex-mode 2)
-            (prog-mode 2)))))
-
-(use-package gptel
-  :bind (("C-c a g" . gptel-send)
-         ("C-c a G" . gptel-menu)
-         ("C-c a a" . gptel-add)
-         ("C-c a f" . gptel-add-file)
-         ("C-c a e c" . 'gptel-enable-copilot)
-         ("C-c a e o" . 'gptel-enable-ollama))
-  :init
-  (defun gptel-enable-copilot ()
-    "Enables Copilot for GPTel."
-    (interactive)
-    (let ((copilot-backend (gptel-make-gh-copilot "Copilot") ))
-      (setopt gptel-backend copilot-backend)
-      (setopt gptel-model (car copilot-models)))
-    (message "Copilot enabled for GPTel."))
-
-  (when ollama-models
-    (defun gptel-enable-ollama ()
-      "Enables Ollama for GPTel."
-      (interactive)
-      (let ((ollama-backend
-             (gptel-make-ollama "Ollama"
-               :host ollama-host
-               :stream t
-               :models ollama-models)))
-        (setopt gptel-backend ollama-backend)
-        (setopt gptel-model (car ollama-models)))
-      (message "Ollama enabled for GPTel."))))
-
-(use-package agent-shell
-  :ensure t
-  :custom
-  (agent-shell-session-strategy 'prompt)
-  (agent-shell-header-style 'text)
-  (agent-shell-show-cost-indicator t)
-  :hook
-  (agent-shell-mode . iimage-mode))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Which Key?
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -1310,6 +1202,24 @@ global git config values."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (add-to-list 'auto-mode-alist '("\\.info\\'" . Info-on-current-buffer))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; AI Configs
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defgroup my-ai nil
+  "Settings for local AI and agentic integrations."
+  :group 'external)
+
+(defcustom my-ai-config-file (expand-file-name "~/.agents/emacs-config.el")
+  "Path to the external AI configuration file."
+  :type 'file
+  :group 'my-ai)
+
+(when (and my-ai-config-file
+           (file-readable-p my-ai-config-file))
+  (load my-ai-config-file 'noerror 'nomessage))
+
 
 (provide 'local)
 ;;; local.el ends here
